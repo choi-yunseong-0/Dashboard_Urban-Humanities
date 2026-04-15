@@ -1,0 +1,40 @@
+# ─── 원본 및 중간 데이터 ───────────────────
+# 원본 데이터 파일 (대용량 / 비공개)
+main data.xlsx
+*.xlsx
+*.xls
+*.csv
+
+# 원본에서 추출한 중간 처리 데이터
+dashboard_data.json
+
+# ─── macOS 시스템 파일 ────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# ─── Windows 시스템 파일 ──────────────────
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ─── 환경변수 / 시크릿 (향후 대비) ───────
+.env
+.env.*
+*.key
+*.secret
+secrets/
+
+# ─── 편집기 / IDE ─────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ─── 패키지 및 빌드 (향후 확장 대비) ──────
+node_modules/
+dist/
+build/
