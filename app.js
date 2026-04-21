@@ -13,10 +13,10 @@ const DATA = {
     {year:2024,count:30},{year:2025,count:28}
   ],
   perspectives: [
-    {name:"문화·매체", count:160, pct:29, color:"#6366f1"},
-    {name:"정책·사회", count:139, pct:25, color:"#f59e0b"},
-    {name:"공간·장소", count:131, pct:24, color:"#10b981"},
-    {name:"철학·이론", count:130, pct:23, color:"#f43f5e"}
+    {name:"문화·매체", count:160, pct:29, color:"#2563eb"},
+    {name:"정책·사회", count:139, pct:25, color:"#d97706"},
+    {name:"공간·장소", count:131, pct:24, color:"#059669"},
+    {name:"철학·이론", count:130, pct:23, color:"#e11d48"}
   ],
   perspectiveTrend: [
     {period:"~2010",     "문화·매체":27,"정책·사회":21,"공간·장소":27,"철학·이론":25},
@@ -53,7 +53,7 @@ function animateCounter(el, target, duration = 1600) {
 }
 
 function initKPI() {
-  document.querySelectorAll('.kpi-value[data-target]').forEach((el, i) => {
+  document.querySelectorAll('.kpi-item-value[data-target]').forEach((el, i) => {
     const target = parseInt(el.dataset.target, 10);
     setTimeout(() => animateCounter(el, target), i * 80);
   });
@@ -61,54 +61,90 @@ function initKPI() {
 
 /* ── Chart.js 공통 설정 ── */
 Chart.defaults.font.family = "'Pretendard', 'Inter', system-ui, sans-serif";
-Chart.defaults.color = '#8b92a8';
+Chart.defaults.color = '#64748b';
 
-const gridColor = 'rgba(255,255,255,0.05)';
-const tickColor  = '#555c72';
+const gridColor = 'rgba(15,23,42,0.06)';
+const tickColor  = '#94a3b8';
 
-/* ── 2계층: 연도별 막대 ── */
+/* ── 2계층: 연도별 막대 + 추이선 (mixed chart) ── */
 function initTrendChart() {
   const ctx = document.getElementById('chart-trend').getContext('2d');
   const labels = DATA.yearTrend.map(d => String(d.year));
   const values = DATA.yearTrend.map(d => d.count);
 
-  // 2017 최고값 강조
+  // 막대 강조 색상
+  const maxVal = Math.max(...values);
   const bgColors = values.map((v, i) => {
-    if (v === Math.max(...values)) return 'rgba(99,102,241,0.9)';
-    if (labels[i] === '2016' || labels[i] === '2020') return 'rgba(99,102,241,0.55)';
-    return 'rgba(99,102,241,0.35)';
+    if (v === maxVal)                                 return 'rgba(37,99,235,0.82)';
+    if (labels[i] === '2016' || labels[i] === '2020') return 'rgba(37,99,235,0.48)';
+    return 'rgba(59,130,246,0.22)';
   });
 
   new Chart(ctx, {
     type: 'bar',
     data: {
       labels,
-      datasets: [{
-        label: '논문 수',
-        data: values,
-        backgroundColor: bgColors,
-        borderColor: bgColors.map(c => c.replace(/[\d.]+\)$/, '1)')),
-        borderWidth: 0,
-        borderRadius: 5,
-        borderSkipped: false,
-      }]
+      datasets: [
+        {
+          type: 'bar',
+          label: '논문 수',
+          data: values,
+          backgroundColor: bgColors,
+          borderWidth: 0,
+          borderRadius: 4,
+          borderSkipped: false,
+          order: 2,
+        },
+        {
+          type: 'line',
+          label: '추이선',
+          data: values,
+          borderColor: '#1d4ed8',
+          borderWidth: 2,
+          pointRadius: values.map(v => v === maxVal ? 6 : 3),
+          pointBackgroundColor: values.map(v => v === maxVal ? '#1d4ed8' : '#fff'),
+          pointBorderColor: '#1d4ed8',
+          pointBorderWidth: 2,
+          pointHoverRadius: 6,
+          fill: false,
+          tension: 0,
+          order: 1,
+        }
+      ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { display: false },
+        legend: {
+          display: true,
+          position: 'top',
+          align: 'end',
+          labels: {
+            color: '#64748b',
+            font: { size: 10 },
+            boxWidth: 12,
+            boxHeight: 8,
+            borderRadius: 2,
+            useBorderRadius: true,
+            padding: 12,
+          }
+        },
         tooltip: {
-          backgroundColor: '#1a1e2a',
-          borderColor: 'rgba(99,102,241,0.3)',
+          backgroundColor: '#ffffff',
+          borderColor: 'rgba(37,99,235,0.2)',
           borderWidth: 1,
-          titleColor: '#f0f2f8',
-          bodyColor: '#8b92a8',
+          titleColor: '#0f172a',
+          bodyColor: '#334155',
           padding: 10,
           callbacks: {
             title: items => `${items[0].label}년`,
-            label: item => ` 논문 ${item.parsed.y}편`
-          }
+            label: item => item.datasetIndex === 0
+              ? ` 논문 ${item.parsed.y}편`
+              : null
+          },
+          filter: item => item.datasetIndex === 0
         }
       },
       scales: {
@@ -151,11 +187,11 @@ function initDonutChart() {
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: '#1a1e2a',
-          borderColor: 'rgba(255,255,255,0.1)',
+          backgroundColor: '#ffffff',
+          borderColor: 'rgba(37,99,235,0.2)',
           borderWidth: 1,
-          titleColor: '#f0f2f8',
-          bodyColor: '#8b92a8',
+          titleColor: '#0f172a',
+          bodyColor: '#334155',
           padding: 10,
           callbacks: {
             label: item => ` ${item.label}: ${item.parsed}편 (${DATA.perspectives[item.dataIndex].pct}%)`
@@ -172,19 +208,19 @@ function initStackedChart() {
   const ctx = document.getElementById('chart-stacked').getContext('2d');
   const periods = DATA.perspectiveTrend.map(d => d.period);
   const perspNames = ["문화·매체","정책·사회","공간·장소","철학·이론"];
-  const colors = ["#6366f1","#f59e0b","#10b981","#f43f5e"];
+  const colors = ["#2563eb","#d97706","#059669","#e11d48"];
 
   const datasets = perspNames.map((name, i) => ({
     label: name,
     data: DATA.perspectiveTrend.map(d => d[name]),
-    backgroundColor: colors[i] + '55',
+    backgroundColor: colors[i] + '22',
     borderColor: colors[i],
     borderWidth: 2,
     fill: true,
     tension: 0.4,
     pointRadius: 4,
     pointBackgroundColor: colors[i],
-    pointBorderColor: '#1a1e2a',
+    pointBorderColor: '#ffffff',
     pointBorderWidth: 2,
   }));
 
@@ -200,7 +236,7 @@ function initStackedChart() {
           position: 'top',
           align: 'end',
           labels: {
-            color: '#8b92a8',
+            color: '#64748b',
             font: { size: 10 },
             boxWidth: 10,
             boxHeight: 10,
@@ -212,11 +248,11 @@ function initStackedChart() {
         tooltip: {
           mode: 'index',
           intersect: false,
-          backgroundColor: '#1a1e2a',
-          borderColor: 'rgba(255,255,255,0.1)',
+          backgroundColor: '#ffffff',
+          borderColor: 'rgba(37,99,235,0.2)',
           borderWidth: 1,
-          titleColor: '#f0f2f8',
-          bodyColor: '#8b92a8',
+          titleColor: '#0f172a',
+          bodyColor: '#334155',
           padding: 10,
           callbacks: {
             label: item => ` ${item.dataset.label}: ${item.parsed.y}%`

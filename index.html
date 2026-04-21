@@ -33,52 +33,40 @@
          1계층 | KPI 요약 바
     ══════════════════════════════════════════ -->
     <section class="section kpi-section" aria-label="핵심 지표">
-      <div class="section-header">
-        <h2 class="section-title">
+      <div class="kpi-bar">
+        <div class="kpi-bar-label">
           <span class="section-num">01</span>
-          핵심 지표
-        </h2>
-        <p class="section-desc">도시인문학 연구의 전체 규모를 한눈에</p>
-      </div>
-      <div class="kpi-grid">
-        <div class="kpi-card" id="kpi-papers">
-          <div class="kpi-icon">📄</div>
-          <div class="kpi-body">
-            <div class="kpi-value" data-target="447">0</div>
-            <div class="kpi-label">총 논문 수</div>
-            <div class="kpi-sub">편</div>
-          </div>
+          <span class="kpi-bar-title">핵심 지표</span>
         </div>
-        <div class="kpi-card" id="kpi-years">
-          <div class="kpi-icon">📅</div>
-          <div class="kpi-body">
-            <div class="kpi-value" data-target="22">0</div>
-            <div class="kpi-label">연구 기간</div>
-            <div class="kpi-sub">년 (2003–2025)</div>
+        <div class="kpi-bar-items">
+          <div class="kpi-item" id="kpi-papers">
+            <span class="kpi-item-value" data-target="447">0</span>
+            <span class="kpi-item-unit">편</span>
+            <span class="kpi-item-label">총 논문 수</span>
           </div>
-        </div>
-        <div class="kpi-card" id="kpi-citations">
-          <div class="kpi-icon">🔗</div>
-          <div class="kpi-body">
-            <div class="kpi-value" data-target="1491">0</div>
-            <div class="kpi-label">총 인용 횟수</div>
-            <div class="kpi-sub">회</div>
+          <div class="kpi-divider"></div>
+          <div class="kpi-item" id="kpi-years">
+            <span class="kpi-item-value" data-target="22">0</span>
+            <span class="kpi-item-unit">년</span>
+            <span class="kpi-item-label">연구 기간 (2003–2025)</span>
           </div>
-        </div>
-        <div class="kpi-card" id="kpi-institutions">
-          <div class="kpi-icon">🏛️</div>
-          <div class="kpi-body">
-            <div class="kpi-value" data-target="137">0</div>
-            <div class="kpi-label">참여 기관 수</div>
-            <div class="kpi-sub">곳</div>
+          <div class="kpi-divider"></div>
+          <div class="kpi-item" id="kpi-citations">
+            <span class="kpi-item-value" data-target="1491">0</span>
+            <span class="kpi-item-unit">회</span>
+            <span class="kpi-item-label">총 인용 횟수</span>
           </div>
-        </div>
-        <div class="kpi-card" id="kpi-journals">
-          <div class="kpi-icon">📚</div>
-          <div class="kpi-body">
-            <div class="kpi-value" data-target="119">0</div>
-            <div class="kpi-label">수록 학술지</div>
-            <div class="kpi-sub">종 (도시인문학연구 54%)</div>
+          <div class="kpi-divider"></div>
+          <div class="kpi-item" id="kpi-institutions">
+            <span class="kpi-item-value" data-target="137">0</span>
+            <span class="kpi-item-unit">곳</span>
+            <span class="kpi-item-label">참여 기관</span>
+          </div>
+          <div class="kpi-divider"></div>
+          <div class="kpi-item" id="kpi-journals">
+            <span class="kpi-item-value" data-target="119">0</span>
+            <span class="kpi-item-unit">종</span>
+            <span class="kpi-item-label">수록 학술지</span>
           </div>
         </div>
       </div>
@@ -95,57 +83,52 @@
         </h2>
         <p class="section-desc">연도별 논문 수 추이와 시기별 핵심 키워드 변화</p>
       </div>
-      <div class="flow-grid">
-        <!-- 연도별 막대 그래프 -->
-        <div class="chart-card" id="chart-trend-card">
-          <div class="chart-card-header">
-            <span class="chart-card-title">연도별 논문 발행 수 (2009–2025)</span>
-          </div>
-          <div class="chart-wrapper">
-            <canvas id="chart-trend" aria-label="연도별 논문 수 막대 차트"></canvas>
-          </div>
+      <div class="integrated-flow-card">
+        <div class="chart-card-header">
+          <span class="chart-card-title">연도별 논문 발행 수 추이 및 시대를 이끈 키워드 (2009–2025)</span>
         </div>
-        <!-- 시기별 키워드 -->
-        <div class="chart-card" id="chart-keywords-card">
-          <div class="chart-card-header">
-            <span class="chart-card-title">5년 단위 핵심 키워드 변화</span>
+        
+        <!-- 상단: 막대그래프 100% -->
+        <div class="chart-wrapper integrated-chart">
+          <canvas id="chart-trend" aria-label="연도별 논문 수 막대 차트"></canvas>
+        </div>
+
+        <!-- 하단: X축 타임라인 키워드 -->
+        <div class="timeline-keywords">
+          <div class="timeline-slot">
+            <div class="ts-header">
+              <span class="period-badge badge-brown">2009–2015</span>
+              <span class="ts-name">개념과 장소 탐색기</span>
+            </div>
+            <div class="keyword-tags">
+              <span class="ktag burst-tag"><span class="burst-icon">↗</span> 벤야민</span>
+              <span class="ktag burst-tag"><span class="burst-icon">↗</span> 도시재생</span>
+              <span class="ktag burst-tag"><span class="burst-icon">↗</span> 공동체</span>
+            </div>
           </div>
-          <div class="period-keywords">
-            <div class="period-item" data-period="0">
-              <div class="period-label">
-                <span class="period-badge badge-brown">~2010</span>
-                <span class="period-name">이론 탐색기</span>
-              </div>
-              <div class="keyword-tags">
-                <span class="ktag">벤야민</span><span class="ktag">도시재생</span><span class="ktag">제3공간</span><span class="ktag">기호학</span><span class="ktag">도시</span><span class="ktag">인문학</span>
-              </div>
+
+          <div class="timeline-slot">
+            <div class="ts-header">
+              <span class="period-badge badge-blue">2016–2018</span>
+              <span class="ts-name">정책 주도 대폭발기</span>
             </div>
-            <div class="period-item" data-period="1">
-              <div class="period-label">
-                <span class="period-badge badge-blue">2011–2015</span>
-                <span class="period-name">개념 형성기</span>
-              </div>
-              <div class="keyword-tags">
-                <span class="ktag">도시인문학</span><span class="ktag">공동체</span><span class="ktag">중국</span><span class="ktag">장소성</span><span class="ktag">도시재생</span><span class="ktag">기본소득</span>
-              </div>
+            <div class="keyword-tags">
+              <span class="ktag burst-tag"><span class="burst-icon">↗</span> 인문도시</span>
+              <span class="ktag burst-tag"><span class="burst-icon">↗</span> 기본소득</span>
+              <span class="ktag burst-tag"><span class="burst-icon">↗</span> 대중화</span>
             </div>
-            <div class="period-item" data-period="2">
-              <div class="period-label">
-                <span class="period-badge badge-green">2016–2020</span>
-                <span class="period-name">정책·제도화기</span>
-              </div>
-              <div class="keyword-tags">
-                <span class="ktag">인문도시</span><span class="ktag">인문학 대중화</span><span class="ktag">사이보그</span><span class="ktag">공유지</span><span class="ktag">문화도시</span>
-              </div>
+          </div>
+
+          <div class="timeline-slot">
+            <div class="ts-header">
+              <span class="period-badge badge-violet">2019–2025</span>
+              <span class="ts-name">생태와 돌봄 전환기</span>
             </div>
-            <div class="period-item" data-period="3">
-              <div class="period-label">
-                <span class="period-badge badge-violet">2021–2025</span>
-                <span class="period-name">이론 전환기</span>
-              </div>
-              <div class="keyword-tags">
-                <span class="ktag">박완서</span><span class="ktag">인류세</span><span class="ktag">돌봄</span><span class="ktag">라투르</span><span class="ktag">이동성</span><span class="ktag">커먼즈</span>
-              </div>
+            <div class="keyword-tags">
+              <span class="ktag burst-tag"><span class="burst-icon">↗</span> 인류세</span>
+              <span class="ktag burst-tag"><span class="burst-icon">↗</span> 돌봄</span>
+              <span class="ktag burst-tag"><span class="burst-icon">↗</span> 박완서</span>
+              <span class="ktag burst-tag"><span class="burst-icon">↗</span> 라투르</span>
             </div>
           </div>
         </div>
