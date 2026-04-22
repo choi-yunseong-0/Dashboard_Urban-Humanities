@@ -35,6 +35,23 @@ const DATA = {
     {rank:8, year:2016, title:"혐오발언, 혐오감, 타자로서 이웃", author:"임옥희", citations:16},
     {rank:9, year:2009, title:"도시민의 문화자본과 문화적 취향분화 — 관람형 여가소비를 중심으로", author:"이승일; 장윤정", citations:16},
     {rank:10,year:2014, title:"산업유산 활용 사례를 통해 본 인문학적 도시재생 방향 모색", author:"김소라; 이병민", citations:16}
+  ],
+  regionData: [
+    { id: "seoul",    group: "서울",       provinces: ["서울특별시"], count: 306, cit: 3.8, char: "이론+정책 복합 (초집중)", tags: ["기본소득","기억","장소성","도시인문학"] },
+    { id: "gyeongi",  group: "경기/인천",  provinces: ["경기도", "인천광역시"], count: 26, cit: 4.0, char: "현상학적 접근", tags: ["생활세계","생활도시","도시인문학"] },
+    { id: "daejeon",  group: "대전/충청",  provinces: ["대전광역시", "세종특별자치시", "충청남도", "충청북도"], count: 22, cit: 3.0, char: "일상·사회 현상 중심", tags: ["MZ세대","러닝크루","코로나19"] },
+    { id: "busan",    group: "부산/경남",  provinces: ["부산광역시", "울산광역시", "경상남도"], count: 18, cit: 1.7, char: "정책+역사 중심", tags: ["인문도시지원사업","부마항쟁"] },
+    { id: "gwangju",  group: "광주/전라",  provinces: ["광주광역시", "전라남도", "전라북도"], count: 16, cit: 2.8, char: "공간+정책", tags: ["인문도시","정체성","벤야민"] },
+    { id: "gangwon",  group: "강원",       provinces: ["강원도"], count: 9, cit: 3.0, char: "공동체+생태", tags: ["커먼즈","공공성","경계동물"] },
+    { id: "daegu",    group: "대구/경북",  provinces: ["대구광역시", "경상북도"], count: 6, cit: 4.7, char: "역사보존 중심 (인용 최상위)", tags: ["도시유산","도시사","가든시티"] },
+    { id: "jeju",     group: "제주",       provinces: ["제주특별자치도"], count: 4, cit: 0.8, char: "이동·이주 테마", tags: ["모빌리티","이주","포스트모던"] }
+  ],
+  globalData: [
+    { country: "중국", count: 10 },
+    { country: "일본", count: 10 },
+    { country: "미국", count: 7 },
+    { country: "유럽", count: 7 },
+    { country: "기타", count: 3 }
   ]
 };
 
@@ -209,6 +226,11 @@ function initStackedChart() {
   const periods = DATA.perspectiveTrend.map(d => d.period);
   const perspNames = ["문화·매체","정책·사회","공간·장소","철학·이론"];
   const colors = ["#2563eb","#d97706","#059669","#e11d48"];
+  // 색약자를 위한 고유 심볼 형태 적용 (원, 둥근 사각형, 마름모, 삼각형)
+  const styles = ['circle', 'rectRounded', 'rectRot', 'triangle'];
+  // 도형 형태에 따른 픽셀 면적 차이(착시 현상)를 상쇄하기 위한 가중치 반경 배분
+  const radii = [4, 5, 5.5, 6.5]; 
+  const hoverRadii = [6, 7, 7.5, 8.5];
 
   const datasets = perspNames.map((name, i) => ({
     label: name,
@@ -218,7 +240,9 @@ function initStackedChart() {
     borderWidth: 2,
     fill: true,
     tension: 0.4,
-    pointRadius: 4,
+    pointRadius: radii[i],
+    pointHoverRadius: hoverRadii[i],
+    pointStyle: styles[i], // 각 데이터셋마다 고유한 심볼 반환
     pointBackgroundColor: colors[i],
     pointBorderColor: '#ffffff',
     pointBorderWidth: 2,
@@ -238,10 +262,8 @@ function initStackedChart() {
           labels: {
             color: '#64748b',
             font: { size: 10 },
-            boxWidth: 10,
-            boxHeight: 10,
-            borderRadius: 3,
-            useBorderRadius: true,
+            usePointStyle: true, // 범례에도 차트와 동일한 심볼 형태 적용
+            boxWidth: 8,
             padding: 10
           }
         },
@@ -298,6 +320,149 @@ function initTop10Table() {
   });
 }
 
+/* ── ECharts 지도 차트 (패널 A) ── */
+function initMapChart() {
+  const chartDom = document.getElementById('map-container');
+  if (!chartDom) return;
+  const myChart = echarts.init(chartDom);
+  try {
+    // korea.js를 통해 전역 변수 koreaGeoData로 지도 데이터가 로드됨 (CORS 문제 우회)
+    echarts.registerMap('korea', koreaGeoData);
+
+    let mapData = [];
+    DATA.regionData.forEach(region => {
+      region.provinces.forEach(prov => {
+        mapData.push({
+          name: prov,
+          value: region.count,
+          regionInfo: region
+        });
+      });
+    });
+
+    const option = {
+      tooltip: {
+        trigger: 'item',
+        className: 'map-tooltip-custom',
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        borderColor: '#e2e8f0',
+        padding: 8,
+        textStyle: { color: '#334155' },
+        transitionDuration: 0.2, // 부드러운 위치 전환 효과
+        position: function(point, params, dom, rect, size) {
+          if (!params.data || !params.data.regionInfo) return point;
+          const id = params.data.regionInfo.id;
+          
+          // 권역별 하드코딩된 레이아웃 슬롯 (백분율 또는 픽셀)
+          const posMap = {
+            'seoul': { left: '3%', top: '3%' },
+            'gyeongi': { left: '3%', top: '21%' },
+            'daejeon': { left: '3%', top: '39%' },
+            'gwangju': { left: '3%', top: '57%' },
+            'jeju': { left: '3%', top: '75%' },
+            
+            'gangwon': { right: '3%', top: '10%' },
+            'daegu': { right: '3%', top: '35%' },
+            'busan': { right: '3%', top: '60%' }
+          };
+          return posMap[id] || point;
+        },
+        formatter: function(params) {
+          if (!params.data) return params.name;
+          const info = params.data.regionInfo;
+          // 태그의 상하단 여백 최소화 및 폰트 10px로 축소
+          let tagsHtml = info.tags.map(t => `<span style="display:inline-block; margin-right:3px; margin-bottom:3px; padding:2px 5px; background:#eff6ff; color:#2563eb; border-radius:100px; font-size:10px; font-weight:600;">#${t}</span>`).join('');
+          
+          // 불필요한 줄바꿈을 줄인 가로 중심의 컴팩트 레이아웃
+          return `
+            <div style="min-width: 170px; max-width: 220px; line-height: 1.3;">
+              <div style="display:flex; align-items:baseline; margin-bottom: 3px;">
+                <span style="font-weight: 700; font-size: 13px; color: #0f172a; margin-right: 8px;">${info.group}</span>
+                <span style="font-weight: 800; font-size: 14px; color: #2563eb;">${info.count}<span style="font-size:10px; font-weight:600; margin-left:1px;">편</span></span>
+              </div>
+              <div style="font-size: 10.5px; margin-bottom: 5px; display: flex; gap: 5px; align-items: center; letter-spacing: -0.3px;">
+                <span style="color: #ea580c; font-weight: 600;">💡 ${info.char.replace(' (인용 최상위)','').replace(' (초집중)','')}</span>
+                <span style="color: #cbd5e1;">|</span>
+                <span style="color: #64748b;">인용 ${info.cit}회</span>
+              </div>
+              <div style="display:flex; flex-wrap:wrap;">${tagsHtml}</div>
+            </div>
+          `;
+        }
+      },
+      visualMap: {
+        show: false,
+        type: 'piecewise',
+        left: 'right',
+        bottom: 10,
+        pieces: [
+          { min: 100, label: '100+ (서울)' },
+          { min: 20, max: 99, label: '20~99편' },
+          { min: 15, max: 19, label: '15~19편' },
+          { min: 6, max: 14, label: '6~14편' },
+          { min: 1, max: 5, label: '1~5편 (제주 등)' }
+        ],
+        inRange: {
+          color: ['#bae6fd', '#7dd3fc', '#0ea5e9', '#0284c7', '#1e3a8a']
+        },
+        itemWidth: 12,
+        itemHeight: 12,
+        textStyle: { fontSize: 10, color: '#64748b' }
+      },
+      series: [
+        {
+          name: '지역별 퍼블리케이션',
+          type: 'map',
+          map: 'korea',
+          roam: false,
+          top: 10, bottom: 10,
+          label: { show: false },
+          itemStyle: {
+            borderColor: 'rgba(255,255,255,0.8)',
+            borderWidth: 0.8
+          },
+          emphasis: {
+            itemStyle: {
+              areaColor: '#fcd34d',
+              shadowOffsetX: 0, shadowOffsetY: 0, shadowBlur: 10,
+              borderWidth: 1.2, shadowColor: 'rgba(0, 0, 0, 0.4)'
+            },
+            label: { show: false }
+          },
+          select: { disabled: true },
+          data: mapData
+        }
+      ]
+    };
+    myChart.setOption(option);
+
+    // 권역(광주/전라 등 다중 행정구역) 동시 하이라이팅 연동
+    myChart.on('mouseover', function(params) {
+      if (params.data && params.data.regionInfo) {
+        myChart.dispatchAction({
+          type: 'highlight',
+          seriesIndex: 0,
+          name: params.data.regionInfo.provinces
+        });
+      }
+    });
+
+    myChart.on('mouseout', function(params) {
+      if (params.data && params.data.regionInfo) {
+        myChart.dispatchAction({
+          type: 'downplay',
+          seriesIndex: 0,
+          name: params.data.regionInfo.provinces
+        });
+      }
+    });
+
+    window.addEventListener('resize', () => myChart.resize());
+  } catch(e) {
+    console.error("지도를 로드할 수 없습니다:", e);
+  }
+}
+
 /* ── 스크롤 진입 시 바 애니메이션 ── */
 function initBarAnimations() {
   const observer = new IntersectionObserver((entries) => {
@@ -316,12 +481,48 @@ function initBarAnimations() {
   document.querySelectorAll('.landscape-section, .top10-section').forEach(el => observer.observe(el));
 }
 
+/* ── 국외 연구 플로팅 패널 초기화 ── */
+function initGlobalPanel() {
+  const container = document.getElementById('global-bars-container');
+  const card = document.querySelector('.global-floating-card');
+  if (!container || !card) return;
+  
+  let html = '';
+  const maxCount = 10;
+  
+  DATA.globalData.forEach(item => {
+    const widthPct = (item.count / maxCount) * 100;
+    html += `
+      <div class="gf-bar-row">
+        <div class="gf-bar-label">${item.country}</div>
+        <div class="gf-bar-track">
+          <div class="gf-bar-fill" style="width: 0%" data-width="${widthPct}%"></div>
+        </div>
+        <div class="gf-bar-value">${item.count}</div>
+      </div>
+    `;
+  });
+  
+  container.innerHTML = html;
+  
+  // 초기 렌더링 시 게이지 차오르는 애니메이션 즉시 발동
+  setTimeout(() => {
+    container.querySelectorAll('.gf-bar-fill').forEach((el, i) => {
+      setTimeout(() => {
+        el.style.width = el.getAttribute('data-width');
+      }, i * 50);
+    });
+  }, 100);
+}
+
 /* ── Init ── */
 function init() {
   initKPI();
   initTrendChart();
   initDonutChart();
   initStackedChart();
+  initMapChart();
+  initGlobalPanel();
   initTop10Table();
   initBarAnimations();
 }

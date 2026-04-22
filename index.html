@@ -9,6 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+  <script src="korea.js"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -153,134 +155,18 @@
           <div class="chart-card-header">
             <span class="chart-card-title">패널 A &nbsp;—&nbsp; 지역별 연구 방향성</span>
           </div>
-          <div class="region-list">
-            <div class="region-item" id="region-seoul">
-              <div class="region-header">
-                <div class="region-name">🏙️ 서울</div>
-                <div class="region-stats">
-                  <span class="region-count">222편</span>
-                  <span class="region-cit">평균 3.5회 인용</span>
-                </div>
+          
+          <div class="map-wrapper" style="position: relative; width: 100%;">
+            <div id="map-container" style="width: 100%; height: 420px;"></div>
+            
+            <!-- 글로벌 연구 범례 (고정형) -->
+            <div class="global-floating-card">
+              <div class="gf-content">
+                <div id="global-bars-container"></div>
               </div>
-              <div class="region-bar-wrap">
-                <div class="region-bar" style="width:0%" data-width="100%"></div>
+              <div class="gf-footer">
+                <div class="gf-subtitle">10개국 · 총 37편 연구</div>
               </div>
-              <div class="region-tags">
-                <span class="rtag">기본소득</span><span class="rtag">기억</span><span class="rtag">장소성</span><span class="rtag">도시인문학</span>
-              </div>
-              <div class="region-char">이론+정책 복합</div>
-            </div>
-            <div class="region-item" id="region-gyeongi">
-              <div class="region-header">
-                <div class="region-name">🌆 경기/인천</div>
-                <div class="region-stats">
-                  <span class="region-count">11편</span>
-                  <span class="region-cit">평균 3.2회 인용</span>
-                </div>
-              </div>
-              <div class="region-bar-wrap">
-                <div class="region-bar" style="width:0%" data-width="5%"></div>
-              </div>
-              <div class="region-tags">
-                <span class="rtag">생활세계</span><span class="rtag">생활도시</span><span class="rtag">도시인문학</span>
-              </div>
-              <div class="region-char">현상학적 접근</div>
-            </div>
-            <div class="region-item" id="region-daejeon">
-              <div class="region-header">
-                <div class="region-name">🌄 대전/충청</div>
-                <div class="region-stats">
-                  <span class="region-count">10편</span>
-                  <span class="region-cit">평균 2.6회 인용</span>
-                </div>
-              </div>
-              <div class="region-bar-wrap">
-                <div class="region-bar" style="width:0%" data-width="4.5%"></div>
-              </div>
-              <div class="region-tags">
-                <span class="rtag">MZ세대</span><span class="rtag">러닝크루</span><span class="rtag">코로나19</span>
-              </div>
-              <div class="region-char">일상·사회 현상 중심</div>
-            </div>
-            <div class="region-item" id="region-gwangju">
-              <div class="region-header">
-                <div class="region-name">🏯 광주/전라</div>
-                <div class="region-stats">
-                  <span class="region-count">13편</span>
-                  <span class="region-cit">평균 2.3회 인용</span>
-                </div>
-              </div>
-              <div class="region-bar-wrap">
-                <div class="region-bar" style="width:0%" data-width="5.7%"></div>
-              </div>
-              <div class="region-tags">
-                <span class="rtag">인문도시</span><span class="rtag">정체성</span><span class="rtag">벤야민</span>
-              </div>
-              <div class="region-char">공간+정책</div>
-            </div>
-            <div class="region-item" id="region-busan">
-              <div class="region-header">
-                <div class="region-name">⚓ 부산/경남</div>
-                <div class="region-stats">
-                  <span class="region-count">13편</span>
-                  <span class="region-cit">평균 1.2회 인용</span>
-                </div>
-              </div>
-              <div class="region-bar-wrap">
-                <div class="region-bar" style="width:0%" data-width="5.7%"></div>
-              </div>
-              <div class="region-tags">
-                <span class="rtag">인문도시지원사업</span><span class="rtag">부마항쟁</span>
-              </div>
-              <div class="region-char">정책+역사 중심</div>
-            </div>
-            <div class="region-item" id="region-daegu">
-              <div class="region-header">
-                <div class="region-name">🏔️ 대구/경북</div>
-                <div class="region-stats">
-                  <span class="region-count">6편</span>
-                  <span class="region-cit">평균 <strong>4.7회</strong> 인용</span>
-                </div>
-              </div>
-              <div class="region-bar-wrap">
-                <div class="region-bar" style="width:0%" data-width="2.7%"></div>
-              </div>
-              <div class="region-tags">
-                <span class="rtag">도시유산</span><span class="rtag">도시사</span><span class="rtag">가든시티</span>
-              </div>
-              <div class="region-char">역사보존 중심 (인용 1위)</div>
-            </div>
-            <div class="region-item" id="region-gangwon">
-              <div class="region-header">
-                <div class="region-name">🌲 강원</div>
-                <div class="region-stats">
-                  <span class="region-count">6편</span>
-                  <span class="region-cit">평균 3.2회 인용</span>
-                </div>
-              </div>
-              <div class="region-bar-wrap">
-                <div class="region-bar" style="width:0%" data-width="2.7%"></div>
-              </div>
-              <div class="region-tags">
-                <span class="rtag">커먼즈</span><span class="rtag">공공성</span><span class="rtag">경계동물</span>
-              </div>
-              <div class="region-char">공동체+생태</div>
-            </div>
-            <div class="region-item" id="region-jeju">
-              <div class="region-header">
-                <div class="region-name">🌊 제주</div>
-                <div class="region-stats">
-                  <span class="region-count">4편</span>
-                  <span class="region-cit">평균 0.8회 인용</span>
-                </div>
-              </div>
-              <div class="region-bar-wrap">
-                <div class="region-bar" style="width:0%" data-width="1.8%"></div>
-              </div>
-              <div class="region-tags">
-                <span class="rtag">모빌리티</span><span class="rtag">이주</span><span class="rtag">포스트모던</span>
-              </div>
-              <div class="region-char">이동·이주 테마</div>
             </div>
           </div>
         </div>
@@ -338,11 +224,6 @@
             <div class="chart-card-subheader">시기별 관점 비중 변화</div>
             <div class="chart-wrapper chart-wrapper-sm">
               <canvas id="chart-stacked" aria-label="시기별 관점 변화 누적 면적 차트"></canvas>
-            </div>
-            <div class="insight-box">
-              <span class="insight-tag">💡 핵심 인사이트</span>
-              2016–2020 <strong>문화·매체 + 정책·사회</strong> 쏠림 → 인문도시 사업 전성기
-              &nbsp;|&nbsp; 2021–2025 <strong>철학·이론 급부상</strong>, 정책·사회 급감 → 인류세·돌봄·라투르로 이론 전환
             </div>
           </div>
         </div>
