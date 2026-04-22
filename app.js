@@ -341,55 +341,7 @@ function initMapChart() {
     });
 
     const option = {
-      tooltip: {
-        trigger: 'item',
-        className: 'map-tooltip-custom',
-        backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        borderColor: '#e2e8f0',
-        padding: 8,
-        textStyle: { color: '#334155' },
-        transitionDuration: 0.2, // 부드러운 위치 전환 효과
-        position: function(point, params, dom, rect, size) {
-          if (!params.data || !params.data.regionInfo) return point;
-          const id = params.data.regionInfo.id;
-          
-          // 권역별 하드코딩된 레이아웃 슬롯 (백분율 또는 픽셀)
-          const posMap = {
-            'seoul': { left: '3%', top: '3%' },
-            'gyeongi': { left: '3%', top: '21%' },
-            'daejeon': { left: '3%', top: '39%' },
-            'gwangju': { left: '3%', top: '57%' },
-            'jeju': { left: '3%', top: '75%' },
-            
-            'gangwon': { right: '3%', top: '10%' },
-            'daegu': { right: '3%', top: '35%' },
-            'busan': { right: '3%', top: '60%' }
-          };
-          return posMap[id] || point;
-        },
-        formatter: function(params) {
-          if (!params.data) return params.name;
-          const info = params.data.regionInfo;
-          // 태그의 상하단 여백 최소화 및 폰트 10px로 축소
-          let tagsHtml = info.tags.map(t => `<span style="display:inline-block; margin-right:3px; margin-bottom:3px; padding:2px 5px; background:#eff6ff; color:#2563eb; border-radius:100px; font-size:10px; font-weight:600;">#${t}</span>`).join('');
-          
-          // 불필요한 줄바꿈을 줄인 가로 중심의 컴팩트 레이아웃
-          return `
-            <div style="min-width: 170px; max-width: 220px; line-height: 1.3;">
-              <div style="display:flex; align-items:baseline; margin-bottom: 3px;">
-                <span style="font-weight: 700; font-size: 13px; color: #0f172a; margin-right: 8px;">${info.group}</span>
-                <span style="font-weight: 800; font-size: 14px; color: #2563eb;">${info.count}<span style="font-size:10px; font-weight:600; margin-left:1px;">편</span></span>
-              </div>
-              <div style="font-size: 10.5px; margin-bottom: 5px; display: flex; gap: 5px; align-items: center; letter-spacing: -0.3px;">
-                <span style="color: #ea580c; font-weight: 600;">💡 ${info.char.replace(' (인용 최상위)','').replace(' (초집중)','')}</span>
-                <span style="color: #cbd5e1;">|</span>
-                <span style="color: #64748b;">인용 ${info.cit}회</span>
-              </div>
-              <div style="display:flex; flex-wrap:wrap;">${tagsHtml}</div>
-            </div>
-          `;
-        }
-      },
+      tooltip: { show: false }, // ECharts 네이티브 툴팁 비활성화 (DOM 오버레이로 대체)
       visualMap: {
         show: false,
         type: 'piecewise',

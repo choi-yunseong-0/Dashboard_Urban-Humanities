@@ -413,10 +413,34 @@ body {
   overflow: hidden;
 }
 
-/* 커스텀 ECharts 툴팁 스타일 강제 적용 보조 */
-.map-tooltip-custom {
-  font-family: 'Pretendard', sans-serif !important;
-  color: var(--text-primary);
+/* 상시 노출 정보 카드 (DOM Overlay) */
+.region-card {
+  position: absolute;
+  pointer-events: auto; /* 카드 자체에도 마우스 오버 가능 */
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  color: #334155;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center center;
+  z-index: 5;
+}
+
+/* 하이라이트 상태 (포커스) */
+.region-card.highlight {
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(37, 99, 235, 0.4);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.15);
+  transform: scale(1.05);
+  z-index: 10;
+}
+
+/* 타 지역 포커스 시 배경으로 가라앉는 이펙트 */
+#region-cards-overlay.has-hover .region-card:not(.highlight) {
+  opacity: 0.4;
+  transform: scale(0.97);
 }
 
 /* 글로벌 범례 카드 (고정형) */
