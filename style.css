@@ -99,8 +99,8 @@ body {
   max-width: 1140px;
   margin: 0 auto;
   display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
+  align-items: center;
+  justify-content: center;
   gap: 1rem;
   position: relative;
   z-index: 1;
@@ -133,6 +133,15 @@ body {
   font-size: 0.85rem;
   color: var(--text-secondary);
   font-weight: 400;
+}
+
+.header-en-title {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.03em;
+  margin-bottom: 0.35rem;
+  opacity: 0.8;
 }
 
 .header-meta {
