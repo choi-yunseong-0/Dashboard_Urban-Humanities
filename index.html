@@ -159,8 +159,8 @@
           <div class="map-wrapper" style="position: relative; width: 100%;">
             <div id="map-container" style="width: 100%; height: 420px;"></div>
             
-            <!-- 상시 노출 정보 카드 오버레이 공간 -->
-            <div id="region-cards-overlay" style="position: absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></div>
+            <!-- 상시 표출 지역 정보 카드 컨테이너 -->
+            <div id="map-cards-container"></div>
             
             <!-- 글로벌 연구 범례 (고정형) -->
             <div class="global-floating-card">
@@ -181,50 +181,53 @@
           </div>
           <div class="panel-b-inner">
             <div class="donut-area">
-              <canvas id="chart-donut" aria-label="관점 분포 도넛 차트" style="max-height:160px;"></canvas>
+              <canvas id="chart-donut" aria-label="관점 분포 도넛 차트" style="max-height:125px;"></canvas>
               <div class="donut-center-label">
                 <div class="dcl-num">447</div>
                 <div class="dcl-text">총 논문</div>
               </div>
             </div>
             <div class="perspective-legend">
-              <div class="persp-item" data-color="#6366f1">
-                <div class="persp-dot" style="background:#6366f1"></div>
+              <div class="persp-item" data-color="#d97706">
+                <div class="persp-dot" style="background:#d97706"></div>
                 <div class="persp-info">
-                  <div class="persp-name">문화·매체</div>
-                  <div class="persp-sub">박완서, 소설, 영화, 서사, SF</div>
+                  <div class="persp-name">사회·공동체</div>
+                  <div class="persp-sub">기본소득, 공동체, 돌봄, 젠더, 이주</div>
                 </div>
-                <div class="persp-pct">29%</div>
+                <div class="persp-pct">40%</div>
               </div>
-              <div class="persp-item" data-color="#f59e0b">
-                <div class="persp-dot" style="background:#f59e0b"></div>
+              <div class="persp-item" data-color="#059669">
+                <div class="persp-dot" style="background:#059669"></div>
                 <div class="persp-info">
-                  <div class="persp-name">정책·사회</div>
-                  <div class="persp-sub">기본소득, 공동체, 인문도시</div>
+                  <div class="persp-name">공간·역사·장소</div>
+                  <div class="persp-sub">도시재생, 장소성, 기념물, 역사공간</div>
                 </div>
                 <div class="persp-pct">25%</div>
               </div>
-              <div class="persp-item" data-color="#10b981">
-                <div class="persp-dot" style="background:#10b981"></div>
+              <div class="persp-item" data-color="#2563eb">
+                <div class="persp-dot" style="background:#2563eb"></div>
                 <div class="persp-info">
-                  <div class="persp-name">공간·장소</div>
-                  <div class="persp-sub">장소성, 헤테로토피아, 이동성</div>
+                  <div class="persp-name">문학·예술·문화</div>
+                  <div class="persp-sub">박완서, 소설, SF, 영화, 웹소설</div>
                 </div>
-                <div class="persp-pct">24%</div>
+                <div class="persp-pct">21%</div>
               </div>
-              <div class="persp-item" data-color="#f43f5e">
-                <div class="persp-dot" style="background:#f43f5e"></div>
+              <div class="persp-item" data-color="#e11d48">
+                <div class="persp-dot" style="background:#e11d48"></div>
                 <div class="persp-info">
                   <div class="persp-name">철학·이론</div>
-                  <div class="persp-sub">벤야민, 라투르, 인류세, 돌봄</div>
+                  <div class="persp-sub">벤야민, 라투르, 인류세, 포스트휴먼</div>
                 </div>
-                <div class="persp-pct">23%</div>
+                <div class="persp-pct">14%</div>
               </div>
             </div>
           </div>
           <!-- 시기별 변화 누적 -->
           <div class="stacked-area-wrap">
-            <div class="chart-card-subheader">시기별 관점 비중 변화</div>
+            <div class="stacked-header-row">
+              <span class="chart-card-subheader" style="margin:0; border:none; padding:0;">시기별 관점 비중 변화</span>
+              <div id="stacked-legend-html" class="stacked-legend-html"></div>
+            </div>
             <div class="chart-wrapper chart-wrapper-sm">
               <canvas id="chart-stacked" aria-label="시기별 관점 변화 누적 면적 차트"></canvas>
             </div>
