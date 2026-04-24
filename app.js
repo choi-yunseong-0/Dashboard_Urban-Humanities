@@ -164,6 +164,50 @@ function initTrendChart() {
               : null
           },
           filter: item => item.datasetIndex === 0
+        },
+        annotation: {
+          annotations: {
+            line2009: {
+              type: 'line',
+              scaleID: 'x',
+              value: '2009',
+              borderColor: 'rgba(37,99,235,0.22)',
+              borderWidth: 1,
+              borderDash: [4, 5],
+              label: {
+                display: true,
+                content: '학술지(도시인문학연구) 창간',
+                position: 'start',
+                yAdjust: 6,
+                backgroundColor: 'rgba(255,255,255,0.92)',
+                color: 'rgba(37,99,235,0.75)',
+                font: { size: 9, weight: '500' },
+                padding: { x: 5, y: 3 },
+                borderRadius: 3,
+                borderWidth: 0
+              }
+            },
+            line2014: {
+              type: 'line',
+              scaleID: 'x',
+              value: '2014',
+              borderColor: 'rgba(5,150,105,0.22)',
+              borderWidth: 1,
+              borderDash: [4, 5],
+              label: {
+                display: true,
+                content: '인문도시사업 시작',
+                position: 'start',
+                yAdjust: 6,
+                backgroundColor: 'rgba(255,255,255,0.92)',
+                color: 'rgba(5,150,105,0.75)',
+                font: { size: 9, weight: '500' },
+                padding: { x: 5, y: 3 },
+                borderRadius: 3,
+                borderWidth: 0
+              }
+            }
+          }
         }
       },
       scales: {
@@ -175,7 +219,7 @@ function initTrendChart() {
           grid: { color: gridColor },
           ticks: { color: tickColor, font: { size: 11 }, stepSize: 10 },
           beginAtZero: true,
-          max: 60
+          max: 52
         }
       },
       animation: { duration: 1000, easing: 'easeOutQuart' }
