@@ -196,7 +196,7 @@ function initTrendChart() {
               borderDash: [4, 5],
               label: {
                 display: true,
-                content: '인문도시사업 시작',
+                content: '인문도시지원사업 시작',
                 position: 'start',
                 yAdjust: 6,
                 backgroundColor: 'rgba(255,255,255,0.92)',
