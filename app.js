@@ -250,6 +250,9 @@ function initTrendChart() {
 /* ── 3계층: 도넛 차트 ── */
 function initDonutChart() {
   const ctx = document.getElementById('chart-donut').getContext('2d');
+  const pctEls = document.querySelectorAll('.persp-pct');
+  const origPcts = DATA.perspectives.map(d => d.pct + '%');
+
   new Chart(ctx, {
     type: 'doughnut',
     data: {
@@ -269,16 +272,25 @@ function initDonutChart() {
       cutout: '68%',
       plugins: {
         legend: { display: false },
-        tooltip: {
-          backgroundColor: '#ffffff',
-          borderColor: 'rgba(37,99,235,0.2)',
-          borderWidth: 1,
-          titleColor: '#0f172a',
-          bodyColor: '#334155',
-          padding: 10,
-          callbacks: {
-            label: item => ` ${item.label}: ${item.parsed}편 (${DATA.perspectives[item.dataIndex].pct}%)`
-          }
+        tooltip: { enabled: false }   // 내장 툴팁 완전 비활성화
+      },
+      onHover: (evt, elements) => {
+        if (elements.length > 0) {
+          const i = elements[0].index;
+          pctEls.forEach((el, j) => {
+            if (j === i) {
+              el.textContent = DATA.perspectives[i].count + '편';
+              el.style.color = DATA.perspectives[i].color;
+            } else {
+              el.textContent = origPcts[j];
+              el.style.color = '';
+            }
+          });
+        } else {
+          pctEls.forEach((el, j) => {
+            el.textContent = origPcts[j];
+            el.style.color = '';
+          });
         }
       },
       animation: { animateRotate: true, duration: 1000 }
