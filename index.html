@@ -184,7 +184,7 @@
             </div>
             <div class="perspective-legend">
               <div class="persp-item" data-color="#d97706">
-                <div class="persp-dot" style="background:#d97706"></div>
+                <svg width="13" height="13" viewBox="0 0 13 13" style="flex-shrink:0"><polygon points="6.5,1 12,12 1,12" fill="#d97706"/></svg>
                 <div class="persp-info">
                   <div class="persp-name">사회·공동체</div>
                   <div class="persp-sub">기본소득, 공동체, 돌봄, 젠더, 이주</div>
@@ -192,7 +192,7 @@
                 <div class="persp-pct">40%</div>
               </div>
               <div class="persp-item" data-color="#059669">
-                <div class="persp-dot" style="background:#059669"></div>
+                <svg width="13" height="13" viewBox="0 0 13 13" style="flex-shrink:0"><polygon points="6.5,1 12,6.5 6.5,12 1,6.5" fill="#059669"/></svg>
                 <div class="persp-info">
                   <div class="persp-name">공간·역사·장소</div>
                   <div class="persp-sub">도시재생, 장소성, 기념물, 역사공간</div>
@@ -200,7 +200,7 @@
                 <div class="persp-pct">25%</div>
               </div>
               <div class="persp-item" data-color="#2563eb">
-                <div class="persp-dot" style="background:#2563eb"></div>
+                <svg width="13" height="13" viewBox="0 0 13 13" style="flex-shrink:0"><rect x="1" y="1" width="11" height="11" rx="3" fill="#2563eb"/></svg>
                 <div class="persp-info">
                   <div class="persp-name">문학·예술·문화</div>
                   <div class="persp-sub">박완서, 소설, SF, 영화, 웹소설</div>
@@ -208,7 +208,7 @@
                 <div class="persp-pct">21%</div>
               </div>
               <div class="persp-item" data-color="#e11d48">
-                <div class="persp-dot" style="background:#e11d48"></div>
+                <svg width="13" height="13" viewBox="0 0 13 13" style="flex-shrink:0"><circle cx="6.5" cy="6.5" r="5.5" fill="#e11d48"/></svg>
                 <div class="persp-info">
                   <div class="persp-name">철학·이론</div>
                   <div class="persp-sub">벤야민, 라투르, 인류세, 포스트휴먼</div>
@@ -219,10 +219,6 @@
           </div>
           <!-- 시기별 변화 누적 -->
           <div class="stacked-area-wrap">
-            <div class="stacked-header-row">
-              <span class="chart-card-subheader" style="margin:0; border:none; padding:0;">시기별 관점 비중 변화</span>
-              <div id="stacked-legend-html" class="stacked-legend-html"></div>
-            </div>
             <div class="chart-wrapper chart-wrapper-sm">
               <canvas id="chart-stacked" aria-label="시기별 관점 변화 누적 면적 차트"></canvas>
             </div>
@@ -233,15 +229,15 @@
     </section>
 
     <!-- ══════════════════════════════════════════
-         4계층 | 인용 Top 10
+         4계층 | 피인용 횟수 Top 10
     ══════════════════════════════════════════ -->
-    <section class="section top10-section" aria-label="인용 Top 10 논문">
+    <section class="section top10-section" aria-label="피인용 횟수 Top 10 논문">
       <div class="section-header">
         <h2 class="section-title">
           <span class="section-num">03</span>
-          인용 Top 10 논문
+          피인용 횟수 Top 10 논문
         </h2>
-        <p class="section-desc">도시인문학 연구 분야 가장 영향력 있는 논문</p>
+        <p class="section-desc">도시인문학 연구 분야에서 가장 많이 인용된 논문</p>
       </div>
       <div class="top10-table-wrap">
         <table class="top10-table" id="top10-table">

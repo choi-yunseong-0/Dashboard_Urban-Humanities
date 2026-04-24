@@ -292,9 +292,8 @@ function initStackedChart() {
   const periods = DATA.perspectiveTrend.map(d => d.period);
   const perspNames = ["철학·이론", "문학·예술·문화", "공간·역사·장소", "사회·공동체"];
   const colors = ["#e11d48", "#2563eb", "#059669", "#d97706"];
-  // 색약자를 위한 고유 심볼 형태 적용 (원, 둥근 사각형, 마름모, 삼각형)
+  // 색약자를 위한 색상+모양 모두 상이하게
   const styles = ['circle', 'rectRounded', 'rectRot', 'triangle'];
-  // 도형 형태에 따른 픽셀 면적 차이(착시 현상)를 상쇄하기 위한 가중치 반경 배분
   const radii = [4, 5, 5.5, 6.5];
   const hoverRadii = [6, 7, 7.5, 8.5];
 
@@ -352,21 +351,6 @@ function initStackedChart() {
       animation: { duration: 1000, easing: 'easeOutQuart' }
     }
   });
-
-  // HTML 범례 주입 (소제목과 같은 행에 표시)
-  const legendEl = document.getElementById('stacked-legend-html');
-  if (legendEl) {
-    legendEl.innerHTML = perspNames.map((name, i) => {
-      const svgStyle = `width:10px; height:10px; display:inline-block; vertical-align:middle;`;
-      const symbolMap = {
-        'circle': `<svg style="${svgStyle}"><circle cx="5" cy="5" r="4" fill="${colors[i]}"/></svg>`,
-        'rectRounded': `<svg style="${svgStyle}"><rect x="1" y="1" width="8" height="8" rx="2" fill="${colors[i]}"/></svg>`,
-        'rectRot': `<svg style="${svgStyle}"><polygon points="5,1 9,5 5,9 1,5" fill="${colors[i]}"/></svg>`,
-        'triangle': `<svg style="${svgStyle}"><polygon points="5,1 9,9 1,9" fill="${colors[i]}"/></svg>`
-      };
-      return `<span class="stacked-legend-item">${symbolMap[styles[i]]}&nbsp;${name}</span>`;
-    }).join('');
-  }
 }
 
 /* ── 4계층: Top 10 테이블 ── */
