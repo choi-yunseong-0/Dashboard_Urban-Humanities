@@ -144,6 +144,15 @@ body {
   opacity: 0.8;
 }
 
+.header-datasource {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-top: 0.4rem;
+  opacity: 0.65;
+  letter-spacing: 0.01em;
+}
+
 .header-meta {
   text-align: right;
 }
