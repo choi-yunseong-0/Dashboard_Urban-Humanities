@@ -5,6 +5,8 @@
 /* ── 데이터 ── */
 const DATA = {
   yearTrend: [
+    { year: 2003, count:  1 }, { year: 2004, count:  0 }, { year: 2005, count:  0 },
+    { year: 2006, count:  2 }, { year: 2007, count:  0 }, { year: 2008, count:  1 },
     { year: 2009, count: 22 }, { year: 2010, count: 29 }, { year: 2011, count: 20 },
     { year: 2012, count: 14 }, { year: 2013, count: 18 }, { year: 2014, count: 23 },
     { year: 2015, count: 25 }, { year: 2016, count: 34 }, { year: 2017, count: 49 },
