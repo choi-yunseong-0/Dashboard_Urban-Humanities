@@ -39,8 +39,8 @@ const DATA = {
     { rank: 10, year: 2014, title: "산업유산 활용 사례를 통해 본 인문학적 도시재생 방향 모색",                       author: "김소라; 이병민", citations: 16, perspective: { name: "공간·역사·장소", color: "#059669" }, tags: ["산업유산", "도시재생", "하이라인"] },
   ],
   regionData: [
-    { id: "seoul", group: "서울", provinces: ["서울특별시"], count: 306, cit: 3.8, char: "이론+정책 복합 (초집중)", tags: ["기본소득", "기억", "장소성"] },
-    { id: "gyeongi", group: "경기/인천", provinces: ["경기도", "인천광역시"], count: 26, cit: 4.0, char: "현상학적 접근", tags: ["생활세계", "생활도시", "이동성"] },
+    { id: "seoul", group: "서울", provinces: ["서울특별시"], count: 305, cit: 3.8, char: "이론+정책 복합 (초집중)", tags: ["기본소득", "기억", "장소성"] },
+    { id: "gyeongi", group: "경기/인천", provinces: ["경기도", "인천광역시"], count: 27, cit: 4.0, char: "현상학적 접근", tags: ["생활세계", "생활도시", "이동성"] },
     { id: "daejeon", group: "대전/충청", provinces: ["대전광역시", "세종특별자치시", "충청남도", "충청북도"], count: 22, cit: 3.0, char: "일상·사회 현상", tags: ["MZ세대", "러닝크루", "코로나19"] },
     { id: "busan", group: "부산/경남", provinces: ["부산광역시", "울산광역시", "경상남도"], count: 18, cit: 1.7, char: "정책+역사", tags: ["인문도시지원사업", "부마항쟁"] },
     { id: "gwangju", group: "광주/전라", provinces: ["광주광역시", "전라남도", "전라북도"], count: 16, cit: 2.8, char: "공간+정책", tags: ["인문도시", "정체성", "벤야민"] },
