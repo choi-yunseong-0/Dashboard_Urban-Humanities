@@ -206,6 +206,26 @@ function initTrendChart() {
                 borderRadius: 3,
                 borderWidth: 0
               }
+            },
+            line2019: {
+              type: 'line',
+              scaleID: 'x',
+              value: '2019',
+              borderColor: 'rgba(220,38,38,0.22)',
+              borderWidth: 1,
+              borderDash: [4, 5],
+              label: {
+                display: true,
+                content: 'COVID-19 팬데믹',
+                position: 'start',
+                yAdjust: 6,
+                backgroundColor: 'rgba(255,255,255,0.92)',
+                color: 'rgba(220,38,38,0.75)',
+                font: { size: 9, weight: '500' },
+                padding: { x: 5, y: 3 },
+                borderRadius: 3,
+                borderWidth: 0
+              }
             }
           }
         }
