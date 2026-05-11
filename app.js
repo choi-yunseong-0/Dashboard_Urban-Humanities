@@ -27,33 +27,34 @@ const DATA = {
     { period: "2021–2025", "철학·이론": 18, "문학·예술·문화": 24, "공간·역사·장소": 21, "사회·공동체": 37 }
   ],
   top10: [
-    { rank: 1,  year: 2011, title: "미셸 푸코의 '헤테로토피아' — 초기 공간 개념에 대한 비판적 검토",                  author: "허경",          citations: 66, perspective: { name: "철학·이론",         color: "#e11d48" }, tags: ["헤테로토피아", "공간 이론", "문화지리학"] },
-    { rank: 2,  year: 2014, title: "르페브르의 변증법적 공간 이론과 공간정치 — 「공간의 생산」을 중심으로",           author: "신승원",        citations: 27, perspective: { name: "철학·이론",         color: "#e11d48" }, tags: ["공간의 생산", "변증법", "공간정치"] },
-    { rank: 3,  year: 2020, title: "한국 SF와 페미니즘의 동시대적 조우 — 김보영·듀나 작품론",                        author: "강은교; 김은주", citations: 21, perspective: { name: "문학·예술·문화",  color: "#2563eb" }, tags: ["페미니즘 SF", "잠재성", "동시대성"] },
-    { rank: 4,  year: 2020, title: "한국 웹소설 판타지의 형식적 갱신과 사회적 성찰 — 책빙의물을 중심으로",           author: "유인혁",        citations: 20, perspective: { name: "문학·예술·문화",  color: "#2563eb" }, tags: ["웹소설", "장르 교차", "메타서사"] },
-    { rank: 5,  year: 2010, title: "발터 벤야민과 도시경험 — 벤야민의 도시인문학 방법론에 대한 고찰",               author: "홍준기",        citations: 18, perspective: { name: "철학·이론",         color: "#e11d48" }, tags: ["아우라 상실", "충격 경험", "도시인문학 방법론"] },
-    { rank: 6,  year: 2014, title: "창조도시 논의의 비판적 성찰과 과제",                                             author: "남기범",        citations: 18, perspective: { name: "공간·역사·장소", color: "#059669" }, tags: ["창조도시 비판", "도시정책", "창조성"] },
+    { rank: 1,  year: 2011, title: "미셸 푸코의 '헤테로토피아' — 초기 공간 개념에 대한 비판적 검토",                  author: "허경",          citations: 68, perspective: { name: "철학·이론",         color: "#e11d48" }, tags: ["헤테로토피아", "공간 이론", "문화지리학"] },
+    { rank: 2,  year: 2014, title: "르페브르의 변증법적 공간 이론과 공간정치 — 「공간의 생산」을 중심으로",           author: "신승원",        citations: 28, perspective: { name: "철학·이론",         color: "#e11d48" }, tags: ["공간의 생산", "변증법", "공간정치"] },
+    { rank: 3,  year: 2020, title: "한국 SF와 페미니즘의 동시대적 조우 — 김보영·듀나 작품론",                        author: "강은교; 김은주", citations: 24, perspective: { name: "문학·예술·문화",  color: "#2563eb" }, tags: ["페미니즘 SF", "잠재성", "동시대성"] },
+    { rank: 4,  year: 2020, title: "한국 웹소설 판타지의 형식적 갱신과 사회적 성찰 — 책빙의물을 중심으로",           author: "유인혁",        citations: 22, perspective: { name: "문학·예술·문화",  color: "#2563eb" }, tags: ["웹소설", "장르 교차", "메타서사"] },
+    { rank: 5,  year: 2014, title: "창조도시 논의의 비판적 성찰과 과제",                                             author: "남기범",        citations: 19, perspective: { name: "공간·역사·장소", color: "#059669" }, tags: ["창조도시 비판", "도시정책", "창조성"] },
+    { rank: 6,  year: 2012, title: "문화도시의 개념과 문화도시화를 위한 서울시 전략의 반성적 고찰",                    author: "라도삼",        citations: 18, perspective: { name: "문학·예술·문화",  color: "#2563eb" }, tags: ["문화도시", "서울시 전략", "도시문화"] },
     { rank: 7,  year: 2017, title: "빅데이터가 던지는 도전적인 철학적 문제들에 대한 고찰",                           author: "이중원",        citations: 18, perspective: { name: "철학·이론",         color: "#e11d48" }, tags: ["빅데이터", "정보 존재론", "데이터 윤리"] },
-    { rank: 8,  year: 2016, title: "혐오발언, 혐오감, 타자로서 이웃",                                                author: "임옥희",        citations: 16, perspective: { name: "사회·공동체",       color: "#d97706" }, tags: ["혐오발언", "주권적 주체", "타자성"] },
-    { rank: 9,  year: 2009, title: "도시민의 문화자본과 문화적 취향분화 — 관람형 여가소비를 중심으로",               author: "이승일; 장윤정", citations: 16, perspective: { name: "사회·공동체",       color: "#d97706" }, tags: ["문화자본", "취향분화", "부르디외"] },
+    { rank: 8,  year: 2010, title: "발터 벤야민과 도시경험 — 벤야민의 도시인문학 방법론에 대한 고찰",               author: "홍준기",        citations: 18, perspective: { name: "철학·이론",         color: "#e11d48" }, tags: ["아우라 상실", "충격 경험", "도시인문학 방법론"] },
+    { rank: 9,  year: 2020, title: "언택트 시대 넷플릭스와 영화: 퀄리티 콘텐츠로서의 영화와 극장의 의미 변화",           author: "홍남희",        citations: 17, perspective: { name: "문학·예술·문화",  color: "#2563eb" }, tags: ["넷플릭스", "언택트", "플랫폼"] },
     { rank: 10, year: 2014, title: "산업유산 활용 사례를 통해 본 인문학적 도시재생 방향 모색",                       author: "김소라; 이병민", citations: 16, perspective: { name: "공간·역사·장소", color: "#059669" }, tags: ["산업유산", "도시재생", "산책자(플라뇌르)"] },
   ],
   regionData: [
-    { id: "seoul", group: "서울", provinces: ["서울특별시"], count: 305, cit: 3.8, char: "이론+정책 복합 (초집중)", tags: ["기본소득", "기억", "장소성"] },
-    { id: "gyeongi", group: "경기/인천", provinces: ["경기도", "인천광역시"], count: 27, cit: 4.0, char: "현상학적 접근", tags: ["생활세계", "생활도시", "이동성"] },
-    { id: "daejeon", group: "대전/충청", provinces: ["대전광역시", "세종특별자치시", "충청남도", "충청북도"], count: 22, cit: 3.0, char: "일상·사회 현상", tags: ["MZ세대", "러닝크루", "코로나19"] },
-    { id: "busan", group: "부산/경남", provinces: ["부산광역시", "울산광역시", "경상남도"], count: 18, cit: 1.7, char: "정책+역사", tags: ["인문도시지원사업", "부마항쟁"] },
-    { id: "gwangju", group: "광주/전라", provinces: ["광주광역시", "전라남도", "전라북도"], count: 16, cit: 2.8, char: "공간+정책", tags: ["인문도시", "정체성", "벤야민"] },
-    { id: "gangwon", group: "강원", provinces: ["강원도"], count: 9, cit: 3.0, char: "공동체+생태", tags: ["커먼즈", "공공성", "경계동물"] },
-    { id: "daegu", group: "대구/경북", provinces: ["대구광역시", "경상북도"], count: 6, cit: 4.7, char: "역사보존 (인용 최상위)", tags: ["도시유산", "도시사", "가든시티"] },
-    { id: "jeju", group: "제주", provinces: ["제주특별자치도"], count: 4, cit: 0.8, char: "이동·이주 테마", tags: ["모빌리티", "이주", "포스트모던"] }
+    { id: "seoul", group: "서울", provinces: ["서울특별시"], count: 316, cit: 3.8, char: "이론+정책 복합 (초집중)", tags: ["기본소득", "도시재생", "박완서"] },
+    { id: "gyeongi", group: "경기/인천", provinces: ["경기도", "인천광역시"], count: 22, cit: 4.0, char: "현상학·텍스트 중심", tags: ["생활세계", "텍스트", "생활권계획"] },
+    { id: "daejeon", group: "대전/충청", provinces: ["대전광역시", "세종특별자치시", "충청남도", "충청북도"], count: 19, cit: 3.0, char: "일상·사회 현상", tags: ["MZ세대", "러닝크루", "코로나19"] },
+    { id: "busan", group: "부산/경남", provinces: ["부산광역시", "울산광역시", "경상남도"], count: 18, cit: 1.7, char: "지역성·정책", tags: ["지역성", "인문도시지원사업", "부마항쟁"] },
+    { id: "gwangju", group: "광주/전라", provinces: ["광주광역시", "전라남도", "전라북도"], count: 16, cit: 2.8, char: "정체성·공간 담론", tags: ["인문도시", "정체성", "벤야민"] },
+    { id: "gangwon", group: "강원", provinces: ["강원도"], count: 9, cit: 3.0, char: "공동체·전후 문학", tags: ["커먼즈", "공공성", "전후 문학"] },
+    { id: "daegu", group: "대구/경북", provinces: ["대구광역시", "경상북도"], count: 5, cit: 4.7, char: "도시사·유산 보존", tags: ["도시유산", "도시사", "가든 시티"] },
+    { id: "jeju", group: "제주", provinces: ["제주특별자치도"], count: 4, cit: 0.8, char: "이동·이주 테마", tags: ["모빌리티", "이주", "포스트 팬데믹"] }
   ],
   globalData: [
-    { country: "중국", count: 10 },
     { country: "일본", count: 10 },
-    { country: "미국", count: 7 },
-    { country: "유럽", count: 7 },
-    { country: "기타", count: 3 }
+    { country: "중국", count: 9 },
+    { country: "미국", count: 4 },
+    { country: "독일", count: 3 },
+    { country: "영국", count: 2 },
+    { country: "기타", count: 6 }
   ]
 };
 
