@@ -1705,3 +1705,283 @@ body {
   color: var(--text-muted);
   opacity: 0.7;
 }
+
+/* ══════════════════════════════════════════
+   담론의 진화 상세 페이지
+══════════════════════════════════════════ */
+.discourse-body {
+  grid-template-columns: 1fr; /* 세로 단일 컬럼 */
+  max-width: 960px;
+}
+
+.discourse-stream-card {
+  width: 100%;
+}
+
+.discourse-author-card {
+  width: 100%;
+}
+
+/* 스트림그래프 커스텀 범례 */
+.stream-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin-top: 0.8rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--border);
+}
+.stream-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+.stream-legend-dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* 신규/기존 연구자 안내 노트 */
+.author-entry-note {
+  margin-top: 1rem;
+  padding: 0.7rem 1rem;
+  background: var(--accent-lt);
+  border: 1px solid rgba(37,99,235,0.15);
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+.author-entry-note strong {
+  color: var(--text-primary);
+}
+
+/* ══════════════════════════════════════════
+   스트림 좌우 패널 레이아웃
+══════════════════════════════════════════ */
+.stream-panel {
+  display: flex;
+  gap: 1.2rem;
+  align-items: flex-start;
+}
+
+/* 좌: 키워드 선택기 */
+.stream-selector {
+  width: 150px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stream-selector-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.stream-select-all {
+  font-size: 0.64rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.1rem 0.3rem;
+  border-radius: 4px;
+  font-family: var(--font-base);
+  transition: background 0.15s;
+}
+.stream-select-all:hover {
+  background: var(--accent-lt);
+}
+
+.stream-keyword-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+/* 키워드 토글 칩 */
+.stream-kw-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 100px;
+  border: 1px solid #e2e8f0;
+  background: transparent;
+  cursor: pointer;
+  font-family: var(--font-base);
+  transition: all 0.18s;
+  text-align: left;
+  width: 100%;
+}
+.stream-kw-chip:hover {
+  border-color: #94a3b8;
+  background: #f8fafc;
+}
+.stream-kw-chip.active {
+  font-weight: 600;
+}
+.skc-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.skc-name {
+  font-size: 0.74rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+.stream-kw-chip.active .skc-name {
+  color: var(--text-primary);
+}
+
+/* 우: 차트 영역 */
+.stream-chart-area {
+  flex: 1;
+  min-width: 0;
+}
+
+/* 키워드 카운트 뱃지 */
+.stream-kw-count {
+  font-size: 0.6rem;
+  color: var(--accent);
+  background: var(--accent-lt);
+  padding: 0.1rem 0.45rem;
+  border-radius: 100px;
+  font-weight: 600;
+}
+
+/* 검색창 */
+.stream-search-wrap {
+  position: relative;
+  margin-bottom: 0.5rem;
+}
+.stream-search-input {
+  width: 100%;
+  padding: 0.42rem 0.7rem 0.42rem 1.9rem;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  font-size: 0.72rem;
+  font-family: var(--font-base);
+  color: var(--text-primary);
+  background: var(--bg-card-alt);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.stream-search-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.1);
+  background: #fff;
+}
+.stream-search-icon {
+  position: absolute;
+  left: 0.55rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.72rem;
+  pointer-events: none;
+}
+
+/* 검색 결과 / 확장 목록 공통 */
+.stream-search-results,
+.stream-expanded-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  max-height: 260px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+.stream-search-results::-webkit-scrollbar,
+.stream-expanded-list::-webkit-scrollbar { width: 4px; }
+.stream-search-results::-webkit-scrollbar-thumb,
+.stream-expanded-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1; border-radius: 2px;
+}
+
+.stream-no-result {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding: 1rem 0;
+}
+
+/* 고정 목록 */
+.stream-fixed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+/* 펼치기 버튼 */
+.stream-expand-btn {
+  width: 100%;
+  margin-top: 0.3rem;
+  padding: 0.35rem 0;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  background: none;
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: var(--font-base);
+  transition: background 0.15s, color 0.15s;
+}
+.stream-expand-btn:hover {
+  background: var(--bg-card-alt);
+  color: var(--accent);
+}
+
+/* 칩에 빈도 수 표시 */
+.skc-count {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  background: #f1f5f9;
+  padding: 0.05rem 0.35rem;
+  border-radius: 100px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+.stream-kw-chip.active .skc-count {
+  background: rgba(255,255,255,0.6);
+}
+
+/* 셀렉터 스크롤 가능하도록 */
+.stream-selector {
+  max-height: 460px;
+  overflow-y: auto;
+}
+.stream-selector::-webkit-scrollbar { width: 4px; }
+.stream-selector::-webkit-scrollbar-thumb {
+  background: #cbd5e1; border-radius: 2px;
+}
+
+/* 전체 키워드 스크롤 목록 */
+.stream-all-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  overflow-y: auto;
+  max-height: 380px;
+  padding-right: 3px;
+}
+.stream-all-list::-webkit-scrollbar { width: 4px; }
+.stream-all-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1; border-radius: 2px;
+}

@@ -12,6 +12,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3/dist/chartjs-plugin-annotation.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
   <script src="korea.js"></script>
+  <script src="keyword_data.js"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -45,14 +46,14 @@
         </button>
 
         <!-- 추후 페이지 토글 (coming soon) -->
-        <div class="detail-nav-btn detail-nav-btn-soon">
+        <button class="detail-nav-btn" onclick="showDetailView('discourse')" aria-label="담론의 진화 페이지로">
           <span class="dnb-icon">📈</span>
           <div class="dnb-text">
             <div class="dnb-name">담론의 진화</div>
             <div class="dnb-sub">키워드는 어떻게 변했는가?</div>
           </div>
-          <span class="dnb-soon">soon</span>
-        </div>
+          <span class="dnb-arrow">›</span>
+        </button>
 
         <div class="detail-nav-btn detail-nav-btn-soon">
           <span class="dnb-icon">🗺️</span>
@@ -419,6 +420,74 @@
     </div><!-- /detail-body -->
   </div><!-- /detail-kpi -->
 
+  <!-- ══════════════════════════════════════════
+       상세 뷰 | 담론의 진화 (연구 흐름 클릭)
+  ══════════════════════════════════════════ -->
+  <div id="detail-discourse" class="detail-view hidden">
+    <div class="detail-header">
+      <button class="back-btn" onclick="hideDetailView()">
+        <span class="back-arrow">←</span> 대시보드 홈으로
+      </button>
+      <div class="detail-header-title">
+        <span class="detail-badge">DEEP DIVE</span>
+        <h2>담론의 진화 — 키워드는 어떻게 변했는가?</h2>
+        <p>KCI 논문 447편의 저자 키워드 데이터를 기반으로 도시인문학 담론의 생애주기를 추적합니다</p>
+      </div>
+    </div>
+
+    <div class="detail-body discourse-body">
+
+      <!-- 차트 1: 키워드 생멸 궤적 (ECharts 스트림그래프) -->
+      <div class="detail-card discourse-stream-card">
+        <div class="detail-card-header">
+          <h3>📈 핵심 키워드 생멸 궤적 (2009–2025)</h3>
+          <p>좌측에서 키워드를 선택하면 해당 키워드의 연도별 빈도 추이가 우측 그래프에 표시됩니다</p>
+        </div>
+        <div class="stream-panel">
+          <!-- 좌: 키워드 선택 목록 -->
+          <div class="stream-selector" id="stream-selector">
+            <div class="stream-selector-header">
+              <span>키워드 탐색</span>
+              <span class="stream-kw-count" id="stream-kw-count">–</span>
+            </div>
+
+            <!-- 검색창 -->
+            <div class="stream-search-wrap">
+              <input type="text" id="stream-search"
+                     class="stream-search-input"
+                     placeholder="키워드 검색..."
+                     oninput="onStreamSearch(this.value)"
+                     autocomplete="off" />
+              <span class="stream-search-icon">🔍</span>
+            </div>
+
+            <!-- 전체 스크롤 목록 -->
+            <div class="stream-all-list" id="stream-all-list">
+              <!-- JS로 채움 -->
+            </div>
+          </div>
+          <!-- 우: 차트 영역 -->
+          <div class="stream-chart-area">
+            <div id="chart-stream" style="width:100%; height:380px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 차트 2: 신규 진입 vs 기존 연구자 -->
+      <div class="detail-card discourse-author-card">
+        <div class="detail-card-header">
+          <h3>👥 신규 진입 vs 기존 연구자 (연도별)</h3>
+          <p>매년 처음 등장한 연구자(신규)와 이전에도 발표한 연구자(기존)의 비율</p>
+        </div>
+        <div id="chart-author-entry" style="width:100%; height:320px;"></div>
+        <div class="author-entry-note">
+          💡 <strong>신규 진입자가 압도적으로 많은 해</strong>는 외부 유입(정책 사업 등)이 강했음을 시사합니다.
+          <strong>기존 연구자 비율이 높아지는 해</strong>는 분야의 자생적 성숙기를 나타냅니다.
+        </div>
+      </div>
+
+    </div><!-- /discourse-body -->
+  </div><!-- /detail-discourse -->
 
   <script src="app.js"></script>
 </body>

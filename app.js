@@ -676,6 +676,7 @@ function showDetailView(viewId) {
     detailEl.classList.remove('hidden');
     window.scrollTo({ top: 0, behavior: 'smooth' });
     if (viewId === 'kpi') { initEcosystemDonut(); initAuthorBarTable(); }
+    if (viewId === 'discourse') { initStreamChart(); initAuthorEntryChart(); }
   }
 }
 
@@ -799,6 +800,314 @@ function initEcosystemDonut() {
           bodyFont: { family: "'Pretendard', 'Inter', sans-serif", size: 12 },
           padding: 12,
           boxPadding: 4
+        }
+      }
+    }
+  });
+}
+
+/* ══════════════════════════════════════════
+   담론의 진화 | 1. 키워드 스트림그래프 (ECharts)
+══════════════════════════════════════════ */
+const DISCOURSE_DATA = {
+  years: [2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025],
+  keywords: {
+    '인문도시':  [0,0,0,0,0,1,0,2,1,2,2,4,2,0,0,0,1],
+    '기본소득':  [0,2,1,0,0,0,3,1,6,0,0,0,0,0,0,0,0],
+    '도시재생':  [1,2,0,0,0,2,2,0,0,0,1,0,1,1,0,0,0],
+    '공동체':    [0,0,0,0,0,0,3,0,1,0,0,1,1,2,0,0,0],
+    '박완서':    [0,0,0,0,0,0,0,0,0,0,0,1,2,2,1,0,1],
+    '벤야민':    [0,3,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0],
+    '장소성':    [0,0,0,0,0,2,0,0,1,0,0,0,0,1,1,1,0],
+    '돌봄':      [0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,2,2],
+    '공유지':    [0,0,0,0,0,0,1,1,3,0,0,0,0,0,0,0,0],
+    '기억':      [0,1,0,0,0,0,0,0,0,1,1,0,1,3,0,1,0],
+    '정체성':    [0,1,0,0,1,0,0,0,1,0,1,1,1,0,1,1,0],
+    '도시화':    [0,1,0,0,1,0,0,0,1,0,0,0,1,0,1,0,0],
+  },
+  colors: ['#3b82f6','#f59e0b','#10b981','#8b5cf6','#ef4444',
+           '#f97316','#06b6d4','#ec4899','#84cc16','#6366f1','#14b8a6','#a78bfa']
+};
+
+let streamChart = null;
+let authorEntryChart = null;
+
+// 선택된 키워드 상태 관리
+let selectedKeyword = null; // 라디오 방식
+let kwExpanded = false;
+
+function getKwTotal(kw) {
+  if (!window.KW_DATA) return 0;
+  return (window.KW_DATA.keywords[kw] || []).reduce((a, b) => a + b, 0);
+}
+
+function initStreamChart() {
+  const el = document.getElementById('chart-stream');
+  if (!el) return;
+  if (streamChart) { streamChart.dispose(); }
+  streamChart = echarts.init(el);
+  selectedKeyword = null;
+  renderKeywordSelector();
+  renderStreamChart();
+}
+
+function renderKeywordSelector() {
+  const allListEl = document.getElementById('stream-all-list');
+  const countEl = document.getElementById('stream-kw-count');
+  if (!allListEl) return;
+
+  // KW_DATA가 없으면 DISCOURSE_DATA 폴백
+  const kwSource = window.KW_DATA ? window.KW_DATA.keywords : DISCOURSE_DATA.keywords;
+  const kwNames = Object.keys(kwSource);
+
+  if (countEl) countEl.textContent = `총 ${kwNames.length.toLocaleString()}개`;
+
+  allListEl.innerHTML = kwNames.map((kw, i) => {
+    const color = DISCOURSE_DATA.colors[i % DISCOURSE_DATA.colors.length];
+    const total = (kwSource[kw] || []).reduce((a, b) => a + b, 0);
+    const isOn = selectedKeyword === kw;
+    return `<button class="stream-kw-chip ${isOn ? 'active' : ''}"
+      data-kw="${kw}" data-idx="${i}"
+      onclick="selectKeyword('${kw.replace(/'/g, "\\'")}', ${i})"
+      style="${isOn ? `border-color:${color};background:${color}18;` : ''}">
+      <span class="skc-dot" style="background:${color}"></span>
+      <span class="skc-name">${kw}</span>
+      <span class="skc-count">${total}</span>
+    </button>`;
+  }).join('');
+}
+
+function onStreamSearch(query) {
+  const allListEl = document.getElementById('stream-all-list');
+  if (!allListEl) return;
+  const q = query.trim();
+  const kwSource = window.KW_DATA ? window.KW_DATA.keywords : DISCOURSE_DATA.keywords;
+  const kwNames = Object.keys(kwSource);
+
+  // 검색어 없으면 전체 표시
+  const filtered = q ? kwNames.filter(kw => kw.includes(q)) : kwNames;
+
+  const countEl = document.getElementById('stream-kw-count');
+  if (countEl) countEl.textContent = q
+    ? `${filtered.length}개 검색됨`
+    : `총 ${kwNames.length.toLocaleString()}개`;
+
+  allListEl.innerHTML = filtered.map((kw, i) => {
+    const color = DISCOURSE_DATA.colors[i % DISCOURSE_DATA.colors.length];
+    const total = (kwSource[kw] || []).reduce((a, b) => a + b, 0);
+    const isOn = selectedKeyword === kw;
+    return `<button class="stream-kw-chip ${isOn ? 'active' : ''}"
+      data-kw="${kw}" data-idx="${i}"
+      onclick="selectKeyword('${kw.replace(/'/g, "\\'")}', ${i})"
+      style="${isOn ? `border-color:${color};background:${color}18;` : ''}">
+      <span class="skc-dot" style="background:${color}"></span>
+      <span class="skc-name">${kw}</span>
+      <span class="skc-count">${total}</span>
+    </button>`;
+  }).join('');
+
+  if (!filtered.length) {
+    allListEl.innerHTML = `<div class="stream-no-result">검색 결과 없음</div>`;
+  }
+}
+
+function selectKeyword(kw, colorIdx) {
+  selectedKeyword = selectedKeyword === kw ? null : kw;
+  document.querySelectorAll('.stream-kw-chip').forEach(btn => {
+    const btnKw = btn.dataset.kw;
+    const idx = parseInt(btn.dataset.idx || 0);
+    const color = DISCOURSE_DATA.colors[idx % DISCOURSE_DATA.colors.length];
+    const isOn = selectedKeyword === btnKw;
+    btn.classList.toggle('active', isOn);
+    btn.style.cssText = isOn ? `border-color:${color};background:${color}18;` : '';
+  });
+  renderStreamChart();
+}
+
+function renderStreamChart() {
+  if (!streamChart) return;
+
+  // 선택된 키워드가 없을 때 빈 상태 표시
+  if (!selectedKeyword) {
+    streamChart.setOption({
+      graphic: [{
+        type: 'group',
+        left: 'center',
+        top: 'middle',
+        children: [
+          {
+            type: 'text',
+            style: {
+              text: '← 좌측에서 키워드를 선택하세요',
+              fill: '#94a3b8',
+              font: "16px 'Pretendard', sans-serif"
+            }
+          }
+        ]
+      }],
+      series: []
+    }, true);
+    return;
+  }
+
+  // 데이터 소스: KW_DATA 우선, 폴백은 DISCOURSE_DATA
+  const kwSource = (window.KW_DATA && window.KW_DATA.keywords[selectedKeyword])
+    ? window.KW_DATA.keywords
+    : DISCOURSE_DATA.keywords;
+  const yearSource = (window.KW_DATA) ? window.KW_DATA.years : DISCOURSE_DATA.years;
+
+  const allKwNames = Object.keys(kwSource);
+  const i = allKwNames.indexOf(selectedKeyword);
+  const colorIdx = i >= 0 ? i : 0;
+  const color = DISCOURSE_DATA.colors[colorIdx % DISCOURSE_DATA.colors.length];
+  const data = kwSource[selectedKeyword] || [];
+
+  streamChart.setOption({
+    graphic: [], // 안내 텍스트 제거
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'line' },
+      textStyle: { fontFamily: "'Pretendard', sans-serif", fontSize: 12 },
+      formatter(params) {
+        const p = params[0];
+        return `<div style="font-weight:700;margin-bottom:4px">${p.axisValue}년</div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color}"></span>
+            <span>${selectedKeyword}</span>
+            <span style="font-weight:700;margin-left:8px">${p.value}회</span>
+          </div>`;
+      }
+    },
+    legend: { show: false },
+    grid: { left: 40, right: 20, top: 30, bottom: 40 },
+    xAxis: {
+      type: 'category',
+      data: yearSource,
+      boundaryGap: false,
+      axisLine: { lineStyle: { color: '#cbd5e1' } },
+      axisLabel: { color: '#94a3b8', fontSize: 11 }
+    },
+    yAxis: {
+      type: 'value',
+      minInterval: 1,
+      min: 0,
+      max: 6,
+      splitLine: { lineStyle: { color: '#f1f5f9' } },
+      axisLabel: { color: '#94a3b8', fontSize: 11 }
+    },
+    series: [{
+      name: selectedKeyword,
+      type: 'line',
+      smooth: true,
+      data,
+      itemStyle: { color },
+      lineStyle: { color, width: 2.5 },
+      areaStyle: {
+        color: {
+          type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
+          colorStops: [
+            { offset: 0, color: color + '55' },
+            { offset: 1, color: color + '08' }
+          ]
+        }
+      },
+      symbol: 'circle',
+      symbolSize: 6,
+      emphasis: {
+        scale: true,
+        itemStyle: { borderWidth: 2, borderColor: '#fff', shadowBlur: 6, shadowColor: color + '88' }
+      },
+      markPoint: {
+        data: [{ type: 'max', name: '최고' }],
+        itemStyle: { color },
+        label: { fontSize: 10, color: '#fff' }
+      }
+    }]
+  }, true);
+}
+
+
+/* ══════════════════════════════════════════
+   담론의 진화 | 2. 신규 진입 vs 기존 연구자 (Chart.js)
+══════════════════════════════════════════ */
+const AUTHOR_ENTRY_DATA = [
+  { year:2009, new:21, returning:1 },
+  { year:2010, new:23, returning:5 },
+  { year:2011, new:12, returning:8 },
+  { year:2012, new:10, returning:4 },
+  { year:2013, new:15, returning:3 },
+  { year:2014, new:22, returning:2 },
+  { year:2015, new:18, returning:3 },
+  { year:2016, new:23, returning:7 },
+  { year:2017, new:14, returning:11 },
+  { year:2018, new:19, returning:4 },
+  { year:2019, new:19, returning:6 },
+  { year:2020, new:21, returning:7 },
+  { year:2021, new:18, returning:9 },
+  { year:2022, new:7,  returning:9 },
+  { year:2023, new:13, returning:11 },
+  { year:2024, new:15, returning:11 },
+  { year:2025, new:25, returning:6 },
+];
+
+function initAuthorEntryChart() {
+  const canvas = document.getElementById('chart-author-entry');
+  if (!canvas) return;
+  if (authorEntryChart) { authorEntryChart.destroy(); authorEntryChart = null; }
+
+  const ctx = canvas.getContext('2d');
+  authorEntryChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: AUTHOR_ENTRY_DATA.map(d => d.year),
+      datasets: [
+        {
+          label: '신규 진입 연구자',
+          data: AUTHOR_ENTRY_DATA.map(d => d.new),
+          backgroundColor: 'rgba(37,99,235,0.75)',
+          borderRadius: 4,
+          stack: 'authors'
+        },
+        {
+          label: '기존 복귀 연구자',
+          data: AUTHOR_ENTRY_DATA.map(d => d.returning),
+          backgroundColor: 'rgba(16,185,129,0.75)',
+          borderRadius: 4,
+          stack: 'authors'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 800 },
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: { font: { family: "'Pretendard', sans-serif", size: 12 }, padding: 16 }
+        },
+        tooltip: {
+          callbacks: {
+            afterBody: (ctx) => {
+              const idx = ctx[0].dataIndex;
+              const d = AUTHOR_ENTRY_DATA[idx];
+              const total = d.new + d.returning;
+              const newPct = Math.round((d.new / total) * 100);
+              return [`신규 비율: ${newPct}% — ${newPct > 70 ? '외부 유입 강세' : '자생적 성숙기'}`];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          stacked: true,
+          grid: { display: false },
+          ticks: { color: '#94a3b8', font: { size: 11 } }
+        },
+        y: {
+          stacked: true,
+          grid: { color: 'rgba(15,23,42,0.05)' },
+          ticks: { color: '#94a3b8', font: { size: 11 } }
         }
       }
     }
