@@ -661,6 +661,148 @@ function init() {
   initGlobalPanel();
   initTop10Table();
   initBarAnimations();
+  initCoreAuthorList();
+}
+
+/* ══════════════════════════════════════════
+   화면 전환 (홈 ↔ 상세 뷰)
+══════════════════════════════════════════ */
+function showDetailView(viewId) {
+  document.getElementById('home-header').style.display = 'none';
+  document.getElementById('home-layout').style.display = 'none';
+
+  const detailEl = document.getElementById('detail-' + viewId);
+  if (detailEl) {
+    detailEl.classList.remove('hidden');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (viewId === 'kpi') { initEcosystemDonut(); initAuthorBarTable(); }
+  }
+}
+
+function hideDetailView() {
+  document.querySelectorAll('.detail-view').forEach(el => el.classList.add('hidden'));
+  document.getElementById('home-header').style.display = '';
+  document.getElementById('home-layout').style.display = '';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ══════════════════════════════════════════
+   KPI 상세 | 연구 생태계 도넛 차트
+══════════════════════════════════════════ */
+const CORE_AUTHORS = [
+  { name: '홍남희',  count: 18, firstAuthor: 15 },
+  { name: '유인혁',  count: 16, firstAuthor: 16 },
+  { name: '홍용진',  count: 15, firstAuthor: 15 },
+  { name: '김은주',  count: 14, firstAuthor: 13 },
+  { name: '곽노완',  count: 14, firstAuthor: 14 },
+  { name: '김태연',  count: 11, firstAuthor: 10 },
+  { name: '정희원',  count: 11, firstAuthor: 11 },
+  { name: '오창룡',  count:  7, firstAuthor:  7 },
+  { name: '노영희',  count:  6, firstAuthor:  5 },
+  { name: '심광현',  count:  5, firstAuthor:  5 },
+];
+
+let ecosystemDonutChart = null;
+
+function initCoreAuthorList() {
+  const listEl = document.getElementById('cta-list');
+  if (!listEl) return;
+  listEl.innerHTML = CORE_AUTHORS.map(a =>
+    `<div class="cta-chip">
+      <span>${a.name}</span>
+      <span class="cta-count">${a.count}편</span>
+    </div>`
+  ).join('');
+}
+
+function initAuthorBarTable() {
+  const el = document.getElementById('author-bar-table');
+  if (!el) return;
+  el.innerHTML = CORE_AUTHORS.map((a, i) => {
+    const pct = Math.round((a.firstAuthor / a.count) * 100);
+    const coAuthor = a.count - a.firstAuthor;
+    return `
+      <div class="abt-row">
+        <div class="abt-rank">${i + 1}</div>
+        <div class="abt-name">${a.name}</div>
+        <div class="abt-total">${a.count}편</div>
+        <div class="abt-bar-wrap">
+          <div class="abt-bar-track">
+            <div class="abt-bar-fill" data-pct="${pct}" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="abt-pct ${pct === 100 ? 'abt-pct-full' : ''}">${pct}%</div>
+        <div class="abt-detail">
+          <span class="abt-first">제1저자 ${a.firstAuthor}편</span>
+          ${coAuthor > 0 ? `<span class="abt-co">공저 ${coAuthor}편</span>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+
+  // 애니메이션: 약간의 딜레이 후 막대 너비 적용
+  requestAnimationFrame(() => {
+    el.querySelectorAll('.abt-bar-fill').forEach((bar, i) => {
+      setTimeout(() => {
+        bar.style.width = bar.dataset.pct + '%';
+      }, i * 60);
+    });
+  });
+}
+
+function initEcosystemDonut() {
+  const canvas = document.getElementById('chart-ecosystem-donut');
+  if (!canvas) return;
+
+  // 이미 그려진 차트가 있으면 파괴 후 재생성
+  if (ecosystemDonutChart) {
+    ecosystemDonutChart.destroy();
+    ecosystemDonutChart = null;
+  }
+
+  const ctx = canvas.getContext('2d');
+  ecosystemDonutChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['1회성 연구자 (78.7%)', '2회성 연구자 (9.7%)', '핵심 코어 연구자 (11.7%)'],
+      datasets: [{
+        data: [236, 29, 35],
+        backgroundColor: ['#cbd5e1', '#93c5fd', '#2563eb'],
+        hoverBackgroundColor: ['#94a3b8', '#60a5fa', '#1d4ed8'],
+        borderWidth: 3,
+        borderColor: '#ffffff',
+        hoverOffset: 10
+      }]
+    },
+    options: {
+      cutout: '68%',
+      responsive: true,
+      maintainAspectRatio: true,
+      animation: { animateRotate: true, duration: 900 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: function(context) {
+              const idx = context.dataIndex;
+              if (idx === 2) {
+                // 핵심 코어 슬라이스: 상위 연구자 목록 노출
+                const lines = ['── 핵심 코어 연구자 (3편 이상) ──'];
+                CORE_AUTHORS.slice(0, 5).forEach(a => {
+                  lines.push(`  ${a.name}: ${a.count}편`);
+                });
+                lines.push('  … 외 30명');
+                return lines;
+              }
+              return ` ${context.label}: ${context.raw}명`;
+            }
+          },
+          bodyFont: { family: "'Pretendard', 'Inter', sans-serif", size: 12 },
+          padding: 12,
+          boxPadding: 4
+        }
+      }
+    }
+  });
 }
 
 document.addEventListener('DOMContentLoaded', init);

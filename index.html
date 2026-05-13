@@ -17,7 +17,7 @@
 <body>
 
   <!-- HEADER -->
-  <header class="dashboard-header">
+  <header class="dashboard-header" id="home-header">
     <div class="header-inner">
       <div class="header-title-group" style="text-align:center; flex:1;">
         <h1 class="header-title">도시인문학 연구 대시보드</h1>
@@ -27,7 +27,66 @@
     </div>
   </header>
 
-  <main class="dashboard-main">
+  <!-- 홈 래퍼 (NAV + MAIN) -->
+  <div class="home-layout" id="home-layout">
+
+    <!-- 좌측 심층 분석 사이드바 -->
+    <nav class="detail-nav" id="detail-nav" aria-label="심층 분석 목차">
+      <div class="detail-nav-header">개관에서 심층으로</div>
+      <div class="detail-nav-items">
+
+        <button class="detail-nav-btn" onclick="showDetailView('kpi')" aria-label="연구자 생태계 페이지로 ">
+          <span class="dnb-icon">👥</span>
+          <div class="dnb-text">
+            <div class="dnb-name">연구자 생태계</div>
+            <div class="dnb-sub">누가 이 학문을 이끄는가?</div>
+          </div>
+          <span class="dnb-arrow">›</span>
+        </button>
+
+        <!-- 추후 페이지 토글 (coming soon) -->
+        <div class="detail-nav-btn detail-nav-btn-soon">
+          <span class="dnb-icon">📈</span>
+          <div class="dnb-text">
+            <div class="dnb-name">담론의 진화</div>
+            <div class="dnb-sub">키워드는 어떻게 변했는가?</div>
+          </div>
+          <span class="dnb-soon">soon</span>
+        </div>
+
+        <div class="detail-nav-btn detail-nav-btn-soon">
+          <span class="dnb-icon">🗺️</span>
+          <div class="dnb-text">
+            <div class="dnb-name">지역별 기관</div>
+            <div class="dnb-sub">서울 바깥의 연구는?</div>
+          </div>
+          <span class="dnb-soon">soon</span>
+        </div>
+
+        <div class="detail-nav-btn detail-nav-btn-soon">
+          <span class="dnb-icon">🔭</span>
+          <div class="dnb-text">
+            <div class="dnb-name">인문학의 편중</div>
+            <div class="dnb-sub">어느 관점에 치중하는가?</div>
+          </div>
+          <span class="dnb-soon">soon</span>
+        </div>
+
+        <div class="detail-nav-btn detail-nav-btn-soon">
+          <span class="dnb-icon">🏆</span>
+          <div class="dnb-text">
+            <div class="dnb-name">이론적 토대</div>
+            <div class="dnb-sub">어떤 지식에 의존하는가?</div>
+          </div>
+          <span class="dnb-soon">soon</span>
+        </div>
+
+      </div>
+    </nav>
+
+    <!-- 메인 대시보드 -->
+    <main class="dashboard-main" id="home-main">
+
 
     <!-- ══════════════════════════════════════════
          1계층 | KPI 요약 바
@@ -259,8 +318,106 @@
       </div>
     </section>
 
-  </main>
+    </main><!-- /home-main -->
+  </div><!-- /home-layout -->
 
+  <!-- ══════════════════════════════════════════
+       상세 뷰 | 연구 생태계 (KPI 클릭)
+  ══════════════════════════════════════════ -->
+  <div id="detail-kpi" class="detail-view hidden">
+    <div class="detail-header">
+      <button class="back-btn" onclick="hideDetailView()">
+        <span class="back-arrow">←</span> 대시보드 홈으로
+      </button>
+      <div class="detail-header-title">
+        <span class="detail-badge">DEEP DIVE</span>
+        <h2>연구 생태계는 누가 유지하는가?</h2>
+        <p>KCI 논문 447편 · 저자 300명의 참여 패턴 분석</p>
+      </div>
+    </div>
+
+    <div class="detail-body">
+
+      <!-- 연구자 지속성 도넛 차트 -->
+      <div class="detail-card detail-main">
+        <div class="detail-card-header">
+          <h3>연구자 지속성 분포</h3>
+          <p>도시인문학 연구자 300명의 논문 출판 패턴</p>
+        </div>
+        <div class="detail-donut-layout">
+          <div class="detail-donut-wrap">
+            <canvas id="chart-ecosystem-donut" aria-label="연구자 지속성 도넛 차트"></canvas>
+            <div class="detail-donut-center">
+              <div class="ddc-num">300</div>
+              <div class="ddc-label">전체 저자</div>
+            </div>
+          </div>
+          <div class="detail-donut-legend">
+            <div class="eco-legend-item" id="eco-legend-one">
+              <div class="eco-legend-dot" style="background:#cbd5e1"></div>
+              <div class="eco-legend-info">
+                <div class="eco-legend-name">1회성 연구자</div>
+                <div class="eco-legend-sub">단 1편만 게재 후 퇴장</div>
+              </div>
+              <div class="eco-legend-stat">
+                <div class="eco-stat-num">236명</div>
+                <div class="eco-stat-pct">78.7%</div>
+              </div>
+            </div>
+            <div class="eco-legend-item" id="eco-legend-two">
+              <div class="eco-legend-dot" style="background:#93c5fd"></div>
+              <div class="eco-legend-info">
+                <div class="eco-legend-name">2회성 연구자</div>
+                <div class="eco-legend-sub">2편 게재 후 중단</div>
+              </div>
+              <div class="eco-legend-stat">
+                <div class="eco-stat-num">29명</div>
+                <div class="eco-stat-pct">9.7%</div>
+              </div>
+            </div>
+            <div class="eco-legend-item eco-legend-highlight" id="eco-legend-core">
+              <div class="eco-legend-dot" style="background:#2563eb"></div>
+              <div class="eco-legend-info">
+                <div class="eco-legend-name">핵심 코어 연구자</div>
+                <div class="eco-legend-sub">3편 이상 꾸준히 게재 — 마우스를 올려보세요</div>
+              </div>
+              <div class="eco-legend-stat">
+                <div class="eco-stat-num">35명</div>
+                <div class="eco-stat-pct">11.7%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 구분선 -->
+        <hr style="border:none; border-top:1px solid var(--border); margin:1.2rem 0 1rem;">
+
+        <!-- 저자 역할 미니바 테이블 (통합) -->
+        <div class="detail-card-header" style="margin-bottom:0.8rem;">
+          <h3>🔍 핵심 코어 연구자 — 저자 역할 분석</h3>
+          <p>상위 10명의 총 논문 편수 중 제1저자(단독) 비율</p>
+        </div>
+        <div class="author-bar-table" id="author-bar-table">
+          <!-- JS로 채움 -->
+        </div>
+        <div class="abt-legend">
+          <span class="abt-dot" style="background:#2563eb"></span><span>제1저자 / 단독</span>
+          <span class="abt-dot" style="background:#e2e8f0; margin-left:1rem"></span><span>공동저자</span>
+        </div>
+
+      </div>
+
+      <!-- 오른쪽 플레이스홀더 (추후 패널 추가 예정) -->
+      <div class="detail-card detail-placeholder">
+        <div class="placeholder-inner">
+          <div class="placeholder-icon">⏳</div>
+          <div class="placeholder-label">추후 추가될 패널</div>
+          <div class="placeholder-sub">분석 내용을 준비 중입니다</div>
+        </div>
+      </div>
+
+    </div><!-- /detail-body -->
+  </div><!-- /detail-kpi -->
 
 
   <script src="app.js"></script>
