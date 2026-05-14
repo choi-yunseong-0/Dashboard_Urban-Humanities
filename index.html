@@ -13,6 +13,7 @@
   <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
   <script src="korea.js"></script>
   <script src="keyword_data.js"></script>
+  <script src="theme_data.js"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -447,27 +448,35 @@
           <!-- 좌: 키워드 선택 목록 -->
           <div class="stream-selector" id="stream-selector">
             <div class="stream-selector-header">
-              <span>키워드 탐색</span>
-              <span class="stream-kw-count" id="stream-kw-count">–</span>
+              <span>담론 탐색</span>
             </div>
 
-            <!-- 검색창 -->
+            <!-- 테마 트리 -->
+            <div class="stream-theme-tree" id="stream-theme-tree">
+              <!-- JS로 채움 -->
+            </div>
+
+            <!-- 구분선 + 개별 키워드 검색 -->
+            <div class="stream-kw-divider">개별 키워드 검색</div>
             <div class="stream-search-wrap">
               <input type="text" id="stream-search"
                      class="stream-search-input"
-                     placeholder="키워드 검색..."
+                     placeholder="전체 2,137개 중 검색..."
                      oninput="onStreamSearch(this.value)"
                      autocomplete="off" />
               <span class="stream-search-icon">🔍</span>
             </div>
-
-            <!-- 전체 스크롤 목록 -->
-            <div class="stream-all-list" id="stream-all-list">
+            <div class="stream-all-list" id="stream-all-list" style="display:none;"></div>
+          </div>
+          <!-- 우: 차트 영역 (Drop Zone) -->
+          <div class="stream-chart-area"
+               ondragover="onDragOver(event)"
+               ondragleave="onDragLeave(event)"
+               ondrop="onDrop(event)">
+            <!-- 비교 중인 항목 태그 영역 -->
+            <div class="stream-compare-tags" id="stream-compare-tags" style="display:none;">
               <!-- JS로 채움 -->
             </div>
-          </div>
-          <!-- 우: 차트 영역 -->
-          <div class="stream-chart-area">
             <div id="chart-stream" style="width:100%; height:380px;"></div>
           </div>
         </div>

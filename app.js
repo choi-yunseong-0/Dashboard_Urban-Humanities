@@ -833,116 +833,218 @@ let streamChart = null;
 let authorEntryChart = null;
 
 // 선택된 키워드 상태 관리
-let selectedKeyword = null; // 라디오 방식
-let kwExpanded = false;
+// ── 선택 상태 ──────────────────────────────────────────────────
+let comparedItems = []; 
+// [{ type, label, color, data, id }]
 
-function getKwTotal(kw) {
-  if (!window.KW_DATA) return 0;
-  return (window.KW_DATA.keywords[kw] || []).reduce((a, b) => a + b, 0);
-}
-
+// ── 테마 트리 초기화 ────────────────────────────────────────────
 function initStreamChart() {
   const el = document.getElementById('chart-stream');
   if (!el) return;
   if (streamChart) { streamChart.dispose(); }
   streamChart = echarts.init(el);
-  selectedKeyword = null;
-  renderKeywordSelector();
+  comparedItems = [];
+  renderThemeTree();
+  renderStreamChart();
+  renderCompareTags();
+}
+
+// ── 드래그 앤 드롭 핸들러 ───────────────────────────────────────
+function onDragStart(e, type, label, color, dataStr) {
+  e.dataTransfer.setData('text/plain', JSON.stringify({ type, label, color, data: JSON.parse(dataStr) }));
+  e.dataTransfer.effectAllowed = 'copy';
+}
+
+function onDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'copy';
+  const chartArea = e.currentTarget;
+  chartArea.classList.add('drag-over');
+}
+
+function onDragLeave(e) {
+  e.preventDefault();
+  const chartArea = e.currentTarget;
+  chartArea.classList.remove('drag-over');
+}
+
+function onDrop(e) {
+  e.preventDefault();
+  const chartArea = e.currentTarget;
+  chartArea.classList.remove('drag-over');
+
+  const dataStr = e.dataTransfer.getData('text/plain');
+  if (!dataStr) return;
+  try {
+    const item = JSON.parse(dataStr);
+    addComparedItem(item);
+  } catch (err) {
+    console.warn("Drop parse error", err);
+  }
+}
+
+// 비교 항목 추가 (드롭 시)
+function addComparedItem(item) {
+  // 이미 존재하는지 확인
+  if (comparedItems.some(existing => existing.label === item.label)) return;
+  // 고유 ID 생성
+  item.id = 'cmp_' + Math.random().toString(36).substr(2, 9);
+  comparedItems.push(item);
+  
+  updateActiveStates();
+  renderCompareTags();
   renderStreamChart();
 }
 
-function renderKeywordSelector() {
-  const allListEl = document.getElementById('stream-all-list');
-  const countEl = document.getElementById('stream-kw-count');
-  if (!allListEl) return;
+// 비교 항목 삭제 (태그 X 클릭 시)
+function removeComparedItem(id) {
+  comparedItems = comparedItems.filter(item => item.id !== id);
+  updateActiveStates();
+  renderCompareTags();
+  renderStreamChart();
+}
 
-  // KW_DATA가 없으면 DISCOURSE_DATA 폴백
-  const kwSource = window.KW_DATA ? window.KW_DATA.keywords : DISCOURSE_DATA.keywords;
-  const kwNames = Object.keys(kwSource);
+// 태그 렌더링
+function renderCompareTags() {
+  const container = document.getElementById('stream-compare-tags');
+  if (!container) return;
+  if (comparedItems.length === 0) {
+    container.style.display = 'none';
+    return;
+  }
+  container.style.display = 'flex';
+  container.innerHTML = comparedItems.map(item => `
+    <div class="stream-tag" style="background:${item.color}15; border:1px solid ${item.color}55;">
+      <span class="st-dot" style="background:${item.color}"></span>
+      <span class="st-label" style="color:${item.color}">${item.label}</span>
+      <button class="st-remove" onclick="removeComparedItem('${item.id}')">×</button>
+    </div>
+  `).join('');
+}
 
-  if (countEl) countEl.textContent = `총 ${kwNames.length.toLocaleString()}개`;
+// 트리의 요소들을 선택 중인 항목 상태로 업데이트
+function updateActiveStates() {
+  document.querySelectorAll('.stt-theme, .stt-sub, .stream-kw-chip').forEach(btn => {
+    btn.classList.remove('active');
+    btn.style.cssText = '';
+  });
+  comparedItems.forEach(item => {
+    const clicked = document.querySelector(`[data-label="${item.label}"]`);
+    if (clicked) {
+      clicked.classList.add('active');
+      clicked.style.cssText = `border-left-color:${item.color};background:${item.color}12;`;
+    }
+  });
+}
 
-  allListEl.innerHTML = kwNames.map((kw, i) => {
-    const color = DISCOURSE_DATA.colors[i % DISCOURSE_DATA.colors.length];
-    const total = (kwSource[kw] || []).reduce((a, b) => a + b, 0);
-    const isOn = selectedKeyword === kw;
-    return `<button class="stream-kw-chip ${isOn ? 'active' : ''}"
-      data-kw="${kw}" data-idx="${i}"
-      onclick="selectKeyword('${kw.replace(/'/g, "\\'")}', ${i})"
-      style="${isOn ? `border-color:${color};background:${color}18;` : ''}">
-      <span class="skc-dot" style="background:${color}"></span>
-      <span class="skc-name">${kw}</span>
-      <span class="skc-count">${total}</span>
-    </button>`;
+function renderThemeTree() {
+  const treeEl = document.getElementById('stream-theme-tree');
+  if (!treeEl || !window.THEME_DATA) return;
+
+  treeEl.innerHTML = window.THEME_DATA.themes.map(theme => {
+    const hasSub = theme.subclusters && theme.subclusters.length;
+    const isThemeSel = comparedItems.some(i => i.label === theme.name);
+
+    const subHTML = hasSub ? theme.subclusters.map(sc => {
+      const isScSel = comparedItems.some(i => i.label === sc.name);
+      return `<button class="stt-sub ${isScSel ? 'active' : ''}"
+        data-label="${sc.name}" data-color="${sc.color}" data-type="cluster"
+        draggable="true" ondragstart="onDragStart(event, 'cluster', '${sc.name}', '${sc.color}', '${JSON.stringify(sc.data)}')"
+        onclick="onTreeSelect('cluster','${sc.name}','${sc.color}',${JSON.stringify(sc.data)})"
+        style="${isScSel ? `border-left-color:${sc.color};background:${sc.color}12;` : ''}">
+        <span class="stt-sub-dot" style="background:${sc.color}"></span>
+        <span class="stt-sub-name">${sc.name}</span>
+        <span class="stt-sub-count">${sc.total}</span>
+      </button>`;
+    }).join('') : '';
+
+    return `<div class="stt-theme-wrap" id="stt-wrap-${theme.id}">
+      <button class="stt-theme ${isThemeSel ? 'active' : ''} ${hasSub ? 'has-sub' : ''}"
+        data-id="${theme.id}"
+        data-label="${theme.name}"
+        ${!hasSub ? `draggable="true" ondragstart="onDragStart(event, 'theme', '${theme.name}', '${theme.color}', '${JSON.stringify(theme.data)}')"` : ''}
+        onclick="${hasSub ? `toggleThemeExpand('${theme.id}')` : `onTreeSelect('theme','${theme.name}','${theme.color}',${JSON.stringify(theme.data)})`}"
+        style="${isThemeSel ? `border-left-color:${theme.color};background:${theme.color}12;` : ''}">
+        <span class="stt-name">${theme.name}</span>
+        <span class="stt-count">${theme.total}</span>
+        ${hasSub ? '<span class="stt-arrow" id="stt-arrow-' + theme.id + '">▸</span>' : ''}
+      </button>
+      ${hasSub ? `<div class="stt-sub-list" id="stt-sub-${theme.id}" style="display:none;">${subHTML}</div>` : ''}
+    </div>`;
   }).join('');
 }
 
+function toggleThemeExpand(id) {
+  const subEl = document.getElementById(`stt-sub-${id}`);
+  const arrow = document.getElementById(`stt-arrow-${id}`);
+  if (!subEl) return;
+  const open = subEl.style.display !== 'none';
+  subEl.style.display = open ? 'none' : '';
+  if (arrow) arrow.textContent = open ? '▸' : '▾';
+}
+
+// 클릭 시에는 단일 선택(초기화 후 추가)으로 동작
+function onTreeSelect(type, label, color, data) {
+  comparedItems = [{ type, label, color, data, id: 'cmp_' + Math.random().toString(36).substr(2, 9) }];
+  
+  // 검색창 초기화
+  const searchEl = document.getElementById('stream-search');
+  if (searchEl) searchEl.value = '';
+  const listEl = document.getElementById('stream-all-list');
+  if (listEl) listEl.style.display = 'none';
+  
+  updateActiveStates();
+  renderCompareTags();
+  renderStreamChart();
+}
+
+// ── 개별 키워드 검색 ────────────────────────────────────────────
 function onStreamSearch(query) {
   const allListEl = document.getElementById('stream-all-list');
   if (!allListEl) return;
   const q = query.trim();
-  const kwSource = window.KW_DATA ? window.KW_DATA.keywords : DISCOURSE_DATA.keywords;
-  const kwNames = Object.keys(kwSource);
 
-  // 검색어 없으면 전체 표시
-  const filtered = q ? kwNames.filter(kw => kw.includes(q)) : kwNames;
-
-  const countEl = document.getElementById('stream-kw-count');
-  if (countEl) countEl.textContent = q
-    ? `${filtered.length}개 검색됨`
-    : `총 ${kwNames.length.toLocaleString()}개`;
-
-  allListEl.innerHTML = filtered.map((kw, i) => {
-    const color = DISCOURSE_DATA.colors[i % DISCOURSE_DATA.colors.length];
-    const total = (kwSource[kw] || []).reduce((a, b) => a + b, 0);
-    const isOn = selectedKeyword === kw;
-    return `<button class="stream-kw-chip ${isOn ? 'active' : ''}"
-      data-kw="${kw}" data-idx="${i}"
-      onclick="selectKeyword('${kw.replace(/'/g, "\\'")}', ${i})"
-      style="${isOn ? `border-color:${color};background:${color}18;` : ''}">
-      <span class="skc-dot" style="background:${color}"></span>
-      <span class="skc-name">${kw}</span>
-      <span class="skc-count">${total}</span>
-    </button>`;
-  }).join('');
-
-  if (!filtered.length) {
-    allListEl.innerHTML = `<div class="stream-no-result">검색 결과 없음</div>`;
+  if (!q) {
+    allListEl.style.display = 'none';
+    return;
   }
+  allListEl.style.display = '';
+
+  const kwSource = window.KW_DATA ? window.KW_DATA.keywords : DISCOURSE_DATA.keywords;
+  const matched = Object.keys(kwSource).filter(kw => kw.includes(q)).slice(0, 40);
+
+  allListEl.innerHTML = matched.length
+    ? matched.map((kw, i) => {
+        const color = DISCOURSE_DATA.colors[i % DISCOURSE_DATA.colors.length];
+        const total = (kwSource[kw] || []).reduce((a,b)=>a+b,0);
+        const data = kwSource[kw] || [];
+        const isOn = comparedItems.some(c => c.label === kw);
+        return `<button class="stream-kw-chip ${isOn?'active':''}"
+          data-label="${kw}" data-idx="${i}"
+          draggable="true" ondragstart="onDragStart(event, 'keyword', '${kw.replace(/'/g,"\\'")}','${color}', '${JSON.stringify(data)}')"
+          onclick="onTreeSelect('keyword','${kw.replace(/'/g,"\\'")}','${color}',${JSON.stringify(data)})"
+          style="${isOn?`border-color:${color};background:${color}18;`:''}">
+          <span class="skc-dot" style="background:${color}"></span>
+          <span class="skc-name">${kw}</span>
+          <span class="skc-count">${total}</span>
+        </button>`;
+      }).join('')
+    : `<div class="stream-no-result">검색 결과 없음</div>`;
 }
 
-function selectKeyword(kw, colorIdx) {
-  selectedKeyword = selectedKeyword === kw ? null : kw;
-  document.querySelectorAll('.stream-kw-chip').forEach(btn => {
-    const btnKw = btn.dataset.kw;
-    const idx = parseInt(btn.dataset.idx || 0);
-    const color = DISCOURSE_DATA.colors[idx % DISCOURSE_DATA.colors.length];
-    const isOn = selectedKeyword === btnKw;
-    btn.classList.toggle('active', isOn);
-    btn.style.cssText = isOn ? `border-color:${color};background:${color}18;` : '';
-  });
-  renderStreamChart();
-}
-
+// ── 차트 렌더링 ─────────────────────────────────────────────────
 function renderStreamChart() {
   if (!streamChart) return;
+  const years = window.THEME_DATA ? window.THEME_DATA.years : DISCOURSE_DATA.years;
 
-  // 선택된 키워드가 없을 때 빈 상태 표시
-  if (!selectedKeyword) {
+  if (comparedItems.length === 0) {
     streamChart.setOption({
-      graphic: [{
-        type: 'group',
-        left: 'center',
-        top: 'middle',
+      graphic: [{ type: 'group', left: 'center', top: 'middle',
         children: [
-          {
-            type: 'text',
-            style: {
-              text: '← 좌측에서 키워드를 선택하세요',
-              fill: '#94a3b8',
-              font: "16px 'Pretendard', sans-serif"
-            }
-          }
+          { type: 'text', style: {
+            text: '← 좌측에서 클릭하거나 여기로 드래그 앤 드롭하여 비교하세요',
+            fill: '#94a3b8', font: "15px 'Pretendard', sans-serif"
+          }}
         ]
       }],
       series: []
@@ -950,81 +1052,75 @@ function renderStreamChart() {
     return;
   }
 
-  // 데이터 소스: KW_DATA 우선, 폴백은 DISCOURSE_DATA
-  const kwSource = (window.KW_DATA && window.KW_DATA.keywords[selectedKeyword])
-    ? window.KW_DATA.keywords
-    : DISCOURSE_DATA.keywords;
-  const yearSource = (window.KW_DATA) ? window.KW_DATA.years : DISCOURSE_DATA.years;
+  // Y축 최대값 찾기 (비교 중인 모든 항목 중)
+  let maxVal = 4;
+  comparedItems.forEach(item => {
+    const itemMax = Math.max(...item.data);
+    if (itemMax > maxVal) maxVal = itemMax;
+  });
 
-  const allKwNames = Object.keys(kwSource);
-  const i = allKwNames.indexOf(selectedKeyword);
-  const colorIdx = i >= 0 ? i : 0;
-  const color = DISCOURSE_DATA.colors[colorIdx % DISCOURSE_DATA.colors.length];
-  const data = kwSource[selectedKeyword] || [];
+  const series = comparedItems.map(item => {
+    return {
+      name: item.label,
+      type: 'line',
+      smooth: true,
+      data: item.data,
+      itemStyle: { color: item.color },
+      lineStyle: { color: item.color, width: 2.5 },
+      areaStyle: { color: { type:'linear', x:0,y:0,x2:0,y2:1,
+        colorStops:[{offset:0,color:item.color+'55'},{offset:1,color:item.color+'08'}]
+      }},
+      symbol: 'circle', symbolSize: 6,
+      emphasis: { itemStyle: { borderWidth:2, borderColor:'#fff', shadowBlur:6, shadowColor:item.color+'88' }},
+      markPoint: {
+        data: [{ type:'max', name:'최고' }],
+        itemStyle: { color: item.color },
+        label: { fontSize: 10, color: '#fff' }
+      }
+    };
+  });
 
   streamChart.setOption({
-    graphic: [], // 안내 텍스트 제거
+    graphic: [],
     tooltip: {
-      trigger: 'axis',
-      axisPointer: { type: 'line' },
+      trigger: 'axis', axisPointer: { type: 'line' },
       textStyle: { fontFamily: "'Pretendard', sans-serif", fontSize: 12 },
       formatter(params) {
-        const p = params[0];
-        return `<div style="font-weight:700;margin-bottom:4px">${p.axisValue}년</div>
-          <div style="display:flex;align-items:center;gap:6px">
-            <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${color}"></span>
-            <span>${selectedKeyword}</span>
-            <span style="font-weight:700;margin-left:8px">${p.value}회</span>
+        if (!params || !params.length) return '';
+        let html = `<div style="font-weight:700;margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid #e2e8f0">${params[0].axisValue}년</div>`;
+        
+        // 값이 큰 순서대로 툴팁 정렬
+        const sortedParams = [...params].sort((a, b) => b.value - a.value);
+        
+        sortedParams.forEach(p => {
+          if (!p.value) return; // 값이 0이면 생략 (선택 사항, 필요 시 제거)
+          html += `<div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+            <span style="width:8px;height:8px;border-radius:50%;background:${p.color};display:inline-block"></span>
+            <span style="flex:1">${p.seriesName}</span>
+            <span style="font-weight:700;margin-left:12px">${p.value}편</span>
           </div>`;
+        });
+        return html;
       }
     },
     legend: { show: false },
-    grid: { left: 40, right: 20, top: 30, bottom: 40 },
+    grid: { left: 40, right: 20, top: 10, bottom: 40 },
     xAxis: {
-      type: 'category',
-      data: yearSource,
-      boundaryGap: false,
+      type: 'category', data: years, boundaryGap: false,
       axisLine: { lineStyle: { color: '#cbd5e1' } },
       axisLabel: { color: '#94a3b8', fontSize: 11 }
     },
     yAxis: {
-      type: 'value',
-      minInterval: 1,
-      min: 0,
-      max: 6,
+      type: 'value', minInterval: 1, min: 0, max: maxVal + 1,
       splitLine: { lineStyle: { color: '#f1f5f9' } },
       axisLabel: { color: '#94a3b8', fontSize: 11 }
     },
-    series: [{
-      name: selectedKeyword,
-      type: 'line',
-      smooth: true,
-      data,
-      itemStyle: { color },
-      lineStyle: { color, width: 2.5 },
-      areaStyle: {
-        color: {
-          type: 'linear', x: 0, y: 0, x2: 0, y2: 1,
-          colorStops: [
-            { offset: 0, color: color + '55' },
-            { offset: 1, color: color + '08' }
-          ]
-        }
-      },
-      symbol: 'circle',
-      symbolSize: 6,
-      emphasis: {
-        scale: true,
-        itemStyle: { borderWidth: 2, borderColor: '#fff', shadowBlur: 6, shadowColor: color + '88' }
-      },
-      markPoint: {
-        data: [{ type: 'max', name: '최고' }],
-        itemStyle: { color },
-        label: { fontSize: 10, color: '#fff' }
-      }
-    }]
+    series: series
   }, true);
 }
+
+
+
 
 
 /* ══════════════════════════════════════════
