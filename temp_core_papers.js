@@ -1,1352 +1,3 @@
-/* ═══════════════════════════════════════════
-   도시인문학 연구 대시보드 — app.js
-   ═══════════════════════════════════════════ */
-
-/* ── 데이터 ── */
-const DATA = {
-  yearTrend: [
-    { year: 2003, count:  1 }, { year: 2004, count:  0 }, { year: 2005, count:  0 },
-    { year: 2006, count:  2 }, { year: 2007, count:  0 }, { year: 2008, count:  1 },
-    { year: 2009, count: 22 }, { year: 2010, count: 29 }, { year: 2011, count: 20 },
-    { year: 2012, count: 14 }, { year: 2013, count: 18 }, { year: 2014, count: 23 },
-    { year: 2015, count: 25 }, { year: 2016, count: 34 }, { year: 2017, count: 49 },
-    { year: 2018, count: 21 }, { year: 2019, count: 20 }, { year: 2020, count: 34 },
-    { year: 2021, count: 25 }, { year: 2022, count: 23 }, { year: 2023, count: 28 },
-    { year: 2024, count: 30 }, { year: 2025, count: 28 }
-  ],
-  perspectives: [
-    { name: "사회·공동체", count: 177, pct: 40, color: "#d97706" },
-    { name: "공간·역사·장소", count: 113, pct: 25, color: "#059669" },
-    { name: "문학·예술·문화", count: 96, pct: 21, color: "#2563eb" },
-    { name: "철학·이론", count: 61, pct: 14, color: "#e11d48" }
-  ],
-  perspectiveTrend: [
-    { period: "~2010",     "철학·이론": 18, "문학·예술·문화": 26, "공간·역사·장소": 26, "사회·공동체": 31 },
-    { period: "2011–2015", "철학·이론": 15, "문학·예술·문화": 16, "공간·역사·장소": 30, "사회·공동체": 39 },
-    { period: "2016–2020", "철학·이론":  8, "문학·예술·문화": 22, "공간·역사·장소": 26, "사회·공동체": 45 },
-    { period: "2021–2025", "철학·이론": 18, "문학·예술·문화": 24, "공간·역사·장소": 21, "사회·공동체": 37 }
-  ],
-  top10: [
-    { rank: 1,  year: 2011, title: "미셸 푸코의 '헤테로토피아' — 초기 공간 개념에 대한 비판적 검토",                  author: "허경",          citations: 68, perspective: { name: "철학·이론",         color: "#e11d48" }, tags: ["헤테로토피아", "공간 이론", "문화지리학"] },
-    { rank: 2,  year: 2014, title: "르페브르의 변증법적 공간 이론과 공간정치 — 「공간의 생산」을 중심으로",           author: "신승원",        citations: 28, perspective: { name: "철학·이론",         color: "#e11d48" }, tags: ["공간의 생산", "변증법", "공간정치"] },
-    { rank: 3,  year: 2020, title: "한국 SF와 페미니즘의 동시대적 조우 — 김보영·듀나 작품론",                        author: "강은교; 김은주", citations: 24, perspective: { name: "문학·예술·문화",  color: "#2563eb" }, tags: ["페미니즘 SF", "잠재성", "동시대성"] },
-    { rank: 4,  year: 2020, title: "한국 웹소설 판타지의 형식적 갱신과 사회적 성찰 — 책빙의물을 중심으로",           author: "유인혁",        citations: 22, perspective: { name: "문학·예술·문화",  color: "#2563eb" }, tags: ["웹소설", "장르 교차", "메타서사"] },
-    { rank: 5,  year: 2014, title: "창조도시 논의의 비판적 성찰과 과제",                                             author: "남기범",        citations: 19, perspective: { name: "공간·역사·장소", color: "#059669" }, tags: ["창조도시 비판", "도시정책", "창조성"] },
-    { rank: 6,  year: 2012, title: "문화도시의 개념과 문화도시화를 위한 서울시 전략의 반성적 고찰",                    author: "라도삼",        citations: 18, perspective: { name: "문학·예술·문화",  color: "#2563eb" }, tags: ["문화도시", "서울시 전략", "도시문화"] },
-    { rank: 7,  year: 2017, title: "빅데이터가 던지는 도전적인 철학적 문제들에 대한 고찰",                           author: "이중원",        citations: 18, perspective: { name: "철학·이론",         color: "#e11d48" }, tags: ["빅데이터", "정보 존재론", "데이터 윤리"] },
-    { rank: 8,  year: 2010, title: "발터 벤야민과 도시경험 — 벤야민의 도시인문학 방법론에 대한 고찰",               author: "홍준기",        citations: 18, perspective: { name: "철학·이론",         color: "#e11d48" }, tags: ["아우라 상실", "충격 경험", "도시인문학 방법론"] },
-    { rank: 9,  year: 2020, title: "언택트 시대 넷플릭스와 영화: 퀄리티 콘텐츠로서의 영화와 극장의 의미 변화",           author: "홍남희",        citations: 17, perspective: { name: "문학·예술·문화",  color: "#2563eb" }, tags: ["넷플릭스", "언택트", "플랫폼"] },
-    { rank: 10, year: 2014, title: "산업유산 활용 사례를 통해 본 인문학적 도시재생 방향 모색",                       author: "김소라; 이병민", citations: 16, perspective: { name: "공간·역사·장소", color: "#059669" }, tags: ["산업유산", "도시재생", "산책자(플라뇌르)"] },
-  ],
-  regionData: [
-    { id: "seoul", group: "서울", provinces: ["서울특별시"], count: 316, cit: 3.8, char: "이론+정책 복합 (초집중)", tags: ["기본소득", "도시재생", "박완서"] },
-    { id: "gyeongi", group: "경기/인천", provinces: ["경기도", "인천광역시"], count: 22, cit: 4.0, char: "현상학·텍스트 중심", tags: ["생활세계", "텍스트", "생활권계획"] },
-    { id: "daejeon", group: "대전/충청", provinces: ["대전광역시", "세종특별자치시", "충청남도", "충청북도"], count: 19, cit: 3.0, char: "일상·사회 현상", tags: ["MZ세대", "러닝크루", "코로나19"] },
-    { id: "busan", group: "부산/경남", provinces: ["부산광역시", "울산광역시", "경상남도"], count: 18, cit: 1.7, char: "지역성·정책", tags: ["지역성", "인문도시지원사업", "부마항쟁"] },
-    { id: "gwangju", group: "광주/전라", provinces: ["광주광역시", "전라남도", "전라북도"], count: 16, cit: 2.8, char: "정체성·공간 담론", tags: ["인문도시", "정체성", "벤야민"] },
-    { id: "gangwon", group: "강원", provinces: ["강원도"], count: 9, cit: 3.0, char: "공동체·전후 문학", tags: ["커먼즈", "공공성", "전후 문학"] },
-    { id: "daegu", group: "대구/경북", provinces: ["대구광역시", "경상북도"], count: 5, cit: 4.7, char: "도시사·유산 보존", tags: ["도시유산", "도시사", "가든 시티"] },
-    { id: "jeju", group: "제주", provinces: ["제주특별자치도"], count: 4, cit: 0.8, char: "이동·이주 테마", tags: ["모빌리티", "이주", "포스트 팬데믹"] }
-  ],
-  globalData: [
-    { country: "일본", count: 10 },
-    { country: "중국", count: 9 },
-    { country: "미국", count: 4 },
-    { country: "독일", count: 3 },
-    { country: "영국", count: 2 },
-    { country: "기타", count: 6 }
-  ]
-};
-
-/* ── KPI 카운터 애니메이션 ── */
-function animateCounter(el, target, duration = 1600) {
-  const start = performance.now();
-  const formatter = new Intl.NumberFormat('ko-KR');
-  function step(now) {
-    const elapsed = now - start;
-    const progress = Math.min(elapsed / duration, 1);
-    const ease = 1 - Math.pow(1 - progress, 3);
-    el.textContent = formatter.format(Math.round(ease * target));
-    if (progress < 1) requestAnimationFrame(step);
-  }
-  requestAnimationFrame(step);
-}
-
-function initKPI() {
-  document.querySelectorAll('.kpi-item-value[data-target]').forEach((el, i) => {
-    const target = parseInt(el.dataset.target, 10);
-    setTimeout(() => animateCounter(el, target), i * 80);
-  });
-}
-
-/* ── Chart.js 공통 설정 ── */
-Chart.defaults.font.family = "'Pretendard', 'Inter', system-ui, sans-serif";
-Chart.defaults.color = '#64748b';
-
-const gridColor = 'rgba(15,23,42,0.06)';
-const tickColor = '#94a3b8';
-
-/* ── 2계층: 연도별 막대 + 추이선 (mixed chart) ── */
-function initTrendChart() {
-  const ctx = document.getElementById('chart-trend').getContext('2d');
-  const labels = DATA.yearTrend.map(d => String(d.year));
-  const values = DATA.yearTrend.map(d => d.count);
-
-  // 막대 강조 색상
-  const maxVal = Math.max(...values);
-  const bgColors = values.map((v, i) => {
-    if (v === maxVal) return 'rgba(37,99,235,0.82)';
-    if (labels[i] === '2016' || labels[i] === '2020') return 'rgba(37,99,235,0.48)';
-    return 'rgba(59,130,246,0.22)';
-  });
-
-  new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets: [
-        {
-          type: 'bar',
-          label: '논문 수',
-          data: values,
-          backgroundColor: bgColors,
-          borderWidth: 0,
-          borderRadius: 4,
-          borderSkipped: false,
-          order: 2,
-        },
-        {
-          type: 'line',
-          label: '추이선',
-          data: values,
-          borderColor: '#1d4ed8',
-          borderWidth: 2,
-          pointRadius: values.map(v => v === maxVal ? 6 : 3),
-          pointBackgroundColor: values.map(v => v === maxVal ? '#1d4ed8' : '#fff'),
-          pointBorderColor: '#1d4ed8',
-          pointBorderWidth: 2,
-          pointHoverRadius: 6,
-          fill: false,
-          tension: 0,
-          order: 1,
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: {
-          display: true,
-          position: 'top',
-          align: 'end',
-          labels: {
-            color: '#64748b',
-            font: { size: 10 },
-            boxWidth: 12,
-            boxHeight: 8,
-            borderRadius: 2,
-            useBorderRadius: true,
-            padding: 12,
-          }
-        },
-        tooltip: {
-          backgroundColor: '#ffffff',
-          borderColor: 'rgba(37,99,235,0.2)',
-          borderWidth: 1,
-          titleColor: '#0f172a',
-          bodyColor: '#334155',
-          padding: 10,
-          callbacks: {
-            title: items => `${items[0].label}년`,
-            label: item => item.datasetIndex === 0
-              ? ` 논문 ${item.parsed.y}편`
-              : null
-          },
-          filter: item => item.datasetIndex === 0
-        },
-        annotation: {
-          annotations: {
-            line2009: {
-              type: 'line',
-              scaleID: 'x',
-              value: '2009',
-              borderColor: 'rgba(37,99,235,0.22)',
-              borderWidth: 1,
-              borderDash: [4, 5],
-              label: {
-                display: true,
-                content: '학술지(도시인문학연구) 창간',
-                position: 'start',
-                yAdjust: 6,
-                backgroundColor: 'rgba(255,255,255,0.92)',
-                color: 'rgba(37,99,235,0.75)',
-                font: { size: 9, weight: '500' },
-                padding: { x: 5, y: 3 },
-                borderRadius: 3,
-                borderWidth: 0
-              }
-            },
-            line2014: {
-              type: 'line',
-              scaleID: 'x',
-              value: '2014',
-              borderColor: 'rgba(5,150,105,0.22)',
-              borderWidth: 1,
-              borderDash: [4, 5],
-              label: {
-                display: true,
-                content: '인문도시지원사업 시작',
-                position: 'start',
-                yAdjust: 6,
-                backgroundColor: 'rgba(255,255,255,0.92)',
-                color: 'rgba(5,150,105,0.75)',
-                font: { size: 9, weight: '500' },
-                padding: { x: 5, y: 3 },
-                borderRadius: 3,
-                borderWidth: 0
-              }
-            },
-            line2019: {
-              type: 'line',
-              scaleID: 'x',
-              value: '2019',
-              borderColor: 'rgba(220,38,38,0.22)',
-              borderWidth: 1,
-              borderDash: [4, 5],
-              label: {
-                display: true,
-                content: 'COVID-19 팬데믹',
-                position: 'start',
-                yAdjust: 6,
-                backgroundColor: 'rgba(255,255,255,0.92)',
-                color: 'rgba(220,38,38,0.75)',
-                font: { size: 9, weight: '500' },
-                padding: { x: 5, y: 3 },
-                borderRadius: 3,
-                borderWidth: 0
-              }
-            }
-          }
-        }
-      },
-      scales: {
-        x: {
-          grid: { display: false },
-          ticks: { color: tickColor, font: { size: 11 }, maxRotation: 0 }
-        },
-        y: {
-          grid: { color: gridColor },
-          ticks: { color: tickColor, font: { size: 11 }, stepSize: 10 },
-          beginAtZero: true,
-          max: 52
-        }
-      },
-      animation: { duration: 1000, easing: 'easeOutQuart' }
-    }
-  });
-}
-
-/* ── 3계층: 도넛 차트 ── */
-function initDonutChart() {
-  const ctx = document.getElementById('chart-donut').getContext('2d');
-  const pctEls = document.querySelectorAll('.persp-pct');
-  const origPcts = DATA.perspectives.map(d => d.pct + '%');
-
-  new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: DATA.perspectives.map(d => d.name),
-      datasets: [{
-        data: DATA.perspectives.map(d => d.count),
-        backgroundColor: DATA.perspectives.map(d => d.color + 'cc'),
-        borderColor: DATA.perspectives.map(d => d.color),
-        borderWidth: 2,
-        hoverBorderWidth: 3,
-        hoverOffset: 6,
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      cutout: '68%',
-      plugins: {
-        legend: { display: false },
-        tooltip: { enabled: false }   // 내장 툴팁 완전 비활성화
-      },
-      onHover: (evt, elements) => {
-        if (elements.length > 0) {
-          const i = elements[0].index;
-          pctEls.forEach((el, j) => {
-            if (j === i) {
-              el.textContent = DATA.perspectives[i].count + '편';
-              el.style.color = DATA.perspectives[i].color;
-            } else {
-              el.textContent = origPcts[j];
-              el.style.color = '';
-            }
-          });
-        } else {
-          pctEls.forEach((el, j) => {
-            el.textContent = origPcts[j];
-            el.style.color = '';
-          });
-        }
-      },
-      animation: { animateRotate: true, duration: 1000 }
-    }
-  });
-}
-
-/* ── 3계층: 누적 면적 차트 ── */
-function initStackedChart() {
-  const ctx = document.getElementById('chart-stacked').getContext('2d');
-  const periods = DATA.perspectiveTrend.map(d => d.period);
-  const perspNames = ["철학·이론", "문학·예술·문화", "공간·역사·장소", "사회·공동체"];
-  const colors = ["#e11d48", "#2563eb", "#059669", "#d97706"];
-  // 색약자를 위한 색상+모양 모두 상이하게
-  const styles = ['circle', 'rectRounded', 'rectRot', 'triangle'];
-  const radii = [4, 5, 5.5, 6.5];
-  const hoverRadii = [6, 7, 7.5, 8.5];
-
-  const datasets = perspNames.map((name, i) => ({
-    label: name,
-    data: DATA.perspectiveTrend.map(d => d[name]),
-    backgroundColor: colors[i] + '22',
-    borderColor: colors[i],
-    borderWidth: 2,
-    fill: true,
-    tension: 0.4,
-    pointRadius: radii[i],
-    pointHoverRadius: hoverRadii[i],
-    pointStyle: styles[i], // 각 데이터셋마다 고유한 심볼 반환
-    pointBackgroundColor: colors[i],
-    pointBorderColor: '#ffffff',
-    pointBorderWidth: 2,
-  }));
-
-  const chart = new Chart(ctx, {
-    type: 'line',
-    data: { labels: periods, datasets },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false }, // HTML 범례로 대체
-        tooltip: {
-          mode: 'index',
-          intersect: false,
-          backgroundColor: '#ffffff',
-          borderColor: 'rgba(37,99,235,0.2)',
-          borderWidth: 1,
-          titleColor: '#0f172a',
-          bodyColor: '#334155',
-          padding: 10,
-          callbacks: {
-            label: item => ` ${item.dataset.label}: ${item.parsed.y}%`
-          }
-        }
-      },
-      scales: {
-        x: {
-          grid: { color: gridColor, drawTicks: false },
-          ticks: { color: tickColor, font: { size: 10 }, padding: 6 },
-          border: { display: false }
-        },
-        y: {
-          grid: { color: gridColor, drawTicks: false },
-          ticks: { color: tickColor, font: { size: 10 }, stepSize: 10, padding: 6, callback: v => v + '%' },
-          border: { display: false },
-          min: 0, max: 50
-        }
-      },
-      animation: { duration: 1000, easing: 'easeOutQuart' }
-    }
-  });
-}
-
-/* ── 4계층: Top 10 테이블 ── */
-function initTop10Table() {
-  const tbody = document.getElementById('top10-body');
-  const maxCit = DATA.top10[0].citations;
-
-  DATA.top10.forEach(paper => {
-    const rankClass = paper.rank <= 3 ? `rank-${paper.rank}` : 'rank-other';
-    const barWidth = Math.round(paper.citations / maxCit * 100);
-
-    // 관점 배지 HTML
-    const badge = paper.perspective
-      ? `<span class="persp-badge" style="background:${paper.perspective.color}18; color:${paper.perspective.color}; border:1px solid ${paper.perspective.color}44;">${paper.perspective.name}</span>`
-      : '';
-
-    // 키워드 태그 HTML
-    const tags = paper.tags
-      ? paper.tags.map(t => `<span class="paper-tag">#${t}</span>`).join('')
-      : '';
-
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><span class="rank-badge ${rankClass}">${paper.rank}</span></td>
-      <td class="year-cell">${paper.year}</td>
-      <td class="title-cell">
-        <div class="title-main">${paper.title}</div>
-        <div class="title-meta">${badge}${tags}</div>
-      </td>
-      <td class="author-cell">${paper.author}</td>
-      <td class="cit-cell">${paper.citations}</td>
-      <td>
-        <div class="cit-bar-wrap">
-          <div class="cit-bar" style="width:0%" data-width="${barWidth}%"></div>
-        </div>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
-/* ── ECharts 지도 차트 (패널 A) ── */
-function initMapChart() {
-  const chartDom = document.getElementById('map-container');
-  if (!chartDom) return;
-  const myChart = echarts.init(chartDom);
-  try {
-    // korea.js를 통해 전역 변수 koreaGeoData로 지도 데이터가 로드됨 (CORS 문제 우회)
-    echarts.registerMap('korea', koreaGeoData);
-
-    let mapData = [];
-    DATA.regionData.forEach(region => {
-      region.provinces.forEach(prov => {
-        mapData.push({
-          name: prov,
-          value: region.count,
-          regionInfo: region
-        });
-      });
-    });
-
-    const option = {
-      tooltip: {
-        show: false // HTML 상시 카드를 사용하므로 기본 ECharts 툴팁 완전 비활성화
-      },
-      visualMap: {
-        show: false,
-        type: 'piecewise',
-        left: 'right',
-        bottom: 10,
-        pieces: [
-          { min: 100, label: '100+ (서울)' },
-          { min: 20, max: 99, label: '20~99편' },
-          { min: 15, max: 19, label: '15~19편' },
-          { min: 6, max: 14, label: '6~14편' },
-          { min: 1, max: 5, label: '1~5편 (제주 등)' }
-        ],
-        inRange: {
-          color: ['#bae6fd', '#7dd3fc', '#0ea5e9', '#0284c7', '#1e3a8a']
-        },
-        itemWidth: 12,
-        itemHeight: 12,
-        textStyle: { fontSize: 10, color: '#64748b' }
-      },
-      series: [
-        {
-          name: '지역별 퍼블리케이션',
-          type: 'map',
-          map: 'korea',
-          roam: false,
-          top: 10, bottom: 10,
-          label: { show: false },
-          itemStyle: {
-            borderColor: 'rgba(255,255,255,0.8)',
-            borderWidth: 0.8
-          },
-          emphasis: {
-            itemStyle: {
-              areaColor: '#fcd34d',
-              shadowOffsetX: 0, shadowOffsetY: 0, shadowBlur: 10,
-              borderWidth: 1.2, shadowColor: 'rgba(0, 0, 0, 0.4)'
-            },
-            label: { show: false }
-          },
-          select: { disabled: true },
-          data: mapData
-        }
-      ]
-    };
-    myChart.setOption(option);
-
-    // 💡 1. 8개의 HTML 정보 카드를 지도 주변에 상시 렌더링
-    renderMapCards(myChart);
-
-    const mapCardsContainer = document.getElementById('map-cards-container');
-
-    // 💡 2. 지도 위 행정구역 마우스 오버 시 연동 하이라이트
-    myChart.on('mouseover', function (params) {
-      if (params.data && params.data.regionInfo) {
-        // ECharts 지도 권역 하이라이트
-        myChart.dispatchAction({
-          type: 'highlight',
-          seriesIndex: 0,
-          name: params.data.regionInfo.provinces
-        });
-
-        // HTML 카드 하이라이트 동기화
-        if (mapCardsContainer) {
-          const id = params.data.regionInfo.id;
-          const targetCard = mapCardsContainer.querySelector(`.region-card[data-id="${id}"]`);
-
-          if (targetCard) {
-            targetCard.classList.add('highlight');
-            // 호버되지 않은 나머지 모든 카드는 흐리게 처리 (dimmed)
-            mapCardsContainer.querySelectorAll('.region-card').forEach(card => {
-              if (card !== targetCard) card.classList.add('dimmed');
-            });
-          }
-        }
-      }
-    });
-
-    myChart.on('mouseout', function (params) {
-      if (params.data && params.data.regionInfo) {
-        // ECharts 하이라이트 해제
-        myChart.dispatchAction({
-          type: 'downplay',
-          seriesIndex: 0,
-          name: params.data.regionInfo.provinces
-        });
-
-        // 모든 HTML 카드의 하이라이트 및 Dimmed 상태 원상 복구
-        if (mapCardsContainer) {
-          mapCardsContainer.querySelectorAll('.region-card').forEach(card => {
-            card.classList.remove('highlight', 'dimmed');
-          });
-        }
-      }
-    });
-
-    window.addEventListener('resize', () => myChart.resize());
-  } catch (e) {
-    console.error("지도를 로드할 수 없습니다:", e);
-  }
-}
-
-/* ── HTML 기반 퍼시스턴트(상시 노출) 정보 카드 렌더링 ── */
-function renderMapCards(myChart) {
-  const container = document.getElementById('map-cards-container');
-  if (!container) return;
-  container.innerHTML = '';
-
-  // 권역별 하드코딩된 레이아웃 슬롯 (앱 솔루트 좌표)
-  // 지도 바다(빈 공간) 영역을 영리하게 활용
-  const posMap = {
-    'seoul': { left: '3%', top: '3%' },
-    'gyeongi': { left: '3%', top: '21%' },
-    'daejeon': { left: '3%', top: '39%' },
-    'gwangju': { left: '3%', top: '57%' },
-    'jeju': { left: '3%', top: '75%' },
-
-    'gangwon': { right: '3%', top: '3%' },   /* 서울과 윗 선 일치 */
-    'daegu': { right: '3%', top: '23%' },
-    'busan': { right: '3%', top: '43%' }
-  };
-
-  DATA.regionData.forEach(info => {
-    const pos = posMap[info.id];
-    if (!pos) return;
-
-    let tagsHtml = info.tags.map(t => `<span style="display:inline-block; margin-right:3px; margin-bottom:3px; padding:2px 5px; background:#eff6ff; color:#2563eb; border-radius:100px; font-size:10px; font-weight:600;">#${t}</span>`).join('');
-
-    const cardEl = document.createElement('div');
-    // pos.left = 좌측 열, pos.right = 우측 열 → 너비 클래스 구분
-    cardEl.className = `region-card ${pos.left ? 'card-left' : 'card-right'}`;
-    cardEl.dataset.id = info.id;
-    if (pos.left) cardEl.style.left = pos.left;
-    if (pos.right) cardEl.style.right = pos.right;
-    if (pos.top) cardEl.style.top = pos.top;
-
-    cardEl.innerHTML = `
-      <div style="max-width: 220px; line-height: 1.3;">
-        <!-- 1행: 지역명 + 논문수 -->
-        <div style="display:flex; align-items:baseline; gap:6px; margin-bottom:3px;">
-          <span style="font-weight: 700; font-size: 13px; color: #0f172a;">${info.group}</span>
-          <span style="font-weight: 800; font-size: 13px; color: #2563eb;">${info.count}<span style="font-size:10px; font-weight:600; margin-left:1px;">편</span></span>
-        </div>
-        <!-- 2행: 연구방향성 -->
-        <div style="font-size: 10.5px; color: #ea580c; font-weight: 600; margin-bottom:4px;">💡 ${info.char.replace(' (인용 최상위)', '').replace(' (초집중)', '')}</div>
-        <!-- 3행: 태그 -->
-        <div style="display:flex; flex-wrap:wrap;">${tagsHtml}</div>
-      </div>
-    `;
-
-    // 💡 카드에 마우스 오버 시 역으로 지도 구역 피드백 (양방향 연동)
-    cardEl.addEventListener('mouseenter', () => {
-      // 본인 하이라이트 & 남들 흐리게
-      cardEl.classList.add('highlight');
-      container.querySelectorAll('.region-card').forEach(other => {
-        if (other !== cardEl) other.classList.add('dimmed');
-      });
-      // 지도 하이라이트
-      myChart.dispatchAction({ type: 'highlight', seriesIndex: 0, name: info.provinces });
-    });
-
-    cardEl.addEventListener('mouseleave', () => {
-      // 상태 복구
-      container.querySelectorAll('.region-card').forEach(card => card.classList.remove('highlight', 'dimmed'));
-      myChart.dispatchAction({ type: 'downplay', seriesIndex: 0, name: info.provinces });
-    });
-
-    container.appendChild(cardEl);
-  });
-}
-
-/* ── 스크롤 진입 시 바 애니메이션 ── */
-function initBarAnimations() {
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        // 약간의 딜레이 후 모든 data-width 요소 애니메이션
-        entry.target.querySelectorAll('[data-width]').forEach((el, i) => {
-          setTimeout(() => { el.style.width = el.dataset.width; }, 150 + i * 60);
-        });
-        observer.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.05, rootMargin: '0px 0px -50px 0px' });
-
-  // 섹션 전체를 감지해서 더 안정적으로 트리거
-  document.querySelectorAll('.landscape-section, .top10-section').forEach(el => observer.observe(el));
-}
-
-/* ── 국외 연구 플로팅 패널 초기화 ── */
-function initGlobalPanel() {
-  const container = document.getElementById('global-bars-container');
-  const card = document.querySelector('.global-floating-card');
-  if (!container || !card) return;
-
-  let html = '';
-  const maxCount = 10;
-
-  DATA.globalData.forEach(item => {
-    const widthPct = (item.count / maxCount) * 100;
-    html += `
-      <div class="gf-bar-row">
-        <div class="gf-bar-label">${item.country}</div>
-        <div class="gf-bar-track">
-          <div class="gf-bar-fill" style="width: 0%" data-width="${widthPct}%"></div>
-        </div>
-        <div class="gf-bar-value">${item.count}</div>
-      </div>
-    `;
-  });
-
-  container.innerHTML = html;
-
-  // 초기 렌더링 시 게이지 차오르는 애니메이션 즉시 발동
-  setTimeout(() => {
-    container.querySelectorAll('.gf-bar-fill').forEach((el, i) => {
-      setTimeout(() => {
-        el.style.width = el.getAttribute('data-width');
-      }, i * 50);
-    });
-  }, 100);
-}
-
-/* ── Init ── */
-function init() {
-  initKPI();
-  initTrendChart();
-  initDonutChart();
-  initStackedChart();
-  initMapChart();
-  initGlobalPanel();
-  initTop10Table();
-  initBarAnimations();
-  initCoreAuthorList();
-}
-
-/* ══════════════════════════════════════════
-   화면 전환 (홈 ↔ 상세 뷰)
-══════════════════════════════════════════ */
-function showDetailView(viewId) {
-  document.getElementById('home-header').style.display = 'none';
-  document.getElementById('home-layout').style.display = 'none';
-
-  const detailEl = document.getElementById('detail-' + viewId);
-  if (detailEl) {
-    detailEl.classList.remove('hidden');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (viewId === 'kpi') { initEcosystemDonut(); initAuthorBarTable(); initAuthorEntryChart(); }
-    if (viewId === 'discourse') { initStreamChart(); }
-  }
-}
-
-function hideDetailView() {
-  document.querySelectorAll('.detail-view').forEach(el => el.classList.add('hidden'));
-  document.getElementById('home-header').style.display = '';
-  document.getElementById('home-layout').style.display = '';
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-/* ══════════════════════════════════════════
-   KPI 상세 | 연구 생태계 도넛 차트
-══════════════════════════════════════════ */
-const CORE_AUTHORS = [
-  { name: '홍남희',  count: 18, firstAuthor: 15 },
-  { name: '유인혁',  count: 16, firstAuthor: 16 },
-  { name: '홍용진',  count: 15, firstAuthor: 15 },
-  { name: '김은주',  count: 14, firstAuthor: 13 },
-  { name: '곽노완',  count: 14, firstAuthor: 14 },
-  { name: '김태연',  count: 11, firstAuthor: 10 },
-  { name: '정희원',  count: 11, firstAuthor: 11 },
-  { name: '오창룡',  count:  7, firstAuthor:  7 },
-  { name: '노영희',  count:  6, firstAuthor:  5 },
-  { name: '심광현',  count:  5, firstAuthor:  5 },
-];
-
-let ecosystemDonutChart = null;
-
-function initCoreAuthorList() {
-  const listEl = document.getElementById('cta-list');
-  if (!listEl) return;
-  listEl.innerHTML = CORE_AUTHORS.map(a =>
-    `<div class="cta-chip">
-      <span>${a.name}</span>
-      <span class="cta-count">${a.count}편</span>
-    </div>`
-  ).join('');
-}
-
-function initAuthorBarTable() {
-  const el = document.getElementById('author-bar-table');
-  if (!el) return;
-  el.innerHTML = CORE_AUTHORS.map((a, i) => {
-    const pct = Math.round((a.firstAuthor / a.count) * 100);
-    const coAuthor = a.count - a.firstAuthor;
-    return `
-      <div class="abt-row" onclick="showAuthorPapers(event, '${a.name}')" style="cursor:pointer; transition: background 0.2s;">
-        <div class="abt-rank">${i + 1}</div>
-        <div class="abt-name">${a.name}</div>
-        <div class="abt-total">${a.count}편</div>
-        <div class="abt-bar-wrap">
-          <div class="abt-bar-track">
-            <div class="abt-bar-fill" data-pct="${pct}" style="width:0%"></div>
-          </div>
-        </div>
-        <div class="abt-pct ${pct === 100 ? 'abt-pct-full' : ''}">${pct}%</div>
-        <div class="abt-detail">
-          <span class="abt-first">제1저자 ${a.firstAuthor}편</span>
-          ${coAuthor > 0 ? `<span class="abt-co">공저 ${coAuthor}편</span>` : ''}
-        </div>
-      </div>`;
-  }).join('');
-
-  // 애니메이션: 약간의 딜레이 후 막대 너비 적용
-  requestAnimationFrame(() => {
-    el.querySelectorAll('.abt-bar-fill').forEach((bar, i) => {
-      setTimeout(() => {
-        bar.style.width = bar.dataset.pct + '%';
-      }, i * 60);
-    });
-  });
-}
-
-function showAuthorPapers(event, authorName) {
-  const panel = document.getElementById('author-papers-card');
-  const title = document.getElementById('ap-author-title');
-  const desc = document.getElementById('ap-author-desc');
-  const list = document.getElementById('ap-list');
-  
-  if (!panel || typeof CORE_AUTHOR_PAPERS === 'undefined') {
-    console.error("Panel or CORE_AUTHOR_PAPERS not found.");
-    return;
-  }
-  
-  const papers = CORE_AUTHOR_PAPERS[authorName] || [];
-  
-  title.innerHTML = `📌 ${authorName} 연구자의 논문 목록`;
-  desc.innerHTML = `KCI에 등록된 총 ${papers.length}편의 논문 (최신순)`;
-  
-  if (papers.length === 0) {
-    list.innerHTML = `<div style="padding: 1rem; color: var(--text-muted);">해당 연구자의 논문 데이터가 없습니다.</div>`;
-  } else {
-    list.innerHTML = papers.map((p, i) => `
-      <div onclick="showPaperModal('${authorName}', ${i})" style="padding: 0.8rem; border-bottom: 1px solid var(--border); display: flex; gap: 1rem; align-items: baseline; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.02)'" onmouseout="this.style.background=''">
-        <div style="font-size: 0.85rem; font-weight: 700; color: var(--accent); min-width: 40px;">${p.year}</div>
-        <div style="flex: 1;">
-          <div style="font-size: 0.95rem; font-weight: 600; color: var(--text-base); margin-bottom: 0.2rem; line-height: 1.4;">${p.title}</div>
-          <div style="font-size: 0.8rem; color: var(--text-muted); display: flex; gap: 0.5rem;">
-            <span><span style="display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent-lt); margin-right:4px;"></span>${p.journal}</span>
-            ${p.is_first ? `<span style="color: var(--accent); font-weight:600;">[제1저자/단독]</span>` : `<span style="color: var(--text-muted);">[공저]</span>`}
-          </div>
-        </div>
-      </div>
-    `).join('');
-  }
-  
-  panel.style.display = 'block';
-  
-  // 패널로 부드럽게 스크롤
-  setTimeout(() => {
-    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }, 100);
-  
-  // 행 하이라이트 효과
-  document.querySelectorAll('.abt-row').forEach(row => {
-    row.style.background = '';
-  });
-  if (event && event.currentTarget) {
-    event.currentTarget.style.background = 'rgba(37, 99, 235, 0.05)';
-  }
-}
-
-function showPaperModal(authorName, idx) {
-  if (typeof CORE_AUTHOR_PAPERS === 'undefined') return;
-  const paper = CORE_AUTHOR_PAPERS[authorName][idx];
-  if (!paper) return;
-  
-  document.getElementById('pm-year').innerText = paper.year + '년';
-  document.getElementById('pm-title').innerText = paper.title;
-  document.getElementById('pm-journal').innerText = paper.journal;
-  document.getElementById('pm-author-type').innerHTML = paper.is_first 
-    ? `<span style="color: var(--accent);">[제1저자/단독]</span>` 
-    : `<span style="color: var(--text-muted);">[공저]</span>`;
-    
-  document.getElementById('pm-abstract').innerText = (paper.abstract && paper.abstract !== 'nan') 
-    ? paper.abstract 
-    : '제공된 초록 데이터가 없습니다.';
-    
-  document.getElementById('pm-keywords').innerText = (paper.keywords && paper.keywords !== 'nan')
-    ? paper.keywords.replace(/;/g, ', ')
-    : '제공된 키워드 데이터가 없습니다.';
-    
-  const modal = document.getElementById('paper-modal');
-  modal.style.display = 'flex';
-}
-
-function closePaperModal() {
-  document.getElementById('paper-modal').style.display = 'none';
-}
-
-function initEcosystemDonut() {
-  const canvas = document.getElementById('chart-ecosystem-donut');
-  if (!canvas) return;
-
-  // 이미 그려진 차트가 있으면 파괴 후 재생성
-  if (ecosystemDonutChart) {
-    ecosystemDonutChart.destroy();
-    ecosystemDonutChart = null;
-  }
-
-  const ctx = canvas.getContext('2d');
-  ecosystemDonutChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['1회성 연구자 (78.7%)', '2회성 연구자 (9.7%)', '핵심 코어 연구자 (11.7%)'],
-      datasets: [{
-        data: [236, 29, 35],
-        backgroundColor: ['#cbd5e1', '#93c5fd', '#2563eb'],
-        hoverBackgroundColor: ['#94a3b8', '#60a5fa', '#1d4ed8'],
-        borderWidth: 3,
-        borderColor: '#ffffff',
-        hoverOffset: 10
-      }]
-    },
-    options: {
-      cutout: '68%',
-      responsive: true,
-      maintainAspectRatio: true,
-      animation: { animateRotate: true, duration: 900 },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              const idx = context.dataIndex;
-              if (idx === 2) {
-                // 핵심 코어 슬라이스: 상위 연구자 목록 노출
-                const lines = ['── 핵심 코어 연구자 (3편 이상) ──'];
-                CORE_AUTHORS.slice(0, 5).forEach(a => {
-                  lines.push(`  ${a.name}: ${a.count}편`);
-                });
-                lines.push('  … 외 30명');
-                return lines;
-              }
-              return ` ${context.label}: ${context.raw}명`;
-            }
-          },
-          bodyFont: { family: "'Pretendard', 'Inter', sans-serif", size: 12 },
-          padding: 12,
-          boxPadding: 4
-        }
-      }
-    }
-  });
-}
-
-/* ══════════════════════════════════════════
-   담론의 진화 | 1. 키워드 스트림그래프 (ECharts)
-══════════════════════════════════════════ */
-const DISCOURSE_DATA = {
-  years: [2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025],
-  keywords: {
-    '인문도시':  [0,0,0,0,0,1,0,2,1,2,2,4,2,0,0,0,1],
-    '기본소득':  [0,2,1,0,0,0,3,1,6,0,0,0,0,0,0,0,0],
-    '도시재생':  [1,2,0,0,0,2,2,0,0,0,1,0,1,1,0,0,0],
-    '공동체':    [0,0,0,0,0,0,3,0,1,0,0,1,1,2,0,0,0],
-    '박완서':    [0,0,0,0,0,0,0,0,0,0,0,1,2,2,1,0,1],
-    '벤야민':    [0,3,0,0,0,0,1,1,0,0,0,0,0,1,0,0,0],
-    '장소성':    [0,0,0,0,0,2,0,0,1,0,0,0,0,1,1,1,0],
-    '돌봄':      [0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,2,2],
-    '공유지':    [0,0,0,0,0,0,1,1,3,0,0,0,0,0,0,0,0],
-    '기억':      [0,1,0,0,0,0,0,0,0,1,1,0,1,3,0,1,0],
-    '정체성':    [0,1,0,0,1,0,0,0,1,0,1,1,1,0,1,1,0],
-    '도시화':    [0,1,0,0,1,0,0,0,1,0,0,0,1,0,1,0,0],
-  },
-  colors: ['#3b82f6','#f59e0b','#10b981','#8b5cf6','#ef4444',
-           '#f97316','#06b6d4','#ec4899','#84cc16','#6366f1','#14b8a6','#a78bfa']
-};
-
-let streamChart = null;
-let authorEntryChart = null;
-
-// 선택된 키워드 상태 관리
-// ── 선택 상태 ──────────────────────────────────────────────────
-let comparedItems = []; 
-// [{ type, label, color, data, id }]
-
-// ── 테마 트리 초기화 ────────────────────────────────────────────
-function initStreamChart() {
-  const el = document.getElementById('chart-stream');
-  if (!el) return;
-  if (streamChart) { streamChart.dispose(); }
-  streamChart = echarts.init(el);
-  comparedItems = [];
-  renderThemeTree();
-  renderStreamChart();
-  renderCompareTags();
-  
-  streamChart.on('click', function(params) {
-    if (params.seriesName) {
-      showKeywordMonopoly(params.seriesName);
-    }
-  });
-}
-
-function showKeywordMonopoly(keyword) {
-  const panel = document.getElementById('keyword-monopoly-panel');
-  const title = document.getElementById('km-title');
-  const total = document.getElementById('km-total');
-  const list = document.getElementById('km-list');
-  
-  if (!panel || typeof KEYWORD_AUTHOR_DATA === 'undefined') return;
-  
-  const kwData = KEYWORD_AUTHOR_DATA[keyword];
-  if (!kwData) {
-    panel.style.display = 'block';
-    title.innerHTML = `📌 <strong>${keyword}</strong> 담론의 독점 분석`;
-    total.innerHTML = `검색된 논문 데이터가 부족합니다.`;
-    list.innerHTML = ``;
-    return;
-  }
-  
-  panel.style.display = 'block';
-  title.innerHTML = `📌 <strong>${keyword}</strong> 담론의 독점 분석`;
-  total.innerHTML = `해당 키워드를 포함한 총 논문: <strong>${kwData.total}편</strong>`;
-  
-  if (kwData.authors.length === 0) {
-    list.innerHTML = `<div style="color: var(--text-muted);">저자 정보가 없습니다.</div>`;
-    return;
-  }
-  
-  // 최대 값을 기준으로 막대그래프 비율 계산
-  const maxCount = kwData.authors[0][1];
-  
-  list.innerHTML = kwData.authors.map((item, idx) => {
-    const author = item[0];
-    const count = item[1];
-    const percent = Math.max(5, Math.round((count / maxCount) * 100)); // 최소 5% 너비 보장
-    // 1위는 색상을 강조 (파란색 계열)
-    const barColor = idx === 0 ? 'var(--accent)' : 'var(--text-muted)';
-    
-    return `
-      <div style="display: flex; align-items: center; gap: 1rem;">
-        <div style="width: 20px; font-weight: 700; color: ${idx === 0 ? 'var(--accent)' : 'var(--text-muted)'};">${idx + 1}</div>
-        <div style="width: 70px; font-weight: 600; color: var(--text-base);">${author}</div>
-        <div style="flex: 1; background: var(--bg-hover); border-radius: 4px; height: 16px; overflow: hidden; position: relative;">
-          <div style="width: ${percent}%; height: 100%; background: ${barColor}; border-radius: 4px; transition: width 0.5s ease-out;"></div>
-        </div>
-        <div style="width: 40px; text-align: right; font-size: 0.9rem; font-weight: 600;">${count}편</div>
-      </div>
-    `;
-  }).join('');
-}
-
-// ── 드래그 앤 드롭 핸들러 ───────────────────────────────────────
-function onDragStart(e, type, label, color, dataStr) {
-  e.dataTransfer.setData('text/plain', JSON.stringify({ type, label, color, data: JSON.parse(dataStr) }));
-  e.dataTransfer.effectAllowed = 'copy';
-}
-
-function onDragOver(e) {
-  e.preventDefault();
-  e.dataTransfer.dropEffect = 'copy';
-  const chartArea = e.currentTarget;
-  chartArea.classList.add('drag-over');
-}
-
-function onDragLeave(e) {
-  e.preventDefault();
-  const chartArea = e.currentTarget;
-  chartArea.classList.remove('drag-over');
-}
-
-function onDrop(e) {
-  e.preventDefault();
-  const chartArea = e.currentTarget;
-  chartArea.classList.remove('drag-over');
-
-  const dataStr = e.dataTransfer.getData('text/plain');
-  if (!dataStr) return;
-  try {
-    const item = JSON.parse(dataStr);
-    addComparedItem(item);
-  } catch (err) {
-    console.warn("Drop parse error", err);
-  }
-}
-
-// 비교 항목 추가 (드롭 시)
-function addComparedItem(item) {
-  // 이미 존재하는지 확인
-  if (comparedItems.some(existing => existing.label === item.label)) return;
-  // 고유 ID 생성
-  item.id = 'cmp_' + Math.random().toString(36).substr(2, 9);
-  comparedItems.push(item);
-  
-  updateActiveStates();
-  renderCompareTags();
-  renderStreamChart();
-  
-  showKeywordMonopoly(item.label);
-}
-
-// 비교 항목 삭제 (태그 X 클릭 시)
-function removeComparedItem(id) {
-  comparedItems = comparedItems.filter(item => item.id !== id);
-  updateActiveStates();
-  renderCompareTags();
-  renderStreamChart();
-}
-
-// 태그 렌더링
-function renderCompareTags() {
-  const container = document.getElementById('stream-compare-tags');
-  if (!container) return;
-  if (comparedItems.length === 0) {
-    container.style.display = 'none';
-    return;
-  }
-  container.style.display = 'flex';
-  container.innerHTML = comparedItems.map(item => `
-    <div class="stream-tag" style="background:${item.color}15; border:1px solid ${item.color}55;">
-      <span class="st-dot" style="background:${item.color}"></span>
-      <span class="st-label" style="color:${item.color}">${item.label}</span>
-      <button class="st-remove" onclick="removeComparedItem('${item.id}')">×</button>
-    </div>
-  `).join('');
-}
-
-// 트리의 요소들을 선택 중인 항목 상태로 업데이트
-function updateActiveStates() {
-  document.querySelectorAll('.stt-theme, .stt-sub, .stream-kw-chip').forEach(btn => {
-    btn.classList.remove('active');
-    btn.style.cssText = '';
-  });
-  comparedItems.forEach(item => {
-    const clicked = document.querySelector(`[data-label="${item.label}"]`);
-    if (clicked) {
-      clicked.classList.add('active');
-      clicked.style.cssText = `border-left-color:${item.color};background:${item.color}12;`;
-    }
-  });
-}
-
-function renderThemeTree() {
-  const treeEl = document.getElementById('stream-theme-tree');
-  if (!treeEl || !window.THEME_DATA) return;
-
-  treeEl.innerHTML = window.THEME_DATA.themes.map(theme => {
-    const hasSub = theme.subclusters && theme.subclusters.length;
-    const isThemeSel = comparedItems.some(i => i.label === theme.name);
-
-    const subHTML = hasSub ? theme.subclusters.map(sc => {
-      const isScSel = comparedItems.some(i => i.label === sc.name);
-      return `<button class="stt-sub ${isScSel ? 'active' : ''}"
-        data-label="${sc.name}" data-color="${sc.color}" data-type="cluster"
-        draggable="true" ondragstart="onDragStart(event, 'cluster', '${sc.name}', '${sc.color}', '${JSON.stringify(sc.data)}')"
-        onclick="onTreeSelect('cluster','${sc.name}','${sc.color}',${JSON.stringify(sc.data)})"
-        style="${isScSel ? `border-left-color:${sc.color};background:${sc.color}12;` : ''}">
-        <span class="stt-sub-dot" style="background:${sc.color}"></span>
-        <span class="stt-sub-name">${sc.name}</span>
-        <span class="stt-sub-count">${sc.total}</span>
-      </button>`;
-    }).join('') : '';
-
-    return `<div class="stt-theme-wrap" id="stt-wrap-${theme.id}">
-      <button class="stt-theme ${isThemeSel ? 'active' : ''} ${hasSub ? 'has-sub' : ''}"
-        data-id="${theme.id}"
-        data-label="${theme.name}"
-        ${!hasSub ? `draggable="true" ondragstart="onDragStart(event, 'theme', '${theme.name}', '${theme.color}', '${JSON.stringify(theme.data)}')"` : ''}
-        onclick="${hasSub ? `toggleThemeExpand('${theme.id}')` : `onTreeSelect('theme','${theme.name}','${theme.color}',${JSON.stringify(theme.data)})`}"
-        style="${isThemeSel ? `border-left-color:${theme.color};background:${theme.color}12;` : ''}">
-        <span class="stt-name">${theme.name}</span>
-        <span class="stt-count">${theme.total}</span>
-        ${hasSub ? '<span class="stt-arrow" id="stt-arrow-' + theme.id + '">▸</span>' : ''}
-      </button>
-      ${hasSub ? `<div class="stt-sub-list" id="stt-sub-${theme.id}" style="display:none;">${subHTML}</div>` : ''}
-    </div>`;
-  }).join('');
-}
-
-function toggleThemeExpand(id) {
-  const subEl = document.getElementById(`stt-sub-${id}`);
-  const arrow = document.getElementById(`stt-arrow-${id}`);
-  if (!subEl) return;
-  const open = subEl.style.display !== 'none';
-  subEl.style.display = open ? 'none' : '';
-  if (arrow) arrow.textContent = open ? '▸' : '▾';
-}
-
-// 클릭 시에는 단일 선택(초기화 후 추가)으로 동작
-function onTreeSelect(type, label, color, data) {
-  comparedItems = [{ type, label, color, data, id: 'cmp_' + Math.random().toString(36).substr(2, 9) }];
-  
-  // 검색창 초기화
-  const searchEl = document.getElementById('stream-search');
-  if (searchEl) searchEl.value = '';
-  const listEl = document.getElementById('stream-all-list');
-  if (listEl) listEl.style.display = 'none';
-  
-  updateActiveStates();
-  renderCompareTags();
-  renderStreamChart();
-  
-  showKeywordMonopoly(label);
-}
-
-// ── 개별 키워드 검색 ────────────────────────────────────────────
-function onStreamSearch(query) {
-  const allListEl = document.getElementById('stream-all-list');
-  if (!allListEl) return;
-  const q = query.trim();
-
-  if (!q) {
-    allListEl.style.display = 'none';
-    return;
-  }
-  allListEl.style.display = '';
-
-  const kwSource = window.KW_DATA ? window.KW_DATA.keywords : DISCOURSE_DATA.keywords;
-  const matched = Object.keys(kwSource).filter(kw => kw.includes(q)).slice(0, 40);
-
-  allListEl.innerHTML = matched.length
-    ? matched.map((kw, i) => {
-        const color = DISCOURSE_DATA.colors[i % DISCOURSE_DATA.colors.length];
-        const total = (kwSource[kw] || []).reduce((a,b)=>a+b,0);
-        const data = kwSource[kw] || [];
-        const isOn = comparedItems.some(c => c.label === kw);
-        return `<button class="stream-kw-chip ${isOn?'active':''}"
-          data-label="${kw}" data-idx="${i}"
-          draggable="true" ondragstart="onDragStart(event, 'keyword', '${kw.replace(/'/g,"\\'")}','${color}', '${JSON.stringify(data)}')"
-          onclick="onTreeSelect('keyword','${kw.replace(/'/g,"\\'")}','${color}',${JSON.stringify(data)})"
-          style="${isOn?`border-color:${color};background:${color}18;`:''}">
-          <span class="skc-dot" style="background:${color}"></span>
-          <span class="skc-name">${kw}</span>
-          <span class="skc-count">${total}</span>
-        </button>`;
-      }).join('')
-    : `<div class="stream-no-result">검색 결과 없음</div>`;
-}
-
-// ── 차트 렌더링 ─────────────────────────────────────────────────
-function renderStreamChart() {
-  if (!streamChart) return;
-  const years = window.THEME_DATA ? window.THEME_DATA.years : DISCOURSE_DATA.years;
-
-  if (comparedItems.length === 0) {
-    streamChart.setOption({
-      graphic: [{ type: 'group', left: 'center', top: 'middle',
-        children: [
-          { type: 'text', style: {
-            text: '← 좌측에서 클릭하거나 여기로 드래그 앤 드롭하여 비교하세요',
-            fill: '#94a3b8', font: "15px 'Pretendard', sans-serif"
-          }}
-        ]
-      }],
-      series: []
-    }, true);
-    return;
-  }
-
-  // Y축 최대값 찾기 (비교 중인 모든 항목 중)
-  let maxVal = 4;
-  comparedItems.forEach(item => {
-    const itemMax = Math.max(...item.data);
-    if (itemMax > maxVal) maxVal = itemMax;
-  });
-
-  const series = comparedItems.map(item => {
-    return {
-      name: item.label,
-      type: 'line',
-      smooth: true,
-      data: item.data,
-      itemStyle: { color: item.color },
-      lineStyle: { color: item.color, width: 2.5 },
-      areaStyle: { color: { type:'linear', x:0,y:0,x2:0,y2:1,
-        colorStops:[{offset:0,color:item.color+'55'},{offset:1,color:item.color+'08'}]
-      }},
-      symbol: 'circle', symbolSize: 6,
-      emphasis: { itemStyle: { borderWidth:2, borderColor:'#fff', shadowBlur:6, shadowColor:item.color+'88' }},
-      markPoint: {
-        data: [{ type:'max', name:'최고' }],
-        itemStyle: { color: item.color },
-        label: { fontSize: 10, color: '#fff' }
-      }
-    };
-  });
-
-  streamChart.setOption({
-    graphic: [],
-    tooltip: {
-      trigger: 'axis', axisPointer: { type: 'line' },
-      textStyle: { fontFamily: "'Pretendard', sans-serif", fontSize: 12 },
-      formatter(params) {
-        if (!params || !params.length) return '';
-        let html = `<div style="font-weight:700;margin-bottom:4px;padding-bottom:4px;border-bottom:1px solid #e2e8f0">${params[0].axisValue}년</div>`;
-        
-        // 값이 큰 순서대로 툴팁 정렬
-        const sortedParams = [...params].sort((a, b) => b.value - a.value);
-        
-        sortedParams.forEach(p => {
-          if (!p.value) return; // 값이 0이면 생략 (선택 사항, 필요 시 제거)
-          html += `<div style="display:flex;align-items:center;gap:6px;margin-top:4px">
-            <span style="width:8px;height:8px;border-radius:50%;background:${p.color};display:inline-block"></span>
-            <span style="flex:1">${p.seriesName}</span>
-            <span style="font-weight:700;margin-left:12px">${p.value}편</span>
-          </div>`;
-        });
-        return html;
-      }
-    },
-    legend: { show: false },
-    grid: { left: 40, right: 20, top: 10, bottom: 40 },
-    xAxis: {
-      type: 'category', data: years, boundaryGap: false,
-      axisLine: { lineStyle: { color: '#cbd5e1' } },
-      axisLabel: { color: '#94a3b8', fontSize: 11 }
-    },
-    yAxis: {
-      type: 'value', minInterval: 1, min: 0, max: maxVal + 1,
-      splitLine: { lineStyle: { color: '#f1f5f9' } },
-      axisLabel: { color: '#94a3b8', fontSize: 11 }
-    },
-    series: series
-  }, true);
-}
-
-
-
-
-
-/* ══════════════════════════════════════════
-   담론의 진화 | 2. 신규 진입 vs 기존 연구자 (Chart.js)
-══════════════════════════════════════════ */
-const AUTHOR_ENTRY_DATA = [
-  { year:2009, new:21, returning:2  },
-  { year:2010, new:23, returning:8  },
-  { year:2011, new:12, returning:8  },
-  { year:2012, new:10, returning:4  },
-  { year:2013, new:15, returning:3  },
-  { year:2014, new:22, returning:4  },
-  { year:2015, new:18, returning:8  },
-  { year:2016, new:23, returning:15 },
-  { year:2017, new:14, returning:37 },
-  { year:2018, new:19, returning:5  },
-  { year:2019, new:19, returning:11 },
-  { year:2020, new:21, returning:24 },
-  { year:2021, new:18, returning:13 },
-  { year:2022, new:7,  returning:17 },
-  { year:2023, new:13, returning:19 },
-  { year:2024, new:15, returning:15 },
-  { year:2025, new:25, returning:7  },
-];
-
-function initAuthorEntryChart() {
-  const canvas = document.getElementById('chart-author-entry');
-  if (!canvas) return;
-  if (authorEntryChart) { authorEntryChart.destroy(); authorEntryChart = null; }
-
-  const ctx = canvas.getContext('2d');
-  authorEntryChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: AUTHOR_ENTRY_DATA.map(d => d.year),
-      datasets: [
-        {
-          label: '신규 진입 연구자',
-          data: AUTHOR_ENTRY_DATA.map(d => d.new),
-          backgroundColor: 'rgba(37,99,235,0.75)',
-          borderRadius: 4,
-          stack: 'authors'
-        },
-        {
-          label: '기존 복귀 연구자',
-          data: AUTHOR_ENTRY_DATA.map(d => d.returning),
-          backgroundColor: 'rgba(16,185,129,0.75)',
-          borderRadius: 4,
-          stack: 'authors'
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: { duration: 800 },
-      plugins: {
-        legend: {
-          position: 'top',
-          labels: { font: { family: "'Pretendard', sans-serif", size: 12 }, padding: 16 }
-        },
-        tooltip: {
-          callbacks: {
-            afterBody: (ctx) => {
-              const idx = ctx[0].dataIndex;
-              const d = AUTHOR_ENTRY_DATA[idx];
-              const total = d.new + d.returning;
-              const newPct = Math.round((d.new / total) * 100);
-              return [`신규 비율: ${newPct}% — ${newPct > 70 ? '외부 유입 강세' : '자생적 성숙기'}`];
-            }
-          }
-        }
-      },
-      scales: {
-        x: {
-          stacked: true,
-          grid: { display: false },
-          ticks: { color: '#94a3b8', font: { size: 11 } }
-        },
-        y: {
-          stacked: true,
-          grid: { color: 'rgba(15,23,42,0.05)' },
-          ticks: { color: '#94a3b8', font: { size: 11 } }
-        }
-      }
-    }
-  });
-}
-
-document.addEventListener('DOMContentLoaded', init);
 const CORE_AUTHOR_PAPERS = {
   "홍남희": [
     {
@@ -1355,7 +6,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "얼굴은 인간을 다른 사람과 구분하고 식별하게 하는 사회문화적 역할을 하는 동시에 개인의 정체성과 자아를 구성하고 개인을 ‘대표’하는 중요한 생체 정보로 작동해왔다. 들뢰즈와 가타리(2001)는 ‘얼굴성’의 개념을 통해 얼굴이 ‘의미 생성과 주체화’ 의 두 축을 가진 체계이며, 사회적 의미화 과정을 통해 구성되는 것이라고 본다. 얼굴-데이터는 사진술 도입 이래로 진전되어 온 얼굴의 사물화, 파편화 과정을 반영하며 디지털 맥락에서 얼굴이 다양한 자발적, 비자발적 재현의 실천을 통해 데이터인프라로 편입되는 과정을 의미한다. 얼굴-데이터는 얼굴을 불변의 정체성으로 고정시키는 동시에 편향과 분류, 식별의 권력 작용과 연관된다. 또한 디지털 플랫폼과인공지능 생태계의 ‘가시성’ 경제에서 얼굴-데이터는 젠더화된 특성을 보인다. ‘높이 올라간’ 얼굴-데이터는 자기 재현과 가시성 확보의 주요한 도구가 되면서도 플랫폼경제의 상품이 되고, 얼굴의 원 소유자를 데이터에서 소외시키며 통제 불가능한 정보 시스템으로 유통시킨다. 얼굴-데이터-액티비즘은 얼굴-데이터의 사물화에 대한자각에서 출발하여 가면과 위장, 비가시화 전략 등의 구체적 실천으로 얼굴을 보이지 않게 하는 다양한 전략을 취한다. 여성들의 마스크 시위에서부터 얼굴-데이터를감추는 전략, 인공지능이 읽을 수 없는 얼굴을 생산하는 전략 등의 사례를 통해 얼굴-데이터화의 작동 방식을 이해하고 얼굴-데이터로부터의 소외를 극복하는 방안을 탐색하였다.",
-      "keywords": "생체 데이터, 얼굴성, 플랫폼 정치, 가시성, 인공지능 생태계, 생성형 인공지능"
+      "keywords": ""
     },
     {
       "year": 2025,
@@ -1363,7 +14,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "한국언론정보학보",
       "is_first": true,
       "abstract": "이 글은 도시의 무인매장을 인간과 기계, 로지스틱스와 소비, 미디어와 문화가 교차하는 도시공간의 기술 배치체(assemblage)로 보고, 이 안에서 ‘스마트’ 시민성과 새로운 사회적 관계가 어떻게 구성되는지를 고찰한다. 무인매장은 키오스크 기반 무인결제 시스템, 절도 방지를 위한 CCTV 감시 등 다양한 첨단기술이 배치된 소규모 상업 공간으로 자동화와 무인화를 통해 도시의 24시간 체제를 구축하고, 소비자에게는 편의성을 자영업자에게는 인건비 절감의 이점을 제공하는 기술 유토피아의 이상을 실현한 공간으로 담론화된다. 기술과 뉴 미디어를 통해 사회적 가속화를 실현하고 이에 걸맞은 신체를 재구성하는무인매장은 기술ᐨ자본 체제와 플랫폼 도시가 요구하는 속도와 규율에 적응하지 못하는 느린 신체를 배제하고 기술과 인간 사이의 당혹감, 수치심, 혼란을 유발하기도 한다. 또 이용자들 사이에서 기술을 둘러싼 긴장, 갈등, 연대가 발생하며 새로운 사회적 관계와 감정을 구성한다. 무인매장 운영자는 매장을지키지 않아도 되는 대신 CCTV를 주기적으로 모니터링하며 이상 행동과 비정상성을 분석하고 이를 서사화하여 다양한 미디어를 통해 공유하는 방식으로 새로운 행동 규범과 윤리를 구성하는 데 적극적인역할을 담당한다. 무인매장에서 빈번하게 발생하는 절도 사건은 매장과 제품 안전에 대한 우려를 높이고 더 많은 감시 기술과 경찰력 투입, 실시간 통제 시스템의 확장을 정당화한다. 이에 따라 ‘스마트’ 시민은 오해의 여지가 없는 명확한 행동과 양심적 결제, CCTV를 통한 사과 및 인사, 손 편지 등의 새로운 기술매개 행위를 수행한다. 무인매장은 소비와 결제 중심의 공간으로 기능화되는 동시에 다양한 행위자들에 의한 미시적 저항과 긴장이 교차하는 복합적인 미디어ᐨ공간으로 작동하면서 기술ᐨ자본 체제의 모순과 균열을 드러낸다.",
-      "keywords": "무인매장, 플랫폼 도시성, 사회적 가속화, 로지스틱스, 스마트 시티, 실시간성"
+      "keywords": ""
     },
     {
       "year": 2024,
@@ -1371,7 +22,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "인문연구",
       "is_first": true,
       "abstract": "이 글은 자동화 테크놀로지로 대표되는 인공지능 시대 노동의 새로운 유형으로서 콘텐츠 모더레이션을 유령 노동의 사례로 다룬다. 크라우드워크, 미세노동, 인간 연산 등 온디맨드 플랫폼에 기반한 다양한 노동 유형들이 대체 가능한 노동자 풀과 잘게 쪼개진 일감으로 말 그대로 미세한 노동을 구성하고 있으며 자동화 시대 노동 소멸 담론과 달리 질 낮은 노동의 대표적 사례를 보여주고 있다. 이 글은 이니스의 편향(bias) 개념과 헤일스의 포스트휴먼 논의를 중심으로 자동화 시대의 노동이 탈신체화 및 신체의 소멸 담론과 달리 매우 물질적이고 신체적인 특징을 가진다고 보았으며, 그 사례로 콘텐츠 모더레이션 노동의 특징을 논의하였다. 먼저, 이니스의 편향 개념은 정보의 이동성에 기반한 공간의 팽창이라는 지리적 확장 열망과 현재적 집착성에 기반한 제국의 구성, 기술 중심주의라는 이데올로기적 편향성을 설명한다. 또한 정보의 피드백 루프와 동종성(homophihly)에 대한 사랑을 전제하는 네트워크 구조는 콘텐츠 모더레이션이라는 ‘지우는 노동’의 수요로 이어진다. 콘텐츠 모더레이션은 대표적인 유령 노동의 일환으로 인도, 필리핀, 케냐 등지의 로컬 노동자에게 신체적, 정서적 트라우마를 낳고 있다. 또한 대도시에서도 이주자 중심의 온디맨드 노동, 보수적인 문화나 돌봄에 얽매인 여성의 틈새 노동으로 노동의 신체화, 재식민화를 야기하고 있다. 이 글은 정보 유통의 조절이라는 필연적인 수요 부상에 따라 떠오른 계산 기계로서의 콘텐츠 모더레이터를 가시화함으로써 정보 유통의 글로벌 흐름에 내재한 불평등한 노동 위계를 드러내고자 했다.",
-      "keywords": "유령 노동, 인공지능, 자동화, 콘텐츠 모더레이션, 온디맨드 노동, 크라우드워크"
+      "keywords": ""
     },
     {
       "year": 2024,
@@ -1379,7 +30,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "대중서사연구",
       "is_first": true,
       "abstract": "이 연구는 넷플릭스 오리지널 <나는 신이다: 신이 배신한 사람들>의 사례를 넷플릭스 체제(Netflix Regime)의 관점에서 살펴보고자 했다. 넷플릭스 체제는 포스트 텔레비전 시대의 한 사례로 로컬의 문화 상품이 글로벌 차원에서 유통되는 동시대 문화 콘텐츠 순환 시스템을 말한다. 이는 로컬 콘텐츠 생산자/수용자 집단의 정서적 변화, 문화 생산, 유통, 소비 체계의 조정 과정을 동반한다. <나는 신이다>는 첫째, 지상파 방송사 PD에 의해 제작된 것으로 로컬 생산자들의 글로벌 진출 열망을 드러낸 동시에 콘텐츠 IP를 넷플릭스에 양도하는 조건으로 제작되었다는 점에서 로컬-글로벌 생산의 역학을 드러낸다. 둘째, <나는 신이다>는 글로벌 OTT의 트루 크라임 붐 현상 및 재현 방식과 맞닿아 있는 로컬 시리즈로 의미화된다. 셋째, <나는 신이다>는 카탈로그 중심 넷플릭스 체제에서 안티페미니즘 백래시 흐름의 사례로 볼 수 있다. 이러한 맥락에서 이 글은 미국적 트루 크라임 장르의 유행과 다큐멘터리의 고급 상품화 과정을 넷플릭스 체제와 관련하여 살피고, <나는 신이다>를 이러한 흐름의 로컬 버전이자 글로벌 안티페미니즘 서사의 일환으로 해석하면서 기술과 상업적 목적에 의해 실화 성범죄가 어떻게 ‘성적으로’ 다루어지는지 탐색하였다. <나는 신이다>는 피해자 인터뷰, 가해자 악마화, 재연과 아카이브 화면 활용 등의 형식, 소셜 미디어와 뉴스를 통한 사회적 공분의 고조 방식 등으로 넷플릭스 트루 크라임 다큐 시리즈의 전형을 따른다. <나는 신이다>는 선정적이고 관습적인 성범죄 재현 방식, 피해자의 2차 피해 야기 등의 윤리적 문제에 대한 고민을 남긴 동시에 실화 범죄에 대한 대중적 공분을 재활성화하고, 사이비 교주 처단이라는 대의를 달성하기 위한 영웅적 창작자로서 다큐 시리즈의 역할을 강조한다. 또한 실화라는 ‘사실’과 피해자 ‘동의’에 기반해 있음을 강조하는 다양한 장치, 몰아보기를 염두에 둔 시각적 방식의 내용 전개를 통해 면책의 서사와 글로벌 차원의 백래시 카탈로그를 구성해 간다. 이러한 분석을 통해 이 연구는 <나는 신이다>를 글로벌과 로컬, 기술과 문화, 생산과 소비의 문제가 뒤얽힌 넷플릭스 체제로 설명하고자 했다.",
-      "keywords": "넷플릭스 체제, 트루 크라임, 다큐멘터리, 몰아보기, 포스트 텔레비전, 나는 신이다"
+      "keywords": ""
     },
     {
       "year": 2024,
@@ -1395,7 +46,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "이 글은 동시대 청년들의 귀촌 브이로그를 분석하면서 청년의 귀촌과 그것의 중계가 갖는 의미를 탐색한다. 청년의 귀촌은 당대 도시성과 매체성의 변화와 결부되는 사회적 현상으로 첫째, 도시적 삶과 신자유주의 ‘생존자 모델’에 대한 회의를 기반으로 진정한 나를 찾는 여정과 연관된다. 둘째, 청년의 귀촌은 진정한 삶의 의미와 도시적 삶의 대안을 찾고자 하는 문화 귀촌의 성격을 갖는다. 셋째, 청년의 귀촌은 퇴사, 탈도시, 창업, 노동, 빚 등을 포함해 결혼, 직업, 자아 및 세계관과 관련한 서사로 이어지는 자아 프로젝트를 브이로그를 통해 중계하면서 진정성을 연출하는 과정으로 나타난다. 나에게 의미 있는 일, 진정한 나, 내가 좋아하는 일을 찾는 진정성 추구의 과정과 브이로그를 통한 귀촌의 재현은 도시/자연, 일상과 자기와의 관계를 새롭게 구성해 가며 유튜브 알고리즘을 통해 또래 청년들의 비슷한 욕망과 충동을 자극하는 유토피아적 재현의 순환으로 나타난다. 이는 회사 인간의 거부라는 차원에서 시작되지만 끊임없는 자기계발과 새로운 노동에의 종속 등으로 나타나 청년 노동자의 새로운 삶-노동 에토스를 발전시키고 있다.",
-      "keywords": "청년, 문화 귀촌, 브이로그, 노동, 진정성"
+      "keywords": ""
     },
     {
       "year": 2023,
@@ -1403,7 +54,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "사이버커뮤니케이션학보",
       "is_first": true,
       "abstract": "이 연구는 디지털 플랫폼 중심의 동시대 매체 환경에서 인터넷 내용규제가 점차 자동화 거버넌스 체제로 구축되어 가고 있으며, 이러한 자동화 거버넌스가내용규제를 ‘무례함’ 혹은 ‘나쁜 말’의 규제로 환원시키고 있다고 보았다. 혐오표현, 테러리즘 정보, 성차별적 혐오표현 등이 디지털 플랫폼을 매개로 유통되는 환경에서 디지털 플랫폼의 사회적 책무로서 콘텐츠에 대한 관리 및 조정(moderation) 의무가 부상하고 있다. 국가와 사회의 요구에 따라 디지털 플랫폼은 AI를 도입해 자동화된 콘텐츠 관리 및 거버넌스 체제를 구축하고 있는데, 이러한 자동화 거버넌스는 온라인에 유통되는 방대한 정보 양으로 인해 정보의처리 속도를 빠르게 하기 위한 방식이자 사회적 문제의 기술적 해법 방식이며, 기존의 데이터셋을 기반으로 욕설, 표현의 강도를 규제하는 방식으로 나타난다. 따라서 자동화 거버넌스는 AI를 통해 거버넌스를 기계화, 자동화하는 방식임과 동시에, 인간에 의해서 수행되더라도 욕설, 표현의 강도를 기준으로 기계적으로 수행되는 내용규제를 뜻한다. 이러한 자동화 거버넌스 과정에서 미묘한 차별 및 혐오표현이나 기술-인간이 매개된 다양한 괴롭힘 행위, 시각적인밈의 유통 등은 규제되지 않으며, 주로 데이터셋에 선(先) 저장된 공격적이고 저속한 표현, 욕설 등 ‘나쁜 말’의 규제가 정착되고 있다. 이 글은 이러한 자동화 거버넌스가 오늘날 디지털 환경에서 발생하는 문제들을 개인화, 사법화하고 있으며, ‘저속한 말’ 중심 규제로 환원되면서 기술-인간-문화가 결합한 디지털 환경의 맥락을 제거하고 있음을 비판적으로 탐색하였다. 따라서 인터넷 내용규제가 사회적, 역사적 맥락, 차별에 대한 감수성을 고려하여 재편될 필요가 있음을 강조한다.",
-      "keywords": "디지털 플랫폼, 콘텐츠 모더레이션, 내용규제, 자동화, 거버넌스, AI"
+      "keywords": ""
     },
     {
       "year": 2023,
@@ -1411,7 +62,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "한국언론학보",
       "is_first": true,
       "abstract": "이 연구는 국가 주도의 기술 유토피아 상상이 1인 미디어 중심의 디지털 생태계를 중심으로 어떻게 고안, 실천되고 있는지 살펴보았다. 오늘날 유튜브 창작자는 동시대 청년들이 선택할 수 있는 창의 노동의 일종으로, 자기관리에 능숙한 기업가적 주체와 자기의 브랜드화를 독려하고, 알고리즘에 기반한 자동화된 주체성을 구성하고 있다. 이 연구는 ‘디지털 뉴딜’의 일환으로 시행되는 정부 주도의 청년 창작자 양성 계획이 한국 사회의 압축적 근대화와 국가 주도의 정보통신 정책의 계보 속에서 어떻게 자리 잡고 있는지 살펴보고, 이것이 유튜브를 통한 청년 실업 및 지역 경제 활성화라는 기술 유토피아적 관점이자 접근과 창작 위주의 제한적인 미디어 리터러시 관점을 전제하고 있다고 보았다. 이에 따라 이 글은 동시대 알고리즘 환경에 대한 이해를 기반으로 한 알고리즘 리터러시 개념을 제안하였다. 알고리즘 리터러시는 1인 창작자가 처한 구조적 조건으로서 디지털 미디어 환경이 “웹의 플랫폼화”로 진전되어 왔으며, 이에 기반한 인간-비인간의 연합과 기술-인간-문화의 상호구성으로 이루어져 있음을 전제한다. 이에 따라 창작자는 알고리즘을 기반으로 한 연결의 망 속에 위치해 있음을 인지하고 파편적 정보가 아닌 종합적 현실과 연결성을 고려한 실천을 해야 한다. 또한 창작자가 상업적 인플루언서로서의 역할을 인지하고 플랫폼 종속적인 불안정 노동 조건을 인식하게 한다. 알고리즘 리터러시 논의는 1인 미디어 창작자의 창작 환경으로서 알고리즘에 대한 이해를 보다 정교화하면서 플랫폼 자본주의의 작동 방식을 가시화한다는 의미를 갖는다.",
-      "keywords": "인플루언서, 유튜버, 디지털 뉴딜, 알고리즘 리터러시"
+      "keywords": ""
     },
     {
       "year": 2023,
@@ -1419,7 +70,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "언론과학연구",
       "is_first": true,
       "abstract": "한국 사회의 세대 갈등과 이를 중심으로 하는 세대 담론, 그리고 담론의 생산/재생산을 담당하는 언론의 문제를 논의하기 위해서는 뉴스 생산 및 유통 현장에서의 세대 문제를 살필 필요가 있다. 이 연구는 일선 기자들의 세대 인식과 경험을 심층 면접을 통해 조사하였다. 디지털 환경에서 현직 기자들이 세대와 세대 갈등에 대해 어떻게 인식하고 있는지를 살펴보고, 언론사 조직 내외적으로 세대 및 세대 갈등과 관련한 원인이 무엇이라고 인식하고 있는지를 분석하였다. 현장 기자들은 세대 갈등을 유발하는 보도 양식이 ‘갈등’을 선호하는 언론의 속성과 환원론적인 세대 명명을 통해 나타나고 있음을 지적하고, 정치권이나 산업적 이득을 위해 세대 담론이 활용되는 양상을 비판적으로 바라보았다. 하지만 주목 경쟁 상황에 놓인 현재의 뉴스 소비 환경에서 언론사들이 이익을 위해 제목 편집을 하는 상황에서 세대 갈등 유발 방식의 보도가 개선되기는 쉽지 않은 것으로 보았으며, 독자들의 뉴스 소비 방식 변화 역시 필요하다는 점이 지적되었다. 언론사 수익 구조가 여전히 종이신문 발행에 있는 상황에서 디지털 전환에서 발생하는 갈등 역시 문제였다. 세대 갈등 보도를 줄이기 위해서는 뉴스룸 내 세대 소통이 필요하고, 환원적 세대 개념을 활용하지 않으려면 뉴스룸의 구성에서 다양성이 확보되어야 한다는 대안이 논의되었다.",
-      "keywords": "디지털 저널리즘, 세대갈등, 뉴스룸 갈등, 심층 인터뷰, 기자 인식"
+      "keywords": ""
     },
     {
       "year": 2022,
@@ -1427,7 +78,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "아시아여성연구",
       "is_first": true,
       "abstract": "일상과 감정, 개인정보 등 모든 것을 수집하고 수량화하는 데이터화(datafication)는 젠더화된 프라이버시 침해 양상을 띤다. 기술매개 신종 젠더 폭력의 양상들과 데이터 감시의 젠더화된 문제들은 기술 시대에 ‘취약한 데이터 주체’ 개념에 젠더적 관점을 도입해야 한다는 문제 제기로 이어진다. ‘취약성(vulnerability)’의 개념은 데이터 사회 모든 인간의 보편적인 존재 조건이자 주변화된 사회 집단의 특수한 조건으로 양분되 며, 데이터 처리 과정과 데이터 처리 ‘결과’의 문제로 나뉘는데, 성차별 사회와 네트워 크화된 데이터 사회에서 ‘취약성’은 후자의 관점에서 보다 다층적으로 이해될 필요가 있다. 이 글은 취약성이 데이터화의 불균등한 권력 배분, 예측불가능한 피해 범위 및 내용, 주체의 회복가능성, 역량 등의 측면에서 복합적으로 고려되어야 한다고 주장한 다. 한편 이러한 젠더화된 데이터 감시 사회에서 기술과 어포던스를 역으로 활용하는 데이터 행동주의(data activism)는 디지털 네이티브의 새로운 세대의 출현과도 연관되는 데, 기술에 익숙하지만 여전히 젠더화된 질서에 영향을 받게 되는 청년 여성들의 경험 이 기술을 활용해 액티비즘을 실천하는 사례들로 나타나고 있음에 주목할 필요가 있 다. 이 글은 데이터화의 배경에서 한국의 젠더화된 부정의의 사례를 검토하고, 이에 대한 데이터 액티비즘의 한국적 사례들을 의미 있게 조망하려는 목적을 갖는다.",
-      "keywords": "감시 자본주의, 데이터 액티비즘, 데이터 페미니즘, 디지털 네이티브, 취약성"
+      "keywords": ""
     },
     {
       "year": 2022,
@@ -1435,7 +86,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "한국언론정보학보",
       "is_first": true,
       "abstract": "저널리즘은 태생적으로 기술의 발전과 밀접한 관계를 가지며 상업적/공적 가치 사이에서 줄타기를 해왔다. 또한 사회적 갈등을 유발하고 구성하며 ‘우리’와 ‘타자’를 구분하는 정치적 인식과 행위에 밀접한영향을 미쳐 왔다. 그러나 한편으로 공적 가치를 가진 저널리즘의 퀄리티 향상을 위한 직업 윤리 및 가치체계 또한 발전해 왔다. 이러한 저널리즘의 양면적 특성과 인터넷 이후 디지털 저널리즘 생태계 진화 과정, 한국사회의 정치사회적 맥락에서 ‘젠더 뉴스’는 상업적 가치를 갖는 동시에 ‘젠더 갈등’으로 프레임되며 지역 갈등을 대체하는 주요한 갈등 요소로 부상해 오고 있다. 이 연구는 온라인 이후 디지털 저널리즘 발전 과정에서 젠더 뉴스가 클릭 유발(clickbait) 콘텐츠이자 ‘독성화(toxification)’의 주요 수단으로자리 잡아 온 방식과 맥락을 살펴 보면서, 한국 사회 젠더 갈등의 맥락이 정치적 맥락을 포함해 기술 문화 및 저널리즘과 관련해 어떻게 확장, 증폭되어 왔는지 확인하고자 했다. 구체적으로는 일명 ‘대림동여경’ 사건에 대한 유튜브 콘텐츠 분석을 통해 오늘의 디지털 저널리즘 생태계에서 젠더 뉴스가 첫째, 그 자체로 이용자의 특정 행위를 유도하는 ‘어포던스’로 기능하고 있으며, 둘째, 주목 경제에서 선정적이고 상업적인 목적의 ‘상품’이자 셋째, 갈등과 여론 극화의 수단으로 기능해 오고 있음을 확인하였다. 넷째로 디지털 저널리즘 생태계 특유의 어포던스와 문법에 따라 젠더 뉴스는 젠더화되고 성적인 밈(meme)과 허위정보(disinformation)의 유통과 결합되어 나타나고 있음을 확인하였다. 여기서 전통 언론의 보도는 이슈 유튜버의 편향된 주장에 대한 신뢰할만한 근거로 동원되고 있었고, 전통 언론사의 유튜브 콘텐츠 또한 주목 경제의 수익화 어포던스를 따라 갈등을 유발하는 방식으로 구성되고 있었다. 이글은 이러한 분석을 통해 저널리즘 윤리의 문제 해결을 위한 개입이 동시대 디지털 저널리즘 생태계 전반에 대한 맥락적 이해를 바탕으로 이루어져야 한다는 점을 강조한다.",
-      "keywords": "디지털 저널리즘, 유튜브 저널리즘, 젠더 갈등, 어포던스, 허위정보, 가짜뉴스, 밈(meme)"
+      "keywords": ""
     },
     {
       "year": 2021,
@@ -1443,7 +94,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "한국언론정보학보",
       "is_first": true,
       "abstract": "학교, 가족 제도의 근대화와 더불어 부상한 아동(기)은 ‘읽기’ 중심의 정보 전달 사회에서 성인과 구분되는 대상으로 ‘발견’되었다. 그러나 텔레비전, 인터넷 등 전자매체의 등장은 연령별로 구분되어 있던 지식 유통 및 소비 체계를 붕괴시키며 아동/성인(기)의 경계를 붕괴시켜 왔다. 특히 유년기의 섹슈얼리티가 미디어를 매개하여 적극적으로 탐색되고 관련 일탈 행위들이 빈번하게 발생하면서, 미디어 리터러시가 그 해결책으로 부상해 왔다. 이러한 지점에 주목하면서 이 연구는 한국언론진흥재단 빅카인즈 분석을 통해 한국의 미디어 리터러시 담론의 추이를 살펴보았다. 그 결과, 1990년대 비디오 문화 영향과인터넷 대중화 배경에서 청소년의 성적 일탈이 시각문화의 자극에 기인한다고 보고 영상문화의 비판적해독이라는 측면에서 등장한 미디어 리터러시 논의는 2000년대 인터넷 대중화 이후 기술 활용 및 정보감별 능력, 공동체 윤리 차원으로 확장되었다. 2010년대 스마트폰과 소셜 미디어 환경은 ‘프로슈머’로서의 역량을 부각시켰으며, 미디어 리터러시 교육이 ‘아동기’부터 필요하다는 논의로 이어졌다. 2017 년부터는 정치권을 중심으로 이른바 ‘가짜뉴스’가 문제시되면서 언론 담론이 급증했으며 미디어 리터러시가 강조되고 정책적 개입이 시도되었다. 또한 청(소)년들의 미디어 매개 성적 일탈 사건들이 보도되면서 미디어 리터러시 교육에 성인지 감수성 개념이 도입되어야 한다는 논의가 강조되었다. 특히 1990 년대 인터넷 도입 초기 아동, 청소년을 미디어 이용의 취약층으로 바라보는 시각에서부터 이들이 기술활용능력을 토대로 각종 성적 일탈의 생비자(프로슈머)로 부상해 왔음을 확인하였다. 이 연구는 미디어리터러시 담론을 뉴미디어 등장과 더불어 부상하는 규범적 담론의 차원으로 바라보면서 이것이 매체 환경 변화와 아동, 청소년(기)를 바라보는 도구적 인식, 미디어 환경의 상업화, 유년기의 연장과 레저 커리어 및 섹슈얼리티 추구 수단으로서의 미디어 등과 연관되는 것임을 확인함으로써 미디어 리터러시 논의를 역사화, 맥락화하고자 했다.",
-      "keywords": "미디어 리터러시, 디지털 리터러시, 아동, 청소년, 청년문화, 섹슈얼리티"
+      "keywords": ""
     },
     {
       "year": 2021,
@@ -1451,7 +102,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "언론과 사회",
       "is_first": true,
       "abstract": "이 연구는 미투 운동 등을 계기로 성차별을 구성하는 ‘제도로서의 미디어’에 제기되고 있는 문제들을 낸시 프레이저의 삼차원적 정의론에 입각해 살펴보고, 이를 통해 2010년 평등법 이후 영국의 미디어 규제의 이슈를 분석함으로써 젠더평등의 달성을 위한 미디어의 사회적 책임과 역할을 탐색해 보고자 했다. 낸시프레이저는 ‘젠더’가 물질적 분배와 문화적 인정, 참여 동등이라는 삼차원적 부정의(injustice)에 시달리는 집단으로 보고, 젠더 평등의 실현이 “분배냐 인정이냐”를 양자택일하는 차원이 아니라 분배, 인정, 참여 동등이라는 삼차원적 측면에서 고려되어야 하는 복합적인 것이라 본다. 이러한 논의는 그간 미디어 ‘재현’ 문제를 주로 다루어 온 미디어 연구 및 정책 담론의 한계를 드러내며, 미디어 조직에서의 물질적 분배와 문화적 인정의 문제, 참여 동등의 문제가 구체적 현실에서 복합적으로 고려되어야 함을 시사한다. 영국에서는 2010년 평등법 제정 이후 미디어 조직에 평등의 이슈를 구체화하고 있으며, 이는 어떤 의미와 한계를갖는지 살펴보았다. 또한 2017년 미투 운동 이후 BBC를 중심으로 불거진 ‘젠더페이 갭’의 이슈는 어떤 시사점을 던져 주는지 살펴보았다. 이를 통해 이 연구는젠더 평등을 달성하기 위해 미디어 조직과 규제 기구가 보다 적극적으로 분배, 인정, 참여 동등을 구체적으로 제도화해야 함을 주장하였다.",
-      "keywords": "평등법, 정의론, 차별금지법, 낸시 프레이저, 젠더 페이 갭"
+      "keywords": ""
     },
     {
       "year": 2021,
@@ -1459,7 +110,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "한국언론학보",
       "is_first": false,
       "abstract": "이 연구는 게임 스트리밍 플랫폼을 중심으로 활동하는 여성 게임 스트리머들에 주목하여, 이들이 게임 스트리밍을 수행하며 겪는 다양한 경험과 정체성의 구성 과정을 살펴보았다. 이를 위해 여성 게임 스트리머와의 심층 인터뷰를 실시했다. 그 결과, 여성 게임 스트리머가 플랫폼의 사회기술적 어포던스에 자신의 수행성을 최적화시켜 가는 과정에 기존 젠더 문화의 관습이 영향을 미치고 있다는 점을 발견할 수 있었다. 웹캠의 시각중심성과 외모 중심의 여성성이 만나면서 젠더 정체성에 기반한 친밀성 수행이 나타나고, 이 과정은 ‘여성’을 향한 독성문화(toxic culture)와의 관계 속에서 여성 게임 스트리머를 취약하게 만들고 있었다. 또한 여성 게임 스트리머는 플랫폼의 수익 구조와 끊임없이 협상하며 자본으로 치환될 수 있는 정동 노동을 수행하였고, 이러한 과정에서 여성 게임 스트리머의 자율성과 이들의 기업가적 실천은 주어진 사회기술적 어포던스에 의해 제한된 선택지를 갖게 된다는 것을 발견할 수 있었다.",
-      "keywords": "게임 스트리밍 플랫폼, 여성 게임 스트리머, 사회기술적 어포던스, 심층 인터뷰, 능력주의"
+      "keywords": ""
     },
     {
       "year": 2020,
@@ -1467,7 +118,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "미디어, 젠더 & 문화",
       "is_first": true,
       "abstract": "이 연구는 기술 진화에 따라 다양해지고 있는 여성 대상 디지털 성 착취 범죄 등 의 사례가 한 개인의 일탈적 행위라기보다는 온, 오프라인에 만연한 여성혐오의 대 표적 사례라는 전제에서 출발했다. 온라인 이후 소위 포르노그라피, 야동, 음란물을 소비하는 사이트들에서 실제 여성들을 대상으로 한 다양한 성 착취 범죄의 공모, 제 작, 유통, 소비가 발생했다는 점에 주목하였다. 이러한 점에서 이 연구는 포르노그라 피를 역사적이고 구조적이며 조직적인 여성혐오적 ‘제도’로 바라본다. 먼저, 이 연구에서는 성차별적 제도로서 포르노그라피를 바라보며 포르노 소비문 화를 정리하였다. 또한 포르노 산업의 경쟁이 심화되면서 여성혐오적 재현이 악화되 었으며, 특히 여성에 대한 ‘폭력’과 섹슈얼리티를 연계해 재현하는 문화적 재현물들 의 함의를 정리하였다. 다음으로는 포르노그라피를 여성에 대한 성적 대상화와 관련 하여 논의하였고, 이것이 여성 종속과 억압을 제도화해 불평등을 구조화하는 산물이 라는 점을 주장한 페미니즘의 논의를 정리하였다. 이를 통해 이 연구는 여성혐오의 대표적 제도로서 포르노그라피 소비 문화를 문제시하고, 이것이 여성의 ‘몸’에 대한 도구화, 성적 대상화를 만연하게 하는 기반이라는 점을 비판하고자 하였다. 이를 통 해 이 연구는 기술 기반 사회에서 여성에 대한 신종 폭력과 모욕이 어떠한 남성적 ‘보기’ 문화의 연장선상에서 이루어진 것인지 그려내고, 이를 개선하기 위한 분석과 실천이 필요함을 주장하였다.",
-      "keywords": "포르노그라피, 성 착취, 성적 대상화, 여성혐오, 디지털 성폭력"
+      "keywords": ""
     },
     {
       "year": 2020,
@@ -1475,7 +126,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "영상문화",
       "is_first": true,
       "abstract": "넷플릭스 오리지널 영화는 극장 개봉을 통한 영화 유통 및 소비 질서, 영화의 정의 등에 균열을 야기하고 있다. 극장 개봉은 영화 고유의 매체적 특징으로 인식되어 왔으나 코로나19 팬데믹은 극장을 대표적인 기피 공간으로 부상시키고 있다. 이러한 상황에서 넷플릭스를 통해 영화를 공개하려는 사례도 늘고 있다. 이 연구는 넷플릭스 오리지널 영화가 영화의 의미에 대한 고전적 질문을 새롭게 제기하고 있다는 점에 주목하여, 넷플릭스 오리지널 영화가 구독 기반 서비스를 지속하게 하는 ‘퀄리티’ 콘텐츠로 기능하고 있음을 주장하였다. 세계적 거장 감독들의 예술 작품으로서 넷플릭스 오리지널 영화는 세계 영화제 수상을 통해 예술성과 화제성을 인정받으며 넷플릭스를 콘텐츠 기업으로 부각시키는 동시에 언택트 시대 영화 소비 문화를 가정, 개인 중심으로 변화시키고 있다. 이 연구는 넷플릭스 오리지널 영화에 대한 논의를 통해 팬데믹 시대 급속도로 변화하는 극장 중심의 영화 문화를 현재의 미디어 전경 변화와 TV와의 관계 속에서, 가정의 맥락 속에서 탐색하고자 했다.",
-      "keywords": "넷플릭스 오리지널, 영화, 팬데믹, 언택트, 퀄리티 TV"
+      "keywords": ""
     },
     {
       "year": 2020,
@@ -1483,7 +134,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "한국언론정보학보",
       "is_first": false,
       "abstract": "미디어 노동의 유연화가 심화되는 과정에서 미디어 생산자 연구는 다양한 ‘주변부’ 노동자들을 대상으 로 확장되어 왔다. 이러한 맥락에서 이 연구는 외주/독립 제작사 PD, 종합편성채널 PD, 웹 기획 콘텐츠 제작사의 대표 제작자, 유튜브 크리에이터이자 프리랜서 PD 등 미디어 콘텐츠 제작 산업에서 다양한 ‘주변부’ 노동자로 일하고 있는 2 · 30대 청년 9명을 대상으로 심층 인터뷰를 실시하였다. 지상파 방송 사 중심의 안정적인 노동 시장에 청년층이 진입하는 사례가 극히 드물어진 시점에서 미디어 산업의 노 동 유연화는 청년층이 가진 개별적 자본과 상황에 따라 다양한 방식으로 나타나고 있다. 그러나 프로젝 트성 노동은 청년들의 개별적 차이에 관계없이 열악한 노동조건을 구성하고 있다. 또 미디어 산업 시장 이 정규직/비정규직의 ‘이중 시장’으로 구성되면서 청년기의 노동이 안정적인 노동 환경으로 이행해 갈 가능성은 희박하다. 인터뷰 참여 청년들은 미디어 콘텐츠 제작이 주는 즐거움과 보람, 희열 등을 기반으 로 미래의 삶을 계획하고 있었으나, 열악한 노동 현장의 현실에 대해 이직이나 침묵, 자기 정당화 등의 개별적 대응을 하고 있었으며, 장기적인 삶의 계획이나 ‘저녁이 있는’ 안정된 삶을 유예하고 있었다. 또, 웹 콘텐츠 시장의 확장으로 청년들의 기회가 더 확대되기도 하였으나, 대체로 경쟁의 심화, 유연화된 노 동의 일반화를 경험하고 있었다.",
-      "keywords": "청년, 미디어생산자, 미디어노동, 유연화, 프리캐리아트"
+      "keywords": ""
     },
     {
       "year": 2020,
@@ -1491,7 +142,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "미디어, 젠더 & 문화",
       "is_first": false,
       "abstract": "이 연구의 목표는 현재 한국 온라인 공간에 만연한 성차별적 혐오표현의 특징을정리하고, 이와 관련하여 현행 성차별적 혐오표현 규제 관련한 쟁점과 한계를 논의하는 것이다. 온라인 공간의 성차별적 혐오표현은 기존 연구가 분류했던 외모, 성과여성성, 나이, 능력 등의 내용과 신체적, 성적 폭력 표현을 포함해 ‘여성’과 인종적소수자, 성 소수자, 탈북민 등 다른 소수자성이 교차하는 특징을 보였다. 또 이러한표현들이 주류 공론장으로 확장되면서 현실에서의 물리적, 성적 폭력과 연관될 수있는 개연성을 높였다. 따라서 이를 중단하게 할 제도적 절차가 필요하다. 하지만방송통신심의위원회 중심의 온라인 내용규제는 ‘나쁜 말’의 단속이나 선량한 풍속유지, 사회통합 등 도덕적 차원에서 이뤄지고 있으며 이는 성차별에 대한 맥락적 인식의 부족에서 기인한 것으로 지적됐다. 이에 따라 심의 과정에 성차별의 구조적, 역사적 맥락과 성인지 감수성을 반영하는 등 심의 규정을 정비하면서 성차별적 혐오표현의 심각성을 사회적으로 인식할 수 있도록 하는 국가, 언론, 플랫폼, 교육 등다양한 사회적 노력이 필요함이 제안되었다. 온라인 공간에 만연한 성차별적 혐오표현은 여성에 대한 왜곡된 인식의 형성은 물론 여성들의 무력감, 여성의 사회적 배제나 차별 등을 야기한다는 점에서, 성평등의 달성을 위한 국가적⋅사회적 차원의 개선 노력이 필요하다.",
-      "keywords": "성차별적 혐오표현, 여성혐오, 내용규제, 성차별"
+      "keywords": ""
     }
   ],
   "유인혁": [
@@ -1501,7 +152,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "이 글은 세계 최대 규모의 팬픽션 사이트인 AO3(archiveofourown.org)를 분석함으로써, 팬픽션을 생산적 글쓰기의 구체적인 사례로서 제시했다. 문화산업에서는 몇몇 텍스트들이 독과점적으로 시장을 지배하고 경쟁자들을 도태시킨다. 이것은 프랑코 모레티가 말했던 ‘문학의 도살장’의 한 사례다. 그러나 팬픽션은 수평적이고 개방적인 네트워크로서 대안적인 생산성을 발휘한다. 이 글의 주제의식은 총 두 가지 세부적인 목표를 경유하는 가운데 표현되었다. 첫째로, 이 글은 AO3가 텍스트를 생산하는 구체적 양상을 살펴보았다. 이는 <오징어 게임> 팬픽션을 검토하는 과정에서 수행되었다. <오징어 게임>의 서사가 기존 AO3에 존재하는 팬창작의 문법에 의해 어떻게 재구성되는 살펴보는 한편, <오징어 게임>의 요소가 다른 팬덤의 텍스트를 어떻게 변형시키는지 살펴보았다. 그럼으로써 AO3가 서로 다른 텍스트의 형질들을 교차 이식하고, 나아가 그 수를 불리는 공간으로 기능하고 있음을 확인했다. 둘째로, 이 글은 AO3가 트랜스내셔널 네트워크의 공간이라는 점을 조명했다. 이것은 <오징어 게임>의 크로스오버 2차창작물을 검토하는 과정에서 이루어졌다. <오징어 게임>의 크로스오버는 <원신>이나 <마인크래프트>와 같은 게임, <해리포터> 시리즈, 일본 만화의 텍스트들을 대상으로 이루어졌다. 이때 AO3는 접점이 거의 존재하지 않는 이질적인 하위문화 집단을 연결시키는 네트워크로 기능했다. 여기서 인터넷은 팬덤의 수평적인 네트워크가 생겨날 수 있는 환경적 조건으로서 발견된다. 정리하자면 AO3는 문화산업에 대하여 대안적이면서 대항적인 문화적 공간의 모델로서 이해할 수 있다. 그것은 몇몇 텍스트가 시장을 독과점하는 것이 아니라, 다양한 텍스트가 함께 번성할 수 있는 새로운 생산성의 모델을 보여주고 있다.",
-      "keywords": "AO3(archiveofourown.org), 팬덤, 팬픽션, <오징어 게임>, 문화 생산의 공간, 트랜스내셔널 네트워크"
+      "keywords": ""
     },
     {
       "year": 2023,
@@ -1509,7 +160,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "탈경계인문학Trans-Humanities",
       "is_first": true,
       "abstract": "이 글은 현재 웹소설 및 웹툰 등 대중서사에서 유행하는 ‘관리자 서사’의 사회문화적 의미를 분석한 연구다. 현단계 자본주의가 인간의 정신적 영역을 어떻게 생산에 동원하고 있으며, 이러한 양상이 어떻게 문화적으로 재현되고 있는지 점검하였다. 이 글의 2장에서는 관리자 서사의 내용적 특성을 살펴보았다. 특히 관리자 서사가 인간의 감정을 경제활동의 자원으로 삼는 감정 자본주의를 반영하고 있음을 제시하였다. 3장에서는 관리자 서사가 대중적 쾌락을 생성하는 지점을 살펴보았다. 특히 관리 행위가 긍정적인 쾌락의 놀이로서 표현되는 서사적 ‘게이미피케이션’의 양상을 점검했다. 이러한 과정을 통해서, 이 글은 관리자 서사가 자본주의의 새로운 전략과 주체성 형태를 예시하고 있음을 입증하고자 했다.",
-      "keywords": "관리자 서사, 웹툰, 웹소설, 스토리텔링 플랫폼, <전지적 독자 시점>, <내가 키운 S급들>, <회귀자 사용 설명서>, 감정 자본주의, 서사의 게이미피케이션, 인적 자원 관리의 서사"
+      "keywords": ""
     },
     {
       "year": 2023,
@@ -1517,7 +168,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "구보학보",
       "is_first": true,
       "abstract": "이 연구는 채만식의 『탁류』가 도시공간과 도시적 삶의 무질서를 재현한 텍스트라는 점을 논증하고자 했다. 이는 특히 초봉이 형보를 살해하기 전 도시를 배회하는 에피소드를 꼼꼼히 분석하는 과정에서 수행되었다. 이 장면에서 초봉은 정처없이 도시를 떠돌고, 이윽고 정념의 과잉상태 속에서 형보를 살해했다. 이러한 양상은 초봉을 결함이 있는 주체로, 『탁류』를 통속적인 소설로 해석하게 만드는 원인이 되었다. 그러나 이 글은 『탁류』가 재현하는 무질서야말로 도시성의 진면목이며, 채만식은 이를 날카롭게 포착했음을 강조하고자 했다. 이러한 목적을 위하여 이 글은 다음과 같은 두 가지 세부 과정을 경유하였다. 첫째, 이 글은 초봉을 ‘여성 군중’의 구체적인 사례로서 분석했다. ‘여성 군중’이란 도시의 특권화된 주체로서 산책자와 대조적인 존재를 의미한다. 산책자는 대체로 남성으로 젠더화되며 군중의 수동성, 비이성적 측면은 대체로 여성 젠더와 공명한다. 초봉은 도시공간 내부를 ‘생각없이’ 이동하고, 냉철한 관찰력을 발휘하지 못하며, 현재나 미래에 대한 합리적 계획을 세우지 못했다. 이는 그녀를 군중의 한 사례로 환원시킨다. 그런데 채만식은 초봉이 바로 이러한 무계획성에 따라 형보를 살해하는 장면을 연출했다. 이때 초봉의 군중성은 합리적 계획으로 무장한 남성 지배자에게 대항할 수 있는 역량으로 전환됐다. 이러한 점을 강조함으로써 산책자의 특권적 지위를 해체하고, 그 개념에 아로새겨져 있는 근대적 주체성에 대한 환상을 비판하고자 했다. 둘째, 이 글은 『탁류』가 초봉을 활용하여 근대적 무질서의 플롯을 연출하고 있음을 강조했다. 『탁류』에서 초봉은 억압적인 타자를 극복하기 위한 합리적이거나 진보적인 계획을 세우지 못했다. 이것은 초봉을 결함의 주체로, 그리고 『탁류』를 통속적인 텍스트로 해석하게 만드는 원인이 되었다. 그러나 초봉이 군중으로서 정처없이 움직이며 예측불허로 행동한다는 점은, 도시공간이 복잡하고 무질서하여 돌연한 마주침들의 연쇄를 만들어낸다는 점과 관련이 있다. 이때 초봉은 단순히 무계획적인 인물이 아니라, 복잡한 도시공간의 ‘인식적 지도’를 작성하는 인물로 재평가할 수 있다. 이러한 독법에 따르면 초봉은 무질서를 체현하는 주체로서, 근대성의 복합적인 측면을 드러내는 표상이다. 이러한 주체는 한편으로 특권적인 주체(산책자)가 아니더라도 도시에서 능동적인 힘을 발휘할 수 있다는 점을 보여준다. 더욱 중요하게는 이성과 질서라고 하는 근대성의 기표들을 반성하는 데 유용한 단초를 제공한다.",
-      "keywords": "『탁류』, 채만식, 군중, 여성 군중, 산책자, 시각성, 이동성, 무질서, 무질서의 플롯, 도시공간, 근대성"
+      "keywords": ""
     },
     {
       "year": 2023,
@@ -1525,7 +176,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "대중서사연구",
       "is_first": true,
       "abstract": "이 연구의 목적은 한국 타임루프 장르의 문화적 의미를 파악하는 것이다. 한국에서 타임루프 장르는 2010년대 이후 본격적으로 재생산되고 있다. 이 형식이 탈근대적 조건의 시공간을 재현하고 있으며, 진보로 대표되는 근대적 시간관‧역사관을 부정하는 측면이 있음을 논증하고자 했다. 이러한 과정은 총 세 가지 상호연관적인 세부목표를 경유하여 수행되었다. 첫째, 이 연구는 타임루프 장르가 반서사학적 측면을 가지고 있다는 점을 강조했다. 즉 타임루프 장르가 연대기적인 시간성을 교란함으로써, 서사학적 차원을 ‘사건의 시간적 배치’에서 ‘사건의 공간적 배치’로 전환시키는 측면이 있음을 살펴보았다. 이때 나타나는 서사의 ‘다중분기구조’가 근대적 시간관‧역사관을 부정하는 효과를 가진다는 점을 조명했다. 둘째, 이 연구는 타임루프 장르가 ‘게임 형식의 서사화’의 성격을 가진다는 점을 보여주었다. 서사에서 동일한 텍스트의 다시읽기는 권장될 수는 있으나 필수적인 경험이 아니다. 그러나 놀이는 동일한 수행의 반복을 전제로 한다. 이러한 맥락을 참조할 때, 타임루프 장르는 비디오 게임의 ‘재시작’이나 ‘세이브/로드’를 서사적으로 번안한 형식으로 이해할 수 있다. 셋째, 이 연구는 타임루프 장르의 서사학적‧기술문화적 맥락이 어떠한 이데올로기적 차원을 가지고 있는지 제시했다. 타임루프에서 시간성의 교란은 미래에 대한 전망을 갖기 어렵다는 현실인식과 연결되어 있다. 그리고 비디오 게임은 재시작을 통해 최소한의 기회를 제공하는 유토피아적인 세계로서 재현되고 있다. 이러한 서사는 현재 우리 사회의 증상이 ‘현실적인 플롯’으로는 적절히 다스려지지 않는 측면이 있음을 보여준다. 이러한 언설의 의미는 타임루프 장르에 아로새겨진 욕망이 ‘비현실적’이며 따라서 현실도피적이라는 데 있지 않다. 오히려 타임루프 장르는 진보에 대한 전망을 갖기 어려운 환경 속에서, 불합리한 환경을 극복하기 위한 가망성과 기회를 상징적으로 요구하는 서사로 이해할 수 있을 것이다.",
-      "keywords": "타임루프, 타임슬립, 다중분기구조 스토리텔링, 시간성의 교란, 진보의 부정"
+      "keywords": ""
     },
     {
       "year": 2023,
@@ -1533,7 +184,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "인문연구",
       "is_first": true,
       "abstract": "이 연구의 목적은 박완서 소설을 통해서 한국 사회의 ‘아파트 디스토피아’ 담론을 비판적으로 성찰하는 것이다. 여기서 ‘아파트 디스토피아’란 한국 사회의 부정적 아파트 담론을 의미한다. 아파트에 대한 비판적 재현들은 아파트 공화국의 위력을 약화시키기보다는 강화․재생산하는 측면이 있었다. 아파트의 막강한 위력에 대한 재현이 오히려 대안적․대항적 삶의 상상력을 위축시켰기 때문이다. 그런데 박완서는 단순히 아파트에 의해 억압․소외당하는 인물을 그리는 데 그치지 않고, 그 부정적 속성을 전유하거나 창의적으로 재활용하는 인물들을 다뤘다. 박완서의 『서있는 여자』에서 아파트의 비장소 및 장소상실의 특성은, 성차별적인 공동체에서 벗어나려는 여성에게 유리한 환경적 조건이 되었다. 한편 『그대 아직도 꿈꾸고 있는가』에서 아파트는 인간적 유대의 장소이기 보다는 상품성이 직접적으로 드러나는 부동산이었다. 그러나 아파트는 경제적 자립을 추구하는 인물에게 필수적인 자원으로 기능했다. 여기서 박완서 소설의 인물들은 주어진 환경에 수동적으로 순응하는 데 그치지 않고, ‘거주하기’를 통해 공간의 의미와 기능을 변화시키는 주체라고 볼 수 있다. 정리하자면 박완서는 아파트를 단순히 비인간적이거나 억압적인 공간이 아니라, 지배문화와의 협상이 이루어지는 현장으로 그렸다. 그럼으로써 단순히 아파트 디스토피아를 재생산하는 데 그치는 것이 아니라, 그것을 극복할 수 있는 서사의 가능성을 제시했다.",
-      "keywords": "아파트 디스토피아, 아파트, 박완서, 『서있는 여자』, 『그대 아직도 꿈꾸고 있는가』, 거주하기, 비장소, 장소상실, 장소성"
+      "keywords": ""
     },
     {
       "year": 2022,
@@ -1541,7 +192,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "동악어문학",
       "is_first": true,
       "abstract": "이 연구의 목적은 『도시의 흉년』에 나타난 가부장제 자본주의의 모순적 조건을 살펴보는 데 있다. 이것은 두 가지 상호관련적인 목표와 연관된다. 첫 번째는 『도시의 흉년』에 나타난 여성의 돌봄이 남성 가족구성원에 대한 억압이라는 정반대의 기능을 가진다는 점을 드러내는 것이다. 두 번째는 『도시의 흉년』에서 가부장제를 재생산하기위한 여성의 노력들이 오히려 가부장제 체제를 교란하거나 뒤흔드는 힘으로 나타나는 모순적 양상을 재구성하는 것이다. 이러한 문제의식은 ‘살아남아 집에 갇힌 남자’라는 인물표상과 ‘돌봄의 감옥’이라는 공간표상을 분석하는 과정에서 탐구되었다. 우선 ‘살아남아 집에 갇힌 남자’의 표상을 통해서, 『도시의 흉년』이 가지고 있는 대체-가족사적 측면을 분석했다. 『도시의 흉년』의 지대풍은 『나목』이나 『목마른 계절』의 남성 가족구성원과 다르게 전쟁에서 생환했다. 그러나 아무런 사회적 역할을 수행하지 않으면서 아내 김복실에게 의존적인삶을 살아가는 나약한 주체가 되었다. 이는 박완서가 상상한 대체 역사로서, 박완서의문제의식을 파악하기 위한 중요한 준거점이다. ‘돌봄의 감옥’은 ‘살아남아 집에 갇힌 남자’가 가진 의미를 이해하기 위한 열쇠다. ‘돌봄의 감옥’이란 『나목』과 『목마른 계절』에 나타난 은신처 표상과 『목마른 계절』에나타난 감옥 표상의 통합이다. 『나목』과 『목마른 계절』에서 집은 남성을 은신시키기위한 공간으로 표현됐다. 이러한 은신처의 핵심은 남성의 이동성을 억제하여, 공적 영역에서 비가시화시키는 데 있었다. 한편 『도시의 흉년』에서는 남성을 보호하기 위한힘이 억압으로 전환된 현상이 포착됐다. 남성을 보호하기 위해 이동성을 억제하는 행위가, 그의 자율성과 주체성을 모두 훼손하는 일이 되었던 것이다. 여기서 남성을 보호하는 힘과 남성을 억압하는 힘은 대립적이기보다는 연속적인 것으로 나타났다. 이러한 해석은 박완서 소설이 가부장제 자본주의의 모순을 복합적으로 포착했다는 점을 가시화한다. 이 언술의 의미는 박완서가 가부장제 자본주의를 비판했다는 의미로 축소되지 않는다. 오히려 박완서는 여성들의 가부장제에 대한 책무가 강화되는맥락을 포착하면서, 그러한 양상들이 오히려 남성성을 억압하여 성권력과 성역할을교란하는 과정을 재현했다.",
-      "keywords": "박완서, 『나목』, 『목마른 계절』, 『도시의 흉년』, 가부장제, 가부장제 자본주의, 돌봄, 남성성, 이동성, 대체 역사"
+      "keywords": ""
     },
     {
       "year": 2022,
@@ -1549,7 +200,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "구보학보",
       "is_first": true,
       "abstract": "이 글의 목적은 『그 남자네 집』에 나타나고 있는 기억과 장소의 양상을 재구조화(re-constructing)로 명명하고, 그것을 ‘창조적 파괴’라고 하는 자본주의의 일반적 원리의 서사화로서 설명하는 것이다. 『그 남자네 집』에서 의도적인 과거의 망각, 과거에 대한 평가절하, 오래된 장소의 해체와 같은 일들이 벌어지고 있으며, 이는 과거를 파괴하는 일이면서 삶의 여건을 개선하는 실천이라는 점을 논증했다. 그리고 이것이 파괴를 통해 생산을 수행하는 자본주의 원리를 표현하고 있음을 드러냈다. 2장에서는 『그 남자네 집』이 창조적 파괴의 원리를 서사화하고 있는 양상을, 기억의 문제와 관련해서 살펴보았다. 『그 남자네 집』에서 ‘나’는 과거의 기억을 재구조화했다. 그녀는 심현보의 실명, 춘희의 ‘양공주’로의 전락, 광수 자녀의 장애에 대한 죄책감을 편집하여 서술했다. 이러한 의도적인 기억상실의 트릭은, 과거의 악조건을 파괴함으로써 새로운 삶의 환경을 조성하고자 하는 실천이었다. 3장에서는 장소의 문제와 관련하여 『그 남자네 집』의 창조적 파괴의 양상을 살펴보았다. 이 소설에서 도시화 과정이 생산한 몰개성적이며 진정성 없는 경관은, 장소에 대한 혐오를 중화시키는 환경으로 나타났다. 즉 장소상실은 전쟁에 따른 가족 상실의 무참한 기억을 해방시키는 힘으로 나타났다. 이러한 해석은 박완서 소설에서 기억과 장소의 문제가 가지고 있는 복잡성을 드러낸다. 박완서는 한편으로 과거를 망각하고 장소를 파괴하는 방식으로 진행되는 도시화의 폭력성을 포착했다. 그러나 다른 한편으로는 파괴를 재생(再生)과 연결시키는 모순을 보여주었다.",
-      "keywords": "박완서, 『그 남자네 집』, 창조적 파괴, 재구조화, 기억, 장소, 장소상실"
+      "keywords": ""
     },
     {
       "year": 2022,
@@ -1557,7 +208,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "대중서사연구",
       "is_first": true,
       "abstract": "이 연구의 목적은 권혁주의 웹툰 <씬커>와 정지돈의 소설 『야간 경비원의 일기』에 나타난 도시 공간의 해킹을 ‘저항의 공간적 실천’의 구체적인 사례로서 설명하는 것이다. 즉 해킹이라는 일탈적 기술의 실천이 특정 장소나 공간의 의미를 변화시키는 사회적 행위로 나타나는 양상을 재구성하고자 했다. 2장은 권혁주의 웹툰 <씬커>를 살펴보았다. <씬커>의 주인공 파이는 해킹과 파쿠르의 수행자다. 그는 슈퍼 컴퓨터와 융합한 일종의 사이보그로서 도시의 네트워크를 교란하는 신체로 나타났다. 한편 파이는 파쿠르 수행자로서 도시공간의 규제를 따르지 않고 자기만의 통행로를 개척하는 인물이다. 즉 파이는 해킹과 파쿠르를 통해 기술적·공간적 보안을 꿰뚫고, 사회적 규칙을 위반하는 저항적 주체로서 재현되고 있었다. 3장은 정지돈의 소설 『야간 경비원의 일기』를 살펴보았다. 이 소설의 주인공 ‘조지(훈)’은 도시 해킹의 수행가다. 여기서 도시 해킹이란 보안으로 통행이 금지된 도시공간 내부에 침투하는 행위를 지칭한다. 이때 해킹은 다만 컴퓨터 기술의 응용에 국한되지 않고, 금지된 공간에 침투하는 해적 행위로서 확장된 의미를 갖게 되었다. 이때 『야간 경비원의 일기』는 도시의 규제를 돌파하고자 하는 저항적인 욕망을 표현하는 것으로 이해할 수 있다. 이러한 텍스트들에서 해킹이라는 반문화적 행위는, 우리가 도시공간을 경험하는 방식을 확장하거나 회복하는 일로 나타나고 있다. 이러한 서사는 대안적인 세계에 대한 열망과 환상을 표현하는 상징적 형식이라는 점에서 주목할 필요가 있다.",
-      "keywords": "<씬커>, 야간 경비원의 일기, 권혁주, 정지돈, 도시 해킹, 도시권, 저항의 공간적 실천"
+      "keywords": ""
     },
     {
       "year": 2022,
@@ -1565,7 +216,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "사이間SAI",
       "is_first": true,
       "abstract": "이 연구는 한국 로맨스 판타지 웹소설에 나타난 여성 사이보그의 양상을 정리하고, 그 안에 아로새겨진 감정 자본주의의 이데올로기를 탐색하는 것을 목적으로 한다. 현재 한국 로맨스 판타지 웹소설에서 감정과 친밀성이 일종의 ‘인적 자원’으로 나타나고 있으며, 여성 사이보그는 이러한 수행의 유토피아적인 주체로서 상상되고 있음을 밝히고자 했다. 2장에서는 『악역의 엔딩은 죽음뿐』을 중심으로 감정을 관리하는 주체의 양상과 의미를 살펴보았다. 이 작품의 주인공은 소프트웨어 프로그램과 융합한 디지털 사이보그다. 그녀는 타인의 감정 상태를 파악하거나 조작할 수 있는 능력을 갖췄다. 그리하여 이 작품의 로맨스는 주인공이 자기 목적에 따라 타인의 감정을 관리하는 양상으로 전개된다. 이는 사랑의 서사를 ‘경영(management)’적 문법을 통해 탈낭만화하는 것이다. 3장에서는 감정과 친밀성의 영역이 사회적 자본으로 나타나는 서사의 양상과 의미를 살펴보았다. ‘로맨스 판타지 헌터물’의 주인공들은 디지털 사이보그가 됨으로써 돌봄의 능력을 계발하거나, 무조건적인 사랑을 받을 수 있는 존재로 거듭난다. 이들은 사회적 이동성을 위한 자본으로 친밀성을 적극 활용하고 있다. 이것은 감정의 문제가 사적 영역뿐만 아니라 공적 영역의 주요 자원이 되고 있다는 현실인식을 반영하고 있다. 정리하자면 로맨스 판타지 장르에서 여성 사이보그들은 감정과 친밀성의 영역을 자본화하는 주체로 나타났다. 이들은 독자들에게 관습적인 젠더 관계를 이상화하는 것이 아니라, 새로운 방식의 젠더 분업을 환상적인 방식으로 재현하고 있다는 점에서 문제적이다.",
-      "keywords": "웹소설, 로맨스 판타지, 디지털 사이보그, 여성 사이보그, 감정 자본주의"
+      "keywords": ""
     },
     {
       "year": 2021,
@@ -1573,7 +224,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "이 연구의 목적은 디지털 장소 소멸의 문화적 의미를 파악하는 데 있다. 지금까지 디지털 장소의 소멸은 학문적 관심의 대상이 되지 못했다. 그것은 상호연관적인 세 가지 이유 때문이다. 첫째, 디지털 세계는 ‘가상공간’으로서 현실에 대해 상대적이거나 심지어 적대적인 존재로 이해되었다. 둘째, 세계의 ‘디지털화’는 점점 가속하고 있어서, 단일 현장(site)의 붕괴는 유의미한 사건으로 식별되지 않았다. 셋째, 디지털 장소의 주민들은 공동체의 일원이기보다는, ‘네트워크화된 개인’으로 정의됐다. 이때 무한한 자율성과 유동성을 발휘하는 주체가, 도태된 서비스에 상실감을 느끼는 일은 상상하기 어려웠다. 그런데 최근 한국 MMORPG 커뮤니티들은 디지털 장소의 소멸에 대해 전혀 다른 정서적 반응을 보여주고 있다. 넥슨의 <일랜시아>의 사용자들은 10여 년째 정상적 관리가 이루어지지 않는 게임 환경을 견디고 있다. 그럼에도 <일랜시아>의 사용자들은 다른 게임 서비스로 이동하는 대신, 자율적으로 낙후된 환경에 머무르고 있다. 한편 넥슨의 또 다른 서비스 <메이플스토리>는 지속적인 혁신을 통해 생존에 성공한 대표적인 구세대 MMORPG다. 그런데 지속적인 변화는 과거에 대한 향수를 발생시켰다. 사용자들은 ‘업데이트’가 변화시키기 이전의 <메이플스토리>에 대한 향수를 꾸준히 호소하게 되었다. 이러한 사례들은, 디지털 공간에서도 장소에 대한 애착과 상실감이 생산되고 있음을 보여주고 있다.",
-      "keywords": "디지털 장소, 디지털 탈장소, 디지털 장소상실, 디지털 슬럼, 디지털 재개발"
+      "keywords": ""
     },
     {
       "year": 2021,
@@ -1581,7 +232,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "한국문학연구",
       "is_first": true,
       "abstract": "이 연구의 목적은 박완서의 『오만과 몽상』에서 불균등발전의 도시공간이 재현되는 양상을 확인하는 것이다. 박완서는 『오만과 몽상』에서 사회․계급적으로 양극화된 도시를 포착하고 있으며, 월경의 환경적 조건으로 전유했다. 이를 나타내기 위하여 『오만과 몽상』의 배경인 1970년대 서울에서 불균등발전의 공간이 어떠한 환경적 조건으로 제시되고 있는지 파악하고, 이를 극복하기 위한 주체의 노력이 어떻게 수행됐는지 재구성했다. 이러한 작업은 『오만과 몽상』의 두 주인공인 현과 남상이 자기 계급의 공간을 떠나 타자의 세계를 탐사하는 과정을 분석하는 가운데 이루어졌다. 2장을 통해서는 현이 탐방을 통해 타자에 대한 잘못된 이해를 교정하고, 진정한 유대의 기초를 구축하는 양상을 살펴보았다. 3장을 통해서는 남상이 염탐자로서 부르주아의 사회에 틈입하는 양상을 분석했다. 이는 『오만과 몽상』에서 현과 남상의 주체성을 재평가하는 작업으로 이해할 수 있다. 이 글은 이렇듯 양극화된 도시공간 내부에서 불안정하게 움직이는 두 청년을 이동성의 주체로 평가하고자 했다. 두 청년이 타자의 공간을 향해 월경하는 일은 정확히 도시의 사회적․계급적 관계에 대하여 위협적인 실천이 되었으며, 일견 난공불락처럼 보이는 도시공간의 체제를 교란하는 일임을 드러내고자 했다.",
-      "keywords": "박완서, 『오만과 몽상』, 불균등발전, 이동성, 이동성의 주체, 탈장소, 월경의 서사"
+      "keywords": ""
     },
     {
       "year": 2021,
@@ -1589,7 +240,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "한국문학연구",
       "is_first": true,
       "abstract": "이 연구는 박완서의 『그해 겨울은 따뜻했네』에서, 외면과 가시화의 공간적 실천이 서울의 도시공간을 배경으로 전개되는 양상을 살펴보는 데 목적이 있다. 지금까지 『그해 겨울은 따뜻했네』는 전후 자본주의 성장 과정에서, 경제력을 획득한 수지와 수철 남매가 그렇지 못한 오목을 외면하는 이야기로 이해되었다. 그리하여 자본가 계급의 도덕적 결함 및 위선을 드러내는 서사로 이해되었다. 그러나 이 연구는 오목을 수동적인 외면의 대상이 아니라, 역동적인 이동성의 주체로 재정의했다. 즉 자본가 계급이 생산한 ‘차이의 공간’ 때문에 고통받고 있지만, 계속해서 정해진 위치를 벗어나 이동성을 발휘하는 주체인 것으로 파악했다. 이는 자본가 계급에 의해 만들어진 외면의 조건들을, 거꾸로 ‘가시화’의 조건으로 전유하는 공간적 실천이라 할 수 있다. 이러한 과정은 소설의 공간성을 정리하며 이루어졌다. 즉 서사공간의 수평․수직적 차원을 매핑함으로써, 등장인물들의 위치와 상호작용의 양상을 시각화했다. 그리하여 『그해 겨울은 따뜻했네』가 서울 도시화의 불균등한 공간의 생산을 포착하면서, 한편으로는 그러한 억압적 환경을 치열한 투쟁과 실천의 조건으로 전환하는 서사라는 점을 드러냈다.",
-      "keywords": "박완서, 『그해 겨울은 따뜻했네』, 불균등 발전, 도시화, 공간적 실천, 서울, 외면, 가시화, 이동성"
+      "keywords": ""
     },
     {
       "year": 2020,
@@ -1597,7 +248,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "현대문학의 연구",
       "is_first": true,
       "abstract": "이 글의 목적은 한국 웹소설에 나타난 ‘네트워크화된 개인’을, ‘기계적 예속’의 관점에서 해석하는 것이다. 현대사회에서 네트워크가 개인을 자본주의라는 거대한 기계에 종속시키는 장치로 기능하고 있으며, 웹소설이 이를 적절히 재현하고 있음을 논증하고자 했다. 2장에서는 최근 네트워크가 한국 웹소설의 공간적 배경으로 나타나는 양상을 살펴보았다. 특히 네트워크가 ‘다망감시’의 감옥으로서, 주체를 대상화하는 환경으로 재현되는 양상을 살펴보았다. 3장에서는 최근 한국 웹소설의 시간적 배경을 분석했다. 그리하여 포스트 아포칼립스의 상황이 네트워크에 의한 ‘주체의 대상화’를 감내하는 원인으로 설정되고 있음을 확인했다. 여기서 포스트 아포칼립스는 주체로 하여금 생존을 위해 불편부당함을 견디게 만드는 ‘불공정한 시장’의 비유이면서, 정체된 사회적 이동성을 재활성화하는 ‘창조적 파괴’ 양상의 표현이기도 했다. 4장에서는 최근 한국 웹소설의 주인공 유형을 분석했다. 기존 한국 웹소설은 디지털 환경에 매개된 사이보그를 반복적으로 재현했었다. 이때 사이보그는 마치 기계와 같이 비인간적인 노동강도를 견딜 수 있고, 한편으로는 기계처럼 자신의 ‘스펙’을 파악하고 향상시키는 유토피아적 신체였다. 그러나 최근에는 기계와 같은 노동이 아니라, 개성과 진정성을 활용하는 주인공 유형이 주류화하고 있다. 이것은 점점 인간의 개성이 중요한 자질로 평가되는 관심경제의 상황을 반영하는 것이다. 이러한 양상은 한국 웹소설이 현재 네트워크 환경 속 자본주의의 모순적 조건들을 적절히 재현하고 있으며, 그에 적응한 주체성 형태를 (재)생산하고 있음을 뜻한다. 요컨대 현재 웹소설은 자본주의가 요구하는 ‘자유로운 노동자’의 최신 버전을 보여주고 있다. 그리하여, 주체적이 될수록 보다 효율적인 기계장치로 환원되는 네트워크화된 인간의 모습을 드러내고 있다.",
-      "keywords": "웹소설, 네트워크화된 개인, 기계적 예속, 다망감시, 관심경제, 포스트 아포칼립스, 사이보그"
+      "keywords": ""
     },
     {
       "year": 2020,
@@ -1605,7 +256,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "사이間SAI",
       "is_first": true,
       "abstract": "이 연구의 목적은 한국 혼합현실(mixed reality) 서사에 나타난 디지털 사이보그의 상상력을 점검하는 데 있다. 여기서 혼합현실이란 가상현실(virtual reality)과 증강현실(augmented reality)의 개념을 아우르는 용어로서, 여러 단계의 가상 연속체(virtual continuum)를 말한다. 이때 혼합현실 서사는 다양한 가상 연속체를 배경으로 삼는 이야기를 통칭한다. 그리고 디지털 사이보그는 디지털적으로 매개․확장․향상된 신체의 표상을 가리키는 것으로, 혼합현실 서사에서 등장하는 기계와 유기체의 잡종으로서의 주체를 말한다. 2장에서는 「달빛조각사」를 중심으로 가상현실 공간과 그 주체로서의 디지털 사이보그의 형상을 점검했다. 여기서 디지털-매개된 신체인 사이보그는, 자기 자신을 수치화하여 인지하고 향상시키는 특별한 주체로 나타났다. 그리고 가상현실은 인간의 통계적 환원이 가능한 대안적 공간으로 표상화되었다. 이때 노동을 투여하여 통계적 자아를 향상시키는 것이 서사의 핵심적 주제로 나타났다. 3장에서는 「나 혼자만 레벨업」, 「무한 레벨업 in 무림」, 「요리의 신」 등을 중심으로 증강현실 공간과 그 주체로서의 디지털 사이보그의 재현 양상을 점검했다. 그리하여 증강현실이 ‘현실 위에 중첩된 비현실’로서, 주체로 하여금 이질적인 리얼리티를 경험하게 만드는 ‘이상한 환영’으로 나타나고 있음을 확인했다. 그리고 디지털-매개된 신체의 ‘업그레이드’가, 사회 시스템의 오류[bug]로 나타나는 양상을 살펴보았다. 이러한 서사는, 비정상적 존재가 아니고서는 사회의 계층 구조를 초월하기 어렵다는 현실인식을 보여주었다. 이러한 작업을 통해 혼합현실 공간과 그 주체로서의 디지털 사이보그가 모두 현실사회의 한계를 극복하는 유토피아적 대안으로 나타나고 있음을 확인했다. 다시 말해 혼합현실은 현실과는 달리 주체가 노력에 따라 성장할 수 있는 가능성의 공간이며, 디지털 사이보그는 현실에서는 불가능한 사회적 이동성을 수행할 수 있는 신체로 나타나고 있음을 살펴보았다. 이때 혼합현실과 사이보그는 단순히 대중문화의 유력한 요소 중 하나로 환원되는 것이 아니라, 사회현실에 대한 비판적 상상력을 전개하는 장치로 이해할 수 있다. 즉 혼합현실 서사의 독자들은 다만 자신에게 익숙한 대중문화의 재료를 소비하고 있는 것이 아니라, 현실사회에 대한 비판적인 상상력을 지지하고 있다.",
-      "keywords": "혼합현실, 가상현실, 증강현실, 가상연속체, 사이보그, 디지털 사이보그, 웹소설, 혼합현실 서사"
+      "keywords": ""
     },
     {
       "year": 2020,
@@ -1613,7 +264,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "어문논집",
       "is_first": true,
       "abstract": "이 연구는 박완서 소설 『아주 오래된 농담』에 나타난 근접성 없는 공동체와 친밀성의 테크놀로지의 서사적 양상을 살펴보는 데 목적이 있다. 이 소설에서는 공동체의 물리적 조건인 근접성이 사라진 가족 형태가 주로 다루어졌다. 그리고 이러한 가족 관계를 매개하는 테크놀로지의 역할이 상세히 기술되었다. 이를 통해 궁극적으로 가족 사이의 적정한 거리와, 그 안에서 이루어지는 의사소통의 적절한 방식이 탐구되었다. 이 글은 2장에서 비디오 영상이 죽은 아버지를 보충하는 이미지로 활용되는 양상을 살펴보았다. 이를 통해 부재하는 가족 구성원을 환상적인 방식으로 복원하고, 완전한 가족의 이미지를 연출하려는 것이, 결국 주체를 압박하는 결과를 가져온다는 점을 확인했다. 3장에서는 『아주 오래된 농담』에서 가족 사이의 적당한 간격이, 개인의 자율성과 가족의 친밀성을 유지하는 핵심으로 기능한다는 점을 확인했다. 또한 이메일이 가족 간 거리를 좁히는 것이 아니라, 오히려 적절히 유지하는 기술로 활용되고 있음을 살펴보았다. 박완서는 가족의 지나친 밀접을 경계하면서도, 근접성의 약화가 친밀성의 강화로 이어지는 역설을 서사화했다. 이것은 가족을 잃은 고통을 계속해서 재현하면서도, 한편으로는 가족으로부터 오는 고통을 반복적으로 포착했던, 박완서 소설의 한 결절점을 보여주고 있다.",
-      "keywords": "박완서, 아주 오래된 농담, 근접성, 근접성 없는 공동체, 가족, 친밀성, 테크놀로지, 친밀성의 테크놀로지, 비디오, 이메일, 가족 이데올로기"
+      "keywords": ""
     },
     {
       "year": 2020,
@@ -1621,7 +272,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "대중서사연구",
       "is_first": true,
       "abstract": "이 글은 한국 웹소설 판타지의 새로운 하위장르인 책빙의물을 분석했다. 그리하여 현재 한국 웹소설 판타지가 형식적 갱신을 서사적 동기로 삼고 있으며, 사회적 전복의 상상력을 장치로 활용하고 있음을 드러냈다. 이는 책빙의물이 가지고 있는 두 가지 형식적 특성을 분석하는 과정에서 수행되었다. 책빙의물에서 주인공은 판타지 소설의 작가나 독자로서, 자신이 서술‧독서하고 있던 소설 속으로 이동한다. 이때 주인공이 진입한 ‘원작’은 전형적인 판타지소설의 관습이 형상화된 공간이다. 이에 따라 주인공은 진부한 장르적 장치와 전형적인 플롯을 체험하며, 그것을 바꾸기 위해 노력한다. 요컨대 책빙의물에서 장르의 전형성을 회피하는 것은 서사의 내적 동기로 주어져 있다. 한편 책빙의물에서 주인공은 원작의 중심인물이 아니라 주변인물에게 이입한다. 원작의 중심인물은 대개 사회의 좋은 자원을 독점하고 있는 지배계급으로 나타난다. 이때 책빙의물은 주변인물이 중심인물을 압도하는 플롯을 통해, 사회적 약자가 사회적 강자를 넘어서는 전복적 상황을 연출한다. 그리하여 독자의 사회적 욕망을 장르 내적인 장치로 전환시킨다. 정리하자면 책빙의물은 한국 장르문학의 관습이 갱신되는 장면을 포착하는 동시에, 동시대 사회적 맥락 및 독자의 욕망을 민감하게 반영하고 있다. 그리하여 한국 웹소설 판타지가 자신의 내적 조건과 사회적 맥락을 동시에 성찰하고 있음을 보여주었다.",
-      "keywords": "한국 웹소설 판타지, 장르소설, 클리셰, 책빙의물, 메타소설, 메타 장르, 장르비틀기, 장르 교차"
+      "keywords": ""
     }
   ],
   "홍용진": [
@@ -1631,7 +282,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "에드워드 소자의 『포스트메트로폴리스』 1부에서 개진되고 있는 지리사는 공간적 선회에 입각하여 시네키즘이 이루어낸 도시공간의 형성을 중심으로 세 단계의 도시혁명들을 기술하고 있다. 차탈휘위크가 대표하는 제1도시혁명은 수렵·채집인들을 정착으로 이끌어 농업혁명을 가능하게 했고 우르가 대표하는 제2도시혁명은 권역에 대한 중앙집권적 지배력을 중심으로 도시기반 제국을 건설했다. 맨체스터가 대표하는 제3도시혁명은 산업자본주의가 초래한 계급적 도시구획을 전형적으로 보여주었다. 하지만 이러한 소자의 설명은 시네키즘이 다양한 효과를 산출한다는 그의 선언과는 달리 경제중심주의적인 경향을 보여준다. 이와는 달리 최근의 고고학적 성과들은 도시형성이 상징혁명을 수반하고 있다는 점을 보여준다. 이러한 차원에서 공간적 선회와 시네키즘에 입각한 소자의 지리사 및 도시혁명론이 본격적인 도시사 연구 방법론이 되기 위해서는 다음의 세 가지 점들을 보충해야 한다. 첫째 도시형성의 원동력을 다양한 분야의 복합적인 관계 속에서 살펴봐야 한다. 둘째 인간의 사회적 실천을 다양한 공간과 시간의 차원들과 함께 균형 있게 고려해야 한다. 셋째 산업혁명에 집중된 서구도시의 특수성을 시간적으로나 공간적으로 보다 확대된 차원에서 도시간 네트워크의 시네키즘에 입각해서 살펴봐야 할 것이다.",
-      "keywords": "에드워드 소자, 포스트메트로폴리스, 시네키즘, 지리사, 도시혁명, 도시사"
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -1647,7 +298,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "역사학보",
       "is_first": true,
       "abstract": "본 논문은 2015년과 2016년에 국내 학자들이 발간한 서양중세사 관련 학술 문헌들을 개괄하는 것을 목적으로 한다. 시기적인 범주가 일반적으로 받아들여지고 있긴 하지만 본 논문은 다음과 같은 주제별 범주를 적용한다. 본 논문은 1) 경제사 및 문화교류사, 2) 정치사 및 정치문화사, 3) 사회문화사. 전체 연구에 대한 검토 결과 전통적인 정치, 경제, 문화상의 주제들을 계승하면서 연구범위의 확대에서뿐만 아니라 주제의 다양성에 있어서 학문적으로 풍성해졌다고 결론을 내린다. 또한 2016년에 개최된 제9회 한일 서양중세사 심포지움과 같은 국제 학술교류 또한 빼놓을 수 없을 것이다. 이러한 긍정적인 전망과 더불어 서양중세사 연구에 대해 세 가지 점에 대한 깊은 성찰이 필요하다. 먼저 일반 독자와 학생들을 위한 최신의 연구성과를 반영한 종합적인 서양중세사 개설서 집필이 시급하다. 둘째로 이러한 작업은 중고등학교 역사교과서를 위한 기준이 되어야 한다. 마지막으로 현재 학계는 점점 악화되어 가고 있는 국내 학문후속세대와 학문 재생산의 상황에 대해 숙고해야 한다.",
-      "keywords": "서양중세사, 2015~2016년 회고와 전망, 연구범위 확대, 주제의 다양화, 학문후속세대"
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -1655,7 +306,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "서양중세사연구",
       "is_first": true,
       "abstract": "본 논문은 백년 전쟁 발발을 전후로 속어로 지어진 6편의 시가들을 통해 이 당시 프랑스 왕국에서 나타나고 있는 다양한 정치적 감정들을 살펴보고자 한다. 먼저 「잉글랜드와 플랑드르의 반란에 대한 단가」는 프랑스왕 중심의 열렬한 민족감정을 보여주지만 전쟁 초기만 하더라도 「왜가리 맹세」나 「라몽 드 코르네 씨, 실례합니다」와 같은 시가들은 피카르디나 기옌지역과 같이 양국 사이에 위치한 지역에서는 그러한 이분법적 대결구도가 선명하지 않다는 점을 보여준다. 전쟁이 발발한 이후 주요한 전투들과 관련하여 등장한 세 시가들 또한 서로 다른 감정선들을 보여준다. 「크레시 전투에 대한 시가」가 지역적 정체성에 기반을 둔 봉건귀족적인 애도를 표현하고 있다면 「〈30인의 잉글랜드인과 30인의 브르타뉴인들 간의 전투〉>에 대한 시가」는 프랑스 민족감정과 기사도의 이상이 혼합된 감수성을 보여준다. 다른 한편으로 「〈30인의 잉글랜드인과 30인의 브르타뉴인들 간의 전투〉에 대한 시가」에서는 시가의 배경에 일반 농민들이 등장하고 이들에 대한 선정(善政)이 주제가 되더니 급기야 「푸아티에 전투에 대한 한탄(哀歌)」에서는 귀족들에 대한 비판과 ‘선량한 자크들’의 적극적인 정치참여 의지가 표명되고 있다. 이상의 6편의 시가들은 지역적 다양성과 역사적 사건의 전개에 따라 당대인들의 복잡다단한 감정들을 보여주며 감정이 지닌 정치적 영향력을 재고할 수 있게 해 준다.",
-      "keywords": "백년전쟁, 정치적 감정, 민족 감정, 중세 시가, 속어"
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -1663,7 +314,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "서양중세사연구",
       "is_first": true,
       "abstract": "1332년 필리프 6세는 십자군 원정 선포에 맞춰 두 권의 문헌 모음집 수서본들을 출간하였다. 프랑스어로 집필되거나 번역된 문학, 여행기, 역사 텍스트들을 포함하고 있는 이 서적들은 필리프 6세 십자군 원정에 속인 대중들의 관심을 불러일으키고 원정의 정당성과 관련하여 이들을 설득시킬 것을 목적으로 정교하게 편집되었다. 또한 이 두 문헌 모음집들은 중세 십자군 관련 저술의 흐름에서 14세기의 다양한 문자문화의 변화양상들을 보여주고 있다. 그것들은 바로 역사와 지리, 백과사전적 지식들에 관심을 갖는 속인독자대중의 등장, 산문형식의 속어로 집필된 문헌들의 대중지향성, 현실정치와의 밀접한 관계, 주로 귀족들을 중심으로 하고 있는 속인독자들의 ‘집단적 독서’, 독서의 이해를 돕거나 휴식을 위한 다양하고 화려한 이미지들의 등장 등이다. 하지만 현실 사안에 깊이 연루된 필리프 6세의 두 수서본들은 수서본에 편집된 각 텍스트들의 수많은 재생산과 유포에도 불구하고 실제로 그 자체로서는 온전하게 널리 유포되지 못했다. 그럼에도 두 수서본들은 당대의 문자기록문화의 변화지점을 확인할 수 있는 중요한 증거라고 할 수 있다.",
-      "keywords": "필리프 6세, 십자군, 문자문화, 속인대중독자, 수서본학"
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -1671,7 +322,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "역사교육",
       "is_first": true,
       "abstract": "본 논문은 고등학교 세계사 교과서에서 서양 중세사 내용구성에 대한 검토와 더불어 어떻게 재구성할 것인가를 모색하고 있다. 역사가 “과거와 현재의 끝없는 대화”라는 에드워드 카의 언급은 세계사 교과서에도 동일하게 적용될 수 있을 것이다. 아쉽게도 현재 세계사 교과서는 전통적인 구성방식을 답습하고 있다는 인상을 준다. 이러한 상황에서 서양중세사의 내용은 현재 한국 사회에 유의미한 것이 무엇인지에 대한 진지한 고민을 바탕으로 재구성되어야 한다. 최신의 연구성과를 반영하여 서양중세사의 내용적 특성을 다음과 같은 세 가지로 정리해 볼 수 있다. 1) 삶의 다양성과 통일성(크리스트교를 중심의 통일화 과정과 다양한 삶의 방식들의 공존), 2) 권력의 파편화와 보편성(제국/교회의 보편성에 대한 꿈에도 불구하고 탈중앙화되어 있는 현실 권력들), 3) 가치의 내재성과 초월성(속인 공동체 내부의 합의와 신과 같은 초월적 가치에 의한 정당화 사이의 대립). 각 특징들 중 삶의 다양성과 권력의 파편화, 가치의 내재성이 역사적 현실과 연관된다면 이것들의 대립쌍인 통일성과 보편성, 초월성은 중세인들의 이상들을 반영한다. 이러한 특징들은 세계사 교육의 현재적 의미를 모색할 수 있는 교과서 재구성의 계기들을 제공해 줄 것이다. 이를 통해 다양한 지역 문화와 다문화 사회를 이해하고 여러 세계의 여러 다양한 공동체에서 필요로 하는 세계시민적 가치관들을 함양할 수 있을 것으로 기대한다.",
-      "keywords": "서양중세사, 세계사 교과서, 현재적 관점과 의미, 과거와 현재의 대화, 세계사 교육의 의의"
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -1679,7 +330,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "역사교육연구",
       "is_first": true,
       "abstract": "프랑스는 유럽에서 역사에 가장 큰 관심을 지닌 나라로 초등학교 4,5학년부터 중･고등학교에 이르기까지 총 9년 동안 전 계열, 전 학년에서 역사･지리과목 수업을 진행하고 있다. 특히 역사･지리는 사회과 관련 과목들을 대체하고 있다는 점에서 다른 교과목과의 관계에서도 많은 비중을 차지하고 있다. 초등학교에서는 프랑스사를 중심으로 한 정체성 형성에 초점을 맞추고 있다면 중학교에서는 선사시대부터 현대사까지의 통사를 유럽사를 중심으로 가르치고 있다. 고등학교에서는 중학교에서 배운 내용을 주제별로 정리한 다음 20세기 역사를 집중적으로 배우면서 현대사회의 다양한 문제들을 비판적으로 다룬다. 이중 2015년에 새롭게 개정된 중학교 역사과 교육과정은 최근에 전개되고 있는 ‘민족서사’ 논쟁과 밀접한 관련을 맺고 있다. 자국사를 탈피하여 교류사에 초점을 두었던 2008년 교육과정에 대한 비판에 따라 2015년 교육과정은 다시 자국사 중심의 역사서술로 돌아갔기 때문이다. 현재 프랑스에서 시행되고 있는 역사교육은 세 가지 특징들을 지닌다. 첫째는 정부의 역사교육 정책은 역사분야에 열정적인 모습을 보여주고 있는 시민사회 및 학계의 다양한 논의들을 수렴하여 결정된다는 점이다. 둘째는 초･중･고 간의 교과내용 구성이다. 초등학교가 자국사 중심의 통사, 중학교가 유럽사 중심의 통사로 구성되어 있다면 고등학교에서는 현대세계에 대한 역사비판적 성찰을 함양하는 주제사로 구성되어 있다. 이는 한국 상황에도 매우 주목할 만한 특징이 된다. 셋째는 정부가 제시하는 교육과정이나 학습지도안, 그리고 졸업자격시험이 역사교육의 통일성을 부여한다면 교과서 자유발행제와 교사의 자율 재량권은 그 다양성을 확보한다는 점이다.",
-      "keywords": "프랑스 역사교육, 프랑스 2015 개정 교육과정, 민족서사, 유럽중심주의, 다양성과 통일성"
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -1687,7 +338,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "인문과학",
       "is_first": true,
       "abstract": "본 논문은 경제 및 인구위기에 대응하고 임금과 상품가격을 규제하고자 1351년 2월 수도 파리를 대상으로 반포된 장 2세 칙령의 특성들을 분석해 보고자 한다. 많은 학자들은 이 칙령과 관련하여 1347-1350년의 대흑사병에 따른 노동력 부족에 대한 대책으로 구걸에 대한 배척과 노동강제가 시행되었다는 점을 강조해 왔다. 하지만 본 칙령의 목적은 단지이 문제에만 국한되는 것이 아니었다. 시장과 가격에 대한 왕정의 규제는빈곤과 노동정책과 관련한 보다 폭넓은 맥락을 구축한다. 이와 동시에 이 두 문제는 종교 및 윤리적 범주에서 정치 및 경제적 범주로 이행한다. 이칙령이 탄생하게 된 배경은 두 가지 수준에서, 즉 한편으로는 정치 및 경제적 맥락에서, 또 다른 한편으로는 이데올로기적 맥락에서 살펴 볼 수있다. 왕국의 경제상황을 통제하려는 시도는 인구감소라는 재난뿐만 아니라 14세기 내내 가중된 전쟁과 재정 문제에서부터도 기인한다. 국왕 정부는 잉글랜드에 대한 전쟁에 대항하여 재정을 마련하길 원했고 이는 화폐및 조세와 관련한 경제 문제에 눈을 뜨게 만들었다. 이러한 현실적인 필요와 함께 이데올로기적 맥락에 대한 고찰은 13세기 말과 14세기 초에등장한 다양한 이론과 담론들로 눈을 돌리게 한다. 토마스 아퀴나스와 에지디우스 로마누스는 왕국의 부와 국왕에 의한 통제와 관련하여 교역 및상인의 역할을 강조한 바 있다. 특히 페트루스 요하네스 올리비는 유용성과 가격의 측정기준이 되는 자발적 청빈을 바탕으로 시장, 상인, 화폐 개념을 발전시켰다. 이 모든 현상들은 14세기부터 노동과 빈곤이 국왕정부의 통제 대상으로 여겨지면서 정치 및 경제 영역으로 진입하기 시작했다는 점을 보여준다. 이때부터 빈곤은 노동과 긴밀한 관계를 맺기 시작했고 이 두 문제들은 왕국의 경제에 필수적인 요소들이 되었다.",
-      "keywords": "중세수도 파리, 빈곤, 노동, 경제정책, 장 2세, 페트루스 요아니스 올리비, 자본"
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -1695,7 +346,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "인문과학",
       "is_first": true,
       "abstract": "This article, with analyses on various royal images produced by French kingship in multiple political crises in the first half of the 14th Century, is intended to survey its various strategies in order to justify its political authority. These images are classed into two categories: three dimensional image(statue) and two dimensional image(miniature of manuscript and panel painting). In one hand, multi-layered meanings involved in these images are catched in the contemporary politico-social context, and in the other, thier receptivities are examined, depending on their properties of medium and form. Through these images, it is verified that the French kingship accepted the various contemporary cultural innovations in order to effectively deliver their images to people and to make them more familiar. The effects of these innovations are 1) the effort to represent contemporary people who could be verified or actual events in the style of 'realism' or 'naturalism'; 2) the tentative to install and expose the images in public spaces where more numerous spectators could see them. This cultural reception doesn't mean an innovation by kingship, but an appropriation by kingship. And this became an important element for the French kingship in critical political crises, engaged with social, economic and demographic crises, to consolidate royal ideologies after the 1360s.",
-      "keywords": "조각상, 채식화, 패널화, 필리프 6세, 장 2세, 정치적 수사, 정치적 의사소통"
+      "keywords": ""
     },
     {
       "year": 2016,
@@ -1703,7 +354,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "본 논문은 코뮌운동을 특징으로 하는 서양중세 도시사회에서 도시공동체에 대한 이상들이 어떻게 이미지에 투영되었는지를 두 회화 작품들을 통해 살펴보고자 한다. 그 중 하나는 14세기 전반기 시에나 시청사 벽화로 제작된 암브로조 로렌체티의 <좋은 정부와 나쁜 정부의 알레고리>이고 다른 하나는 15세기 말 안트베르펜의 화가 ‘프랑크푸르트의 장인’이 그린 <궁수들의 연회>이다. 먼저 암브로조 로렌체티의 벽화 연작들은 <나쁜 정부>에서 <좋은 정부>로의 이행을 대칭이 아닌 서사로 풀어내면서 당대 시에나의 9인 정부 체제의 정치적 정당성을 강조하고 있다. 그가 옹호하고 있는 당대 시에나의 정치체제는 비록 중세 이탈리아 도시에 일반적인 과두정의 형태를 보여주고는 있지만 최대한 일반 인민들의 정치적 동의를 확보하고자 하는 체제를 유지하고 있었다. 그가 보여주고 있는 시에나 시는 시 공동체를 구성하고 있는 시민들의 다양성과 조화, 그리고 시정의 공공성을 특징으로 한다. 로렌체티의 작품은 복잡하지만 다양성이 보장된 도시 공동체가 일인지배적 체제보다 도시 공동체의 안정과 번영을 확고하게 가져올 수 있다고 확신한다. 다음으로 ‘프랑크푸르트 장인’의 작품인 <궁수들의 연회>는 부르고뉴 공작을 중심으로 안트베르펜의 위계적인 사회구도를 보여주고 있는 듯이 보이면서도 이 위계를 위반하고 전복시키는 다양한 회화적 장치들을 설정하고 있다. 농촌의 이상향인 ‘코카뉴’와 기독교적 문명의 비유인 도시를 결합시킨 이 작품은 안트베르펜 도시공동체를 장악하고 있는 군주와 거대자본에 대한 통렬한 비판을 내포하고 있다. 각각의 작품들이 취하고 있는 전략적 차이점에도 불구하고 이 두 작품들을 통해 나타나고 있는 화가 및 주문자들의 도시공동체에 대한 욕망과 비전은 크게 다르지 않아 보인다. 그것은 도시를 구성하고 있는 구성원들 사이에 동등한 권리를 확보하고 이를 바탕으로 도시 외재적인 거대권력에 대해 도시공동체의 자유를 쟁취하는 일이다. 그리고 이들의 이러한 요구들이 이루어질 때라야 진정한 의미의 풍요와 평화가 보장된다. 이러한 전망들은 바로 현대 도시공동체의 다양한 문제들과 맞닿아 있는 듯이 보인다. 정치체 내부에서 정치체에 대한 권리가 배제된 자들의 자유평등에 대한 요구의 문제, 추상적인 정치체의 대의를 누가 전유하여 조직할 것인가의 문제, 정치공동체의 개방성과 폐쇄성의 문제 등 어쩌면 중세에는 때에 맞지 않는 이 두 작품의 생각들이 현재 도시공동체의 문제들과 공명하고 있다.",
-      "keywords": "중세 도시공동체, 시에나, 암브로조 로렌체티, 좋은 정부와 나쁜 정부의 알레고리, 안트베르펜, 프랑크푸르트 장인, 궁수들의 연회"
+      "keywords": ""
     },
     {
       "year": 2016,
@@ -1711,7 +362,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "프랑스사 연구",
       "is_first": true,
       "abstract": "본 논문은 클로비스와 프랑크왕국을 되돌아보고 중세부터 현대까지 어떻게 프랑스적 정체성의 원천으로 만들어져 왔는가를 일별해본다. 프랑크족의 왕인 클로비스는 서로마제국이 소멸된 이후 4세기 말에서 5세기 초에 갈리아 지역 대부분을 정복하고 아타나시우스파 가톨릭을 수용하였다. 9세기 후반에 랭스 대주교좌가 서프랑키아에 소속되고 랭스 대주교 앵크마르가 클로비스와 그의 개종을 신비화하기 시작하면서 클로비스는 곧 프랑스의 역사와 밀접한 관련을 맺게 되었다. 특히 취약한 왕권을 지닌 카페왕조 초기에 그와 관련한 각종 신화와 전설이 고안되었고 이후 발루아왕조 초기에 백년전쟁과 함께 증폭되었다. 하지만 프랑스 대혁명 이후 그는 왕당파와 교권주의자, 현재는 보수 우파의 상징이 되었다. 이제 그를 새로운 역사적 해석의 대상으로 삼아야 할 것이다.",
-      "keywords": "클로비스, 가톨릭, 도유식, 프랑크족, 메로베우스 왕조, 프랑스 정체성"
+      "keywords": ""
     },
     {
       "year": 2016,
@@ -1719,7 +370,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "세계 역사와 문화 연구",
       "is_first": true,
       "abstract": "본 논문은 정치적 위기에 처해 있던 중세 말 프랑스 왕 장 2세(1350-1364) 시기에 왕권의 후원 아래 시행된 『성서』에 대한 세 편의 프랑스어 번역본들, 즉 『교화 성서(Bible moralisée)』, 『장드시의 성서(Bible de Jean de Sy)』, 『이야기 성서(Bible historiale)』를 살펴보고자 한다. 속인들의 독서문화 확대, 프랑스어 번역운동의 활성화, 새로운 신앙심의 등장 등과 같이 13세기 후반부터 시작된 새로운 문화적 변혁의 흐름 속에서 장 2세는 다양한 성서 번역을 통해 한편으로는 자신의 신앙심을 지적인 수준에서 과시적으로 보여주면서도 다른 한편으로는 이를 통해 대내외적으로 비판받던 자신의 왕권을 정당화한다. 『교화 성서』와 『장드시의 성서』의 경우에는 라틴어와 프랑스어, 그리고 이미지 사이의 삼각관계가 텍스트와 이미지가 맺는 의미작용을 풍부하게 하면서 성직자의 언어인 라틴어와 속어, 특히 프랑스왕의 언어인 프랑스어 사이의 상보적 관계를 상징적으로 보여준다. 또한 『이야기 성서』는 성서의 구조를 「창세기」와 솔로몬의 「잠언」으로 양분하면서 신의 질서와 왕의 질서라는 이원적 구도를 형성한다. 특히 각종 이미지들은 정교하게 잉글랜드 에드워드 3세에 맞서 발루아 가문의 왕위계승을 정당화하는 의미와 상징들을 보여준다. 이 세 프랑스어 번역 『성서』들은 이후 왕실은 물론 대귀족들이 제작하는 『성서』들의 모델이 되었고 프랑스 왕정이 처한 각종 위기상황 속에서 프랑스 왕권의 상징자본으로 기능하였다.",
-      "keywords": "선량왕 장 2세, 프랑스어 번역, 교화 성서, 장 드시의 성서, 이야기 성서"
+      "keywords": ""
     },
     {
       "year": 2016,
@@ -1727,7 +378,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시연구: 역사·사회·문화",
       "is_first": true,
       "abstract": "데이비드 하비에 따르면 19세기 파리는 파괴와 창조라는 특징을 지니는 근대성의 도시였다. 하지만 이 시기 파리는 동시에 과거의 역사기념물들을 보존하고 복원하려는 역사화의 과정을 보여주기도 한다. 이에 따라 18세기 말까지 부정적인 대상으로 인식되어 오던 ‘옛 파리’는 19세기 초에 들어와 낭만주의의 물결과 더불어 미학적으로 재발견된다. 이러한 문화사조는 새로운 국민정체성을 확립하고자 하는 7월 왕정의 정책으로 이어졌다. ‘시민왕’ 루이-필리프와 내무부장관 기조는 통합적인 ‘국민’의 이름으로 7월 왕정을 과거 왕조와 프랑스혁명 모두의 종합적 계승자로 내세우고자 했고 이는 곧 국민 공통의 기억의 모범인 역사기념물들의 보존과 복원정책으로 이어졌다. 비올레르뒤크를 중심으로 하는 역사기념물 보존 및 복원 사업은 1848혁명과 루이 보나파르트의 쿠데타, 제2제정의 등장이라는 파란만장한 정치적 격변 속에서도 꾸준히 이어졌다. 물론 이러한 작업들은 다양한 현실적⋅행정적 문제들과, 특히 제2제정 당시에 시행된 오스만 남작의 도시계획과 충돌할 수밖에 없었다. 제3공화정이 수립되고 민주주의가 확립되어 가면서 비올레르뒤크가 이끄는 역사기념물 보존 및 복원작업은 새로운 저항에 부딪히게 되었다. 이 시기의 소장 역사학자들과 고고학자들은 중세와 국민적 모범을 중심으로 하는 기존의 개념과 정책을 비판하면서 고대에서 근대까지 시기를 확장하고 민중의 일상생활과 관련된 유적들을 포함해야 한다는 주장하였다. 이렇게 해서 역사기념물 정책은 국민적 모범 확립에서 시민적 역사교육으로 변화해 갔다. 19세기 파리가 보여준 이상의 과정은 두 가지 의미를 던져준다. 한편으로 그것은 근대화 반대하는 역사화가 바로 근대화의 산물이라는 이중적 관계를, 다른 한편으로는 역사기념물 정책을 둘러싼 국민 정체성 확립의 변화를 잘 보여준다.",
-      "keywords": "파리, 근대성, 역사기념물, 외젠 비올레르뒤크, 역사문화공간의 생산, 역사문화도시"
+      "keywords": ""
     },
     {
       "year": 2016,
@@ -1735,7 +386,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "프랑스사 연구",
       "is_first": true,
       "abstract": "본 논문의 목적은 14세기 전반기 프랑스왕국에서 봉건사회에서 정치사회로 이행의 문제를 1346년의 크레시 전투 패배와 1347년 신분회의를 중심으로 구체적으로 살펴보는 데 있다. 14세기 초만 하더라도 전쟁과 조세를 중심으로 작동하는 국가체제는 예외적인 경우에 한정된 것으로 여겨졌고 따라서 국가체제가 전제하는 전국적 단일성과 체제의 영속성은 정치사회 구성원들로부터 안정적인 지지를 확보하지 못했다. 이러한 상황에서 장기적인 전쟁준비를 요구하는 백년전쟁의 시작과 더불어 필리프 6세의 프랑스 왕정은 신분회의의 심각한 도전에 직면하였다. 과세의 정당성은 전쟁의 발발에 있었기에 전쟁 발발 전에 준비를 위한 과세는 부당한 정책으로 여겨졌기 때문이었다. 하지만 프랑스의 연패, 특히 1346년 크레시 전투의 패배에서 보여준 왕과 귀족의 무능력함은 정치사회 구성원들에게 새로운 정치적 움직임의 동기를 부여하였다. 1347년의 신분회의 때부터 프랑스 정치사회 구성원들은 왕권 주도의 국가체제를 넘어서 신분회의를 통해 국가체제 운영에 적극적으로 개입하려는 움직임을 보이기 시작했다. 특히 이 신분회의는 과세에 대한 거부가 아닌 과세에 대한 통제를 처음으로 표명했다는 점에서 역사적 중요성을 지닌다. 이는 프랑스에서 본격적으로 봉건사회가 정치사회로 변화해 갔다는 것을, 또 정치사회의 관심이 지방주의적 성격을 탈각하고 수도 파리라는 중앙의 정치무대로 향하기 시작했다는 것을 의미한다. 경제위기와 급격한 사회변동, 흑사병, 끝없는 전쟁과 민생파탄이라는 파국의 연쇄 속에서 이제 정치에 대해 권리가 없던 자들이 공동의 정치공동체라는 정치적 감수성을 바탕으로 정치체에 대한 권리를 요구하기 시작했다.",
-      "keywords": "백년전쟁, 크레시 전투, 정치사회, 정치체에 대한 권리, 신분회의, 수도 파리, 정치적 담론장"
+      "keywords": ""
     },
     {
       "year": 2015,
@@ -1743,7 +394,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "동국사학",
       "is_first": true,
       "abstract": "본 논문은 서양중세 정치사상에서 가장 전형적인 구도였던 위계적 성·속 이원론과 이에 기반을 두고 있던 성직자지배론 또는 신정정치론이 역사적 현실 속에서 언제, 어떻게 약화되어 갔는가를 14세기 전반기 프랑스의 경우를 사례로 살펴보고 있다. 이미 1303년 아나니 폭거로 아비뇽 교황시대가 시작되면서 교황권이 실추되긴 했지만 1315년부터 시작된 프랑스 왕국의 정치적 위기는 아비뇽 교황 요하네스 22세에게 사목적 이상에 따른 교황권의 위상을 회복시켜 주었고 이를 기반으로 그는 치밀한 행정·재정체제를 구축해 나갈 수 있었다. 그러나 1337년 백년전쟁이 일어날 때부터 교황은 서유럽 세계 전체를 포괄하는 보편적인 영적 지도자로서의 지위를 상실하기 시작했다. 이에 본 논문은 서유럽 세계 내 교황권의 결정적인 실추의 계기를 1333년 뱅센 토론회로 보고 구체적으로 살펴보고자 한다. 카페왕조 방계로서 왕위에 오른 필리프 6세는 왕권 정당화 작업의 일환으로 십자군 원정을 대대적으로 준비했고 교황 요하네스 22세는 영적 지도자로서 필리프 6세를 시혜적인 차원에서 물심양면 도와주었다. 이러한 와중에 교황 요하네스 22세는 자신만의 독특한 지복직관론을 주장했고 필리프 6세는 파리대학 신학자들을 동원하여 이를 검증하기 위한 대토론회를 1333년 뱅센궁에서 개최했다. 이 토론회는 어디까지나 신학적인 주제로 개최되었지만 교황권에 대한 프랑스 왕권의 독립성 천명하려는 의도 또한 지니고 있었다. 결국 이 토론회는 교황의 입장을 이단으로 몰았고 이에 충격을 받은 요하네스 22세는 곧 사망하고 말았다. 뱅센 대토론회 이후 프랑스에서는 다음과 같은 세 가지 현상이 등장했다. 첫째는 토마스 아퀴나스의 신학을 중심으로 파리대학에서 형성되기 시작한 신학적 교조주의이고 둘째는 파리대학과 프랑스왕권의 긴밀한 관계 구축이다. 마지막으로 요하네스 22세의 죽음은 십자군 원정에 부정적이었던 베네딕투스 12세의 즉위로 이어졌고 십자군 원정계획의 좌절은 뜻하지 않게도 백년전쟁의 도화선이 되었다. 물론 뱅센 대토론회는 이러한 서로 다른 세 현상들의 직접적인 원인이 될 수는 없을 것이다. 하지만 그것은 다양한 영역들에서 교황권을 중심으로 하는 보편적 질서가 쇠퇴하고 새로운 질서들로 대체되는 분수령이 되었다.",
-      "keywords": "성직자지배론, 신정정치론, 필리프 6세, 요하네스 22세, 파리대학, 지복직관론, 1333년 뱅센 토론회, 백년전쟁, 토마스주의"
+      "keywords": ""
     }
   ],
   "김은주": [
@@ -1753,7 +404,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "이 논문은 체현된 인지와 체현의 물질적 구조를 통해 사이보그의 체현와 젠더의 관계를 탐색한 캐서린 헤일스의 문제의식을 공유하며, 웬디 휘경 전의 논의를 중심으로 계산하는 인간 컴퓨터였던 여성 컴퓨터와 프랑켄슈타인의 ‘딸’로 불린 소프트웨어의 작동을 살핀다. 이를 통해 이 글은 인간과 비인간을 훈육하고 양육하는 계산 기계를 계산하는 친족으로 제안하면서 블랙박스화된 계산 기계의 연산에 연결될 수 있는 방법을 모색한다. 이 글의 최종 목표는 계산 기계가 연산하는 패턴 식별이 기술의 용어만이 아니라, 정치적 소음을 차단하여 차이를 차별로 구조화한다는 점을 비판한 히토 슈타이얼의 논의를 제시하면서, 도나 해러웨이의 친족 만들기를 계산하는 기계와 연결하여 계산하는 친족 만들기의 형상에 관해 질문하고자 한다.",
-      "keywords": "계산하는 친족, 비인간, 인공지능, 패턴 식별, 할루시네이션"
+      "keywords": ""
     },
     {
       "year": 2024,
@@ -1761,7 +412,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "한국여성철학",
       "is_first": true,
       "abstract": "이 글은 해러웨이의 응답하기와 기억하기를 친족 만들기와 SF 글쓰기로 조명하고 해러웨이의 응답하기의 윤리를 이해고자 한다. 해러웨이에게서 응답하기와 불가분의 관계를 맺고 있는 심포이에시스 개념은 해러웨이의 인간존재를 진화론적으로 환경에 적응, 변화해가는 구체적 생명체이자 자연-문화 연속체로서의 크리터들의 연합인 홀로바이온트로 제시한다. 홀로바이온트는 살아있음만이 아니라 죽어서 다른 존재들의 양분이 되는 퇴비라는 점에서 공생발생의 진화인 심포이에시스로 진화해 온 생태적 순환과 배치에 있는 관계성의 존재이다. 해러웨이의 홀로바이온트 개념은 해러웨이의 응답하기의 윤리를 응답의 상대로서 인간과 분리된 타자인 비인간을 세워놓는 인간중심주의적 윤리와 구별하는 존재론적 전제를 마련하며, 이러한 응답하기의 방식은 “친족만들기”로 등장한다. 친족은 이 행성에 거주하기에 트러블로 얽히면서 서로를 감염시키는 종들이 불순하게 얽힌 관계망이다. 친족 만들기는 친족으로 얽혀있었으나 인간중심주의적 경계선으로 배제한 관계를 친족으로 제시하면서 친족의 역사를 기억하기, 홀로바이온트로서 이미 얽힌 멤버를 함께 기념하기를 동반한다. 해러웨이가 기억하고 기념하기 위한 방식으로 제시하는 것이 친족에 관한 SF 글쓰기이다. 이 글은 친족 만들기와 기억하기로서 SF 글쓰기가 실행하는 응답하기를 역사성과 구체성에서 비롯한 응답의 위치 차이를 이해하는 부분적 회복으로서 제안하고, 응답하기의 윤리를 오염된 다양성과 불확실한 마주침 속에서 지구 행성에서 거주하기로 그 의미를 밝힌다.",
-      "keywords": "기억하기, 응답하기, 친족만들기, 해러웨이, SF 글쓰기"
+      "keywords": ""
     },
     {
       "year": 2024,
@@ -1769,7 +420,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "여성학연구",
       "is_first": true,
       "abstract": "이질적 현상들의 복합 위기를 뜻하는 다중 위기의 상황은 코로나19 바이러스로 인한 팬데믹을 기점으로 지구 행성적 재난으로 본격화되고 있다. 이 글은 ‘비인간전회’를 통과해 다중위기상황에서 새로운 정치적 이행을 모색하는 행위자(actor)와 그 연결을 살핀다. 글의 구성은 다음과 같다. 우선 비인간 전회의 의미를 짚고, 브루노 라투르의 행위자 네트워크 개념을 해러웨이가 제안한 광학적 기구가 행하는 회절(diffraction)과 연결하여 설명한다. 행위성은 다양한 행위자들의 행위의 중첩과 얽힘 그리고 연결에 따른 것이라는 점에서, 간섭의 패턴으로서 회절이라는 개념과 연관한다. 이러한 회절은 바라드의 양자적 이해를 통과해 중첩과 얽힘 그리고 전유할 수 없는 타자들의 간섭한 패턴으로 구체화된다. 바라드는 이러한 얽힘이 타자화의 흔적에 얽매여 있는 관계이기에 다른 것과 얽혀 있는 의무의 관계를 드러낸다고 설명한다. 바라드는 특히 회절의 특징은 모호성과 미결정성을 강조하며 이분법적 사유를 넘어서 인간 행위자와 비인간 행위자 연결을 강조하는 회절의 정치의 가능성을 제시한다.",
-      "keywords": "다중위기, 바라드, 비인간전회, 해러웨이, 행위자-네트워크, 회절"
+      "keywords": ""
     },
     {
       "year": 2023,
@@ -1777,7 +428,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "이 논문은 인류세를 근대성의 산물로 이해하고 이를 비판하면서, 근대성이 상정한 선형적 역사의 발전상인 기술유토피아라는 상에서 벗어나 디지털 폴리스를 모색하려는 것이다. 이를 위해, 사물로의 전회와 행위자 네트워크 이론을 통과해 디지털폴리스를 사물들의 플랫폼으로 제시하고, 블랙박스화와 디지털 행위 경관을 디지털 폴리스의 한 양상으로 설명하면서, 디지털폴리스라는 공동체를 물의 정치의 장으로 변모시킬 것을 제안한다. 물의 정치는 지각불가능하게 되기와 안보여주기의 전략으로 나타나며, 이종적 네트워크를 펼치며 없는 장소로서 유토피아의 역량을 드러낸다.",
-      "keywords": "디지털 폴리스, 사물, 인류세, 유토피아, 행위자 네트워크"
+      "keywords": ""
     },
     {
       "year": 2023,
@@ -1793,7 +444,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "디지털 폴리스는 디지털 매체가 되어가는 도시 공간이며 비유클리드적 관계망으로 나타난다. 스마트 도시와 동일시 된 디지털 폴리스는 안전을 명목 삼아 동질성을강화하는 ‘빗장 공동체(gated community)’가 될 가능성이 높다. 그러나 매체로서 디지털 폴리스는 데이터를 생성하는 환경이자 관계적 실재이다. 이 공간에서는 인간 행위자와 비인간 행위자 그리고 디지털 기술을 공동 작용하게 하는 차이 생성과 관계의 연결이 중요하다. 이 글은 빗장 공동체화를 비판하며, 커먼즈의 논의를 통해 디지털 폴리스의 정의를 모색한다. 슬로터다이커의 거품 도시와 대기 디자인 개념은 커먼즈를 주어진 자원으로 규정하고 분배하는 입장에서 벗어나, 기술과 함께하는 커머닝의 과정 그 자체이자 활동을 커먼즈로 이해할 수 있게 한다. 커머닝의 행위자로서 기술은 브뤼노라투르의 행위자네트워크이론(actor-network theory)의 맥락에서 설명 될 수 있다. 이를 통해, 디지털 폴리스의 정의를 기술에 얽힌 커머닝의 역량을 강화하는 지속가능한 정의로서 사유할 수 있다.",
-      "keywords": "디지털 폴리스, 슬로터다이크, 빗장 공동체, 정의, 커먼즈"
+      "keywords": ""
     },
     {
       "year": 2022,
@@ -1801,7 +452,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "한국여성철학",
       "is_first": true,
       "abstract": "‘제인 진 카이젠(Jane Jin Kaisen)’의 영화 <이별의 공동체(2019)>는 바리의 신화를 제주를 비롯한 한반도의 분단된 각 영토와 각기 다른 시간대의 현대사와 맞닿게 하며 디아스포라, 여성과 소수자의 기억을 미학적, 윤리적 태도로 제시 한다. 이 글은 <이별의 공동체>를 오이코스인 조에의 계보학적 탐구로 이해한다. 서사의 추동은 버려짐의 갱신된 의미를 통과하는, 이산의 이미지와 제주 4. 3 항쟁의 생존자이자 심방 고순안의 제례의 반복적 이미지로 엮인다. 영화에서 디아스포 라는 순수한 기원의 동질한 공동체를 문제시 하면서, ‘우리’의 기억으로 수렴할 수없는 이질적 시간성을 드러낸다. <이별의 공동체>는 바리의 제례를 통해 파편화된 기억 이미지들을 연결하고 사건을 일으키는 아카이브를 제시한다. 이 글은 바르부르크의 잔존 개념을 해석한 디디-위베르만의 논의와 들뢰즈의 정동 개념으로 <이별의 공동체>에서 바리를 조에의 역량으로 이질적 시간성들을 산포하는 정념이자 정동적인 것으로 설명한다. <이별의 공동체>는 트라우마적 사건의 말 잃음이나 대안적 역사 서술을 넘어 각기 다른 시간성들의 계보를 그리며 시대착오적 동시대의 서사를 실행하는 기억의 공동체인 조에의 공동체를 형성한다.",
-      "keywords": "기억, 디아스포라, 잔존, 정동, 조에"
+      "keywords": ""
     },
     {
       "year": 2022,
@@ -1809,7 +460,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "탈경계인문학Trans-Humanities",
       "is_first": true,
       "abstract": "이 글의 목적은 공동체와 면역의 새로운 관계 맺음을 성찰하는 에스포지토의 사유로부터, 이질성을 추방하면서 동질화를 추구하는 면역 패러다임에서 벗어나 생성의 역량으로서 면역을 긍정하는 근대 너머의‘ 지구 행성’의 커먼즈(commons)와 공동체를 모색하려는 것이다. 에스포지토는 인구를 통치의 대상으로 삼는 근대의 생명 정치가 면역적 주권 개념을 통과해 극단적 안전을 추구하며 동질적 공동체 소속을 강화하는 공동체를 구성한다고 비판한다. 에스포지토의 논의는 생명 정치의 비판에 그치지 않고, 긍정적(affirmative) 생명정치를 모색한다. 에스포지토는 공동체인 코뮤나티스와 면역인 이뮤니타스의 조건을 면역의 어원이자 선물을 의미하는 무누스(munus)를 통해 그 가능성을 살핀다",
-      "keywords": "공동체, 면역, 무누스, 생명 정치, 지구 행성, 인류세, 커먼즈"
+      "keywords": ""
     },
     {
       "year": 2021,
@@ -1817,7 +468,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "시대와 철학",
       "is_first": true,
       "abstract": "본 연구의 목적은 인본주의의 가정을 해체하면서 신체에서 포스트 휴먼적 전회가 일어난다는 사실에 주목하면서 포스트 휴먼의 신체를 설명하는 것이다. 들뢰즈의 신체 개념을 통해 포스트 휴먼의 신체를 결합과 변이의 정동을 담아내고 지속하면서 변이하는 정동체(affect-capacité/affectcapacity)로 칭하고 설명한다. 정동체 개념은 포스트 휴먼의 신체를 경계설정을 거듭하며 변이하는 신체이자 매체로 작동하고 존재함을 제시한다. 정동체로서 포스트 휴먼 신체는 다른 신체들과 구분되는 본질적 구별을 지닌 것이 아니라, 세계와 신체의 상호적인 겹침을 이루는 강도들이 이행하는바를 표시하는 경계면이자 인터페이스이다. 또한 이러한 신체는 자연 문화이분법을 넘어 환경과 결합하고 적응하며 환경 그 자체가 되는 생명체이다. 본고는 정동체로서 포스트 휴먼 신체를 이해하면서, 포스트 휴먼 신체에서 공생(symbiosis/poiesis)의 거주하기를 사유해보려는 것이다.",
-      "keywords": "공생, 매체, 신체, 정동체, 포스트 휴먼"
+      "keywords": ""
     },
     {
       "year": 2020,
@@ -1825,7 +476,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "한국여성학",
       "is_first": true,
       "abstract": "푸코는 생명 권력(bio-power)을 죽이고 살리는 권력이 아니라 ‘살게 하거나 죽게 내버려두는’권력으로 설명한다. 본고는 생명권을 강조하며 낙태죄 유지를 옹호하는 논리가 생명 정의를 독점하며 인구(population)에 관여하는 생명 권력으로 비판한다. 생명 정치에 대항하는 낙태죄 폐지 운동은 낙태의 권리를 옹호하며, 생명권 인정과 유지의 범위가 어떻게 정해지며, 누가 이를 정하는가?라 질문한다. 이러한 낙태의 권리는 낙태의 권리를 개개인의 권리의 자유를 넘어, 자유의 한계를 재가치화 하는 임계적 자유인 ‘반규율적인 새로운 권리’로서 제안하며 근대 국가 성립의 조건인 시민권의 전제를 정치화한다. 따라서, 생명 정치 시대에 낙태죄 폐지의 요구 신체적 취약성과 ‘불능’으로 등장하는 정치화된 생명을 드러내고, ‘공동’은 누구인지 질문하며 정치화된 생명을 새로운 주체화의 장소로서 강조하는 것이다.",
-      "keywords": "낙태죄, 생명 권력, 여성 신체, 인구, 페미니즘 정치"
+      "keywords": ""
     },
     {
       "year": 2020,
@@ -1841,7 +492,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "철학연구",
       "is_first": true,
       "abstract": "버틀러는『젠더 트러블』이후, 규범적 젠더 수행을 넘어, 젠더를 단지 규범이 아니라 규제적(regulative)이라 설명한다. 규제(regulation)는 버틀러는『젠더 트러블』이후, 규범적 젠더 수행을 넘어, 젠더를 단지 규범적(normative) 일뿐 아니라 규제적(regulative)이라 설명한다. 규제(regulation)는 표준적인 사람으로 만들어지는 과정의 제도화를 뜻하며, 구체적인 법과 규칙과 정책을 동반한 표준화(normalization)로 실행된다. 특히 『젠더 허물기』에서는 젠 더가 규제적이라는 점을 강조하여, 규제를 통해 젠더가 젠더 규범으로 재생산되 는 구체적 과정에 주목하고, 규제적 담론이 개인을 관리하고 활용할 뿐 아니라 개인을 적극적으로 구성한다는 의미에서 젠더는 사회 권력의 형식이자 젠더 이 분법이 제도화되는 장치(apparatus)가 된다는 점을 강조한다. 이러한 장치 개념 을 거치면서 젠더는 규범의 차원에서가 아니라 주체화에 관여하는 권력 장치로 설명된다. 규범과 규범화라는 이중적 작동을 통해 규제적으로 발휘되는 젠더 장치의 의미 는 다음과 같다. 젠더가 규범적으로 작용할 뿐 아니라, 이분법적 젠더 체계를 유지하는 전제에 도전하고 변화할 가능성을 연다는 것이다. 특히, 버틀러의 젠더 개념의 변화는 신체를 생성의 양식으로 이해하고, 이로부터 젠더 장치의 변화 역량을 끌어낸다는 것이다. 이는 규범의 재생산이 신체의 실천을 통해 환기되고 인용되며, 신체의 실천이 그 인용과정에 규범을 변화시킬 능력도 갖기 때문이다. 또한, 사회 권력의 형식인 젠더 장치는 '개인(individual)'이자 주체로 개별화하는 동시에 '인구(population)'로 전체화하는 주체화와 생명 정치의 기술이다. 이 점에 서, 젠더 장치의 급진적 작동은 주체화에 개입하는 방식, 정상성을 주조하는 방 식에 도전하는 일이며, 삶의 경계를 정하는 규범, 그리고 이러한 규범들이 벌어 지는 다양한 신체의 상황에서 벌어지는 생존에 개입할 뿐 아니라, 퀴어 정치의 퀴어링이 주장하는 권력의 불안정성 및 변화 가능성으로 확장될 수 있다.",
-      "keywords": "규범, 버틀러, 장치, 젠더, 인구"
+      "keywords": ""
     },
     {
       "year": 2020,
@@ -1849,7 +500,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "한국여성철학",
       "is_first": true,
       "abstract": "신체와 공간 개념은 페미니즘 이론의 계보에서 중요한 위치를 차지한다. 특히, 여성 주체의 존재론적적 구조인 신체는 안/밖이 분리된 공간 구조로서 설명될 수 없다. 본고는 신체와 공간에 대한 이분법적 사유를 넘어, 들뢰즈의 신체 개념과 공간 개념을 검토함으로써 신체를 정동체로 공간을 지리 신체로 제안한다. 정동체로서 신체는 자연과 사회 문화의 이분법을 해체하고, 자연 역시 기술화된 것이며 문화와 연속적 선상에 있는 것으로 받아들인다. 이러한 신체는 기술 매개적 물질, 물리적 실재, 정보전달적 신체이며, 변용능력과 배치로 공간을 생산한다. 신체가 생산한 공간은 지리 신체의 공간으로, 문화, 미디어, 체계, 환경, 교통, 법, 인구, 기후등의 요소가 신체의 변용능력에 물리적 거리의 멈과 가까움에 상관없이 상호작용하는 배치의 효과로 생겨나는 비유클리드적 관계망이다. 각기 다른 차이를 지닌 현장인, 정동체로서 신체가 지리 신체의 공간을 창출해냄으로써, 페미니즘은 차이를 연결의 동력으로 삼을 수 있다. 여성간의 그리고 여성 내의 이질적이며 복수적인 차이들은 페미니즘 주체화를 일으키는 원동력, 잠재력인 것이다. 또한, 현장의 정치인 페미니즘은 정동체로서 신체들의 결합과 연결을 활성화하는 기술과 속도의 문제에 페미니즘 관점에서의 젠더 개입을 적극적으로 실행할 필요가 있다.",
-      "keywords": "신체, 공간, 현장, 정동체, 지리신체"
+      "keywords": ""
     },
     {
       "year": 2020,
@@ -1857,7 +508,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "여성문학연구",
       "is_first": false,
       "abstract": "본고는 한국 페미니즘 대중화의 흐름 속에서 이루어진 SF와 페미니즘의 동시대적 조우에 주목한다. 한국의 SF 작가들이 페미니즘의 정치적, 이론적 논의와 문화적 풍조를 공유하고 있다고 본다면, 젠더와 섹슈얼리티에 대해 사유하는 SF 텍스트를 페미니즘 논의의 반영일 뿐만 아니라 페미니즘 논의에의 기여로서 적극적으로 독해할 필요가 있다. 이를 위해 본고에서는 두 편의 SF 중편소설 김보영의 「얼마나 닮았는가」(2017)와 듀나의 「두 번째 유모」(2017)를 독해한다. 김보영의 「얼마나 닮았는가」는 성차별이 온존하는 미래의 한국 사회를 인공지능 화자의 시선을 통해 낯설게 함(defamiliarization)으로써, 동일성의 폭력에서 벗어나 차이를 긍정하는 데 젠더에 대한 인식이 필수적임을 보여준다. 듀나의 「두 번째 유모」는 아버지의 폭력성으로 인해 균열이 난 기존의 세계에서 살아남기 위해 욕망하고, 생각하고, 행동하면서 새로운 삶의 조건을 찾아 나서는 모험 서사의 주인공으로 소녀를 내세우면서 새로운 주체성을 형상화하고, 세계의 안티‐오이디푸스적 재편을 꾀한다. SF가 그리는 세계는 그 배경이 연대기 상으로 미래이던, 과거이던, 현재이던지 간에 단 한 번도 도래하지 않았다는 점에서 언제나 잠재적인 위상을 가지며, 미래를 향해 있다. 이러한 SF의 잠재성/미래성은 차별이 온존하던 과거를 의식하면서 차별이 사라진 더 나은 미래를 열망하는 페미니즘의 동시대적 시간성과 교차하면서 페미니즘 대안 세계를 생성한다. SF의 잠재적인 대안 세계는 현재 현실을 새로운 시각으로 바라보고 미래의 결정에 비판적으로 개입할 동기를 부여한다는 점에서 정치적인 힘을 갖는다. 이와 같은 SF의 장르적 특성이 작가들, 독자들 모두에게 젠더 권력관계를 변화시키고자 하는 페미니즘의 주요한 자원이자 방법으로 인식됨에 따라 ‘한국 페미니즘 SF’의 저변이 확장되고 있다.",
-      "keywords": "SF, 페미니즘 SF, 듀나, 김보영, 잠재성, 동시대성"
+      "keywords": ""
     }
   ],
   "곽노완": [
@@ -1867,7 +518,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "도시개발과정에서 도시거주자들은 축차적으로 연이어 수탈당한다. 현대차 한전부지의 용적률과 층고 상향을 통해 개발을 인허가해주는 대가로 서울시가 환수할 1조 7천여억원 중에서 일부라도 서울거주자 모두에게 돌아가는 데 투자하거나 사용하지 않고 전액을 다시 현대차부지와 인근 부동산의 가격을 폭등시킬 기반시설과 지하개발에 사용하는 것은 이런 전형이라 할 수 있다. 이를 통해 도시의 양극화는 축차적으로 확대 재생산된다. 이처럼 환수된 공공소유지나 토지수익이 사회성원 모두에게 돌아가지 않고 정부나 지자체의 장에 의해 다시 해당 사유지에 인접한 인프라 건설을 매개로 토지소유자에게 전유될 경우 공유지의 역설에 빠지게 된다. 따라서 공유지의 수익이 공공기관의 장에 의해 일방적으로 처분되지 않고 전국이나 지자체의 사회성원 모두에게 평등하게 현물/현금 기본소득으로 돌아갈 권리로 확립될 필요가 있다. 이는 정부나 지자체의 장이 처분권을 갖는 공공소유지를 모두의 권리에 해당하는 공유지로 전환하고 여기서 나오는 수익을 사회성원 모두에게 돌아갈 현물/현금 기본소득의 재원으로 법제화하는 문제라고 할 수 있다. 현재에도 정부나 지자체의 세입이나 세외수입의 일정부분은 이미 원리적인 공유지에서 나오는 수익이다. 이 수익이 4대강사업이나 외평채처럼 건설업자나 부동산부자, 또는 수출대기업의 순이익과 재벌의 자산과 배당금을 증폭시키는 데 활용되는 것은 이미 ‘공유지의 역설’이라 할 수 있다. 이와 연관하여 부동산 공유지의 외연을 토지와 지표면을 넘어서서 아직 확립되지 않은 공중권으로 확장할 필요가 있다. 공중권이 공유화된다면 전파사용대역의 확대, 도시재생과 용적률/층고상향에 따라 임대수익이 갈수록 증가할 것이므로 점점 비중 있는 기본소득의 재원이 될 것이다.",
-      "keywords": "도시공유지, 수탈, 공유지의 역설, 공중권, 기본소득"
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -1875,7 +526,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "서강인문논총",
       "is_first": true,
       "abstract": "각각의 공동체성원들에게 노동과 무관하게 무조건적으로 평등하게 지급되는 기본소득이 노동자의 가구소득 및 노동소득을 증가시킬 것인가에 대해서는, 기본소득의 재원을 무엇으로 조달되는가에 따라 다르게 답변될 수밖에 없다. 조지 등 좌파자유지상주의자, 판 빠레이스와 같은 실질적 자유지상주의자, 미드와 같은 아가토토피안, 후버와 같은 사회신용론자 등 대부분 기본소득논자들의 분배정의 개념에 따르면, 기본소득은 사회의 공유자원인 토지, 외부천부, 공유자본, 사회신용화폐의 수익에 대한 모든 사회성원들의 평등한 청구권이다. 이러한 기본소득의 정의 개념에 비해, 노동소득에 관한 정의 개념은 노동에 대한 공정한 대가에 관한 ‘보상적 정의’ 개념이다. 슈밥이 강조한 대로, 직업의 미래가 소수에게만 밝게 전망되는 현실을 감안할 때 대다수 노동자들이 공정한 보상적 정의를 충족하는 노동소득을 받기는 더욱 힘들어졌다. 뿐만 아니라 자유노동이 연합하여 생산한 사회적 생산물에 대한 자본의 사적 전유가 새로운 자본주의적 착취의 핵심요소로 부상한 시대에, 노동소득은 더더욱 보상적 정의에 못 미친다고 볼 수 있다. 이러한 상황에서 기본소득은 노동에 대한 보상적 정의의 필수조건으로 작동하는 분배정의일 뿐만 아니라, 그 중 일부는 지식과 빅데이타 등을 생산하는 자유노동에 대한 보상적 정의이기도 하다. 그리고 분배정의+보상적 정의로서 기본소득은 거의 대다수 노동자의 가구소득과 노동소득을 증가시키고, 비정규직 및 프레카리아트와 함께하는 길이 될 것이다.",
-      "keywords": "기본소득, 보상적 정의, 분배정의, 임금노동, 자유노동, 공유지."
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -1883,7 +534,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "인문사회 21",
       "is_first": true,
       "abstract": "스마트도시는 ICTs가 융합된, 정보의 수신과 발신이 자유로운 지능화된 도시를 뜻한다. 이전의 U(유비쿼터스)시티가 첨단기술 중심이었던 것에 비해 스마트도시에서는 사람중심의 계획이 우선된다. 스마트도시의 시민은 정보통신의 사용자로서 도시공간 및 디지털 미디어와 상호작용하며 도시와 함께 진화하는 사람들이다. 그러나 스마트도시의 문제점도 있다. 첫째로 도시공간 및 사물에 설치된 센서와 네트워크, 그리고 관리시스템이 시민들을 감시하고 통제하는 수단이 되기도 하며, 둘째로 스마트도시가 글로벌 IT 기업 및 대형 건설/부동산 업체들의 새로운 이윤추구를 위한 장으로 변질되어 경제적 사회적 불평등의 기폭제가 되기도 한다. 이 글은 이처럼 양극단의 기로에 서 있는 기존의 스마트도시 담론을 공유경제 논의와접목시켜 스마트공유도시라는 대안적 스마트도시 패러다임과 전망을 제시하려는 시도이다. 이를 위해 2절에서 스마트도시의 시민들이 빅데이터 등 정보재를 공동으로 생산하는프로슈머로 진화하며, 또 리빙랩을 통해 도시혁신의 적극적인 주체로 전환될 비전을 밝힐것이다. 그리고 3절에서는 레식(Lessig), 리프킨(Rifkin) 등이 제시한 ‘공유경제=선물경제’ 개념 및 순다라라잔(Sundararajan)이 제시한 ‘공유경제=선물경제와 시장경제의 사이’ 패러다임과 비판적으로 대결하면서, 시민들에게 공동유산으로 전승된 자연적･역사적 공유재의 수익뿐만 아니라 시민들의 실시간 정보공유와 협력을 통해 새로 생산한 공유재의 수익을 시민들 모두가 평등하게 공유할 새로운 공유경제 패러다임을 제시할 것이다. 그리고 4절에서 이러한 공유경제는 ‘분배정의+보상적 정의라’는 두 가지 정의 개념으로 정당화되어 현금･현물 도시기본소득으로 구체화됨을 보이고자 한다. 이처럼 새로운 공유경제 개념을 스마트도시와 융합함으로써, 플랫폼벡터기업에 의해 시민들의 공동투자와 공동노동으로 생산된 만물인터넷 공유재의 수익이 사유화되거나 수탈될 것이라는 스마트도시에 대한 수동적 반대를 넘어서서, 스마트도시를 21세의 도시공동체 곧 스마트공유도시로 진화시키기 위한 대안적인 노력이 학술적으로나 실천적으로 활성화될 것으로 기대된다.",
-      "keywords": "스마트도시, 프로슈머, 공유경제, 선물경제, 분배정의, 보상적 정의, 도시기본소득"
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -1891,7 +542,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "마르크스주의 연구",
       "is_first": true,
       "abstract": "이 논문은 마르크스 \"자본\"에 제시된 도시지대 개념을 재구성하여 현대 자본주의 도시지대론의 시론을 제시하려는 시도이다. 현대 자본주의의 총순환에서 도시공간에 대한 자본투자와 도시지대의 비중이 급증하고 도시부동산에 대한 투기가 대중화되면서 도시의 부동산과 가계부채는 현대 경제위기의 뇌관 중에 하나로 자리 잡았다. 자본주의 분석에서 이제 도시지대는 필수영역이라 할 수 있다. \"자본\" 1권출간 150주년을 맞아 도시지대론을 재구성하려는 시도는 \"자본\"의 현재성을 새롭게 조명할 수 있는 계기가 될 것이다. 도시지대를 “사회의 진보를 가로채는 것”으로정식화한 마르크스는 공유지의 수탈이 도시지대의 기반을 이룬다는 점을 밝힘으로써 새로운 지평을 열어주고 있다. 이 글은 마르크스에 따라 공유지가 확대될수록공유지 수탈과 도시지대가 증가하는 ‘공유지의 역설’을 마르크스 도시지대론의 키워드로 정식화하고자 한다.",
-      "keywords": "독점지대, 차액지대, 절대지대, 도시지대, 마르크스, 공유지의 역설."
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -1899,7 +550,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "철학연구",
       "is_first": true,
       "abstract": "라이트는 리얼 유토피아 기획을 통해, 민주평등주의 사회, 곧 인간번영을 위한 물질적 사회적 수단과 기회의 평등한 접근권을 보장하며 ‘민주주의가 극대화된 사회’를 창출하고자 한다. 그렇지만 그는 자신의 민주평등주의에 대해 설득력 있는 근거를 제시하지 않는다. 이 글에서는 공유지에 대한 평등한 권리에서 유래하는 기본소득이, 그의 민주평등주의를 위한 설득력 있는 근거가 될 수 있음을 보인다. 이어서 공유지에서 유래하는 기본소득에 기초하여 그의 리얼 유토피아 기획을 보다 일관된 체계로 재구성한다. 또한 이를 통해 리얼 유토피아에 대한 라이트의 비전이, ‘공유사회’, 곧 ‘민주적으로 관리·통제되는 공유지와 기본소득에 기초하는 사회’라는 비전과 중첩되어 있음을 주장한다. 따라서 리얼 유토피아 기획과 기본소득 기획이 이러한 중첩과 연관성 및 서로의 성과에 기초하여 발전할 수 있음을 주장한다.",
-      "keywords": "라이트, 리얼 유토피아. 기본소득, 공유지, 공유사회"
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -1907,7 +558,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "마르크스주의 연구",
       "is_first": true,
       "abstract": "마르크스주의 연구자들 사이에서 모든 사회성원들에게 지급되는 무조건적인 기본소득에 대한 입장은 크게 네 가지로 나뉜다. 첫째, 기본소득은 모든 사회성원들을 노동자에 대한 착취자로 만드는 것이라 반대한다는 입장이다(엘스터, 비숍). 둘째, 기본소득은 자본주의 분배관계를 개선하지만 사회주의의 요소는 아니기에 한정적인 의미만 있다는 입장이다. 셋째, 기본소득은 노동자의 자유와 해방을 확대하는 한에서 사회주의적이라고 보는 입장이다(라이트, 키핑). 넷째, 기본소득은 생산수단의 공유화에 기초한 사회주의의 필수요소일 뿐만 아니라 자본주의에서도사회주의로 이행의 주체역량을 증폭시킨다고 보는 입장이다(블라슈케, 라이터, 하워드). 특히 로머의 사회배당+쿠폰사회주의 개념은 넷째에 가깝지만 절충적인 대안이라 할 수 있다. 성인 사회성원들이 공공부문 기업의 이윤을 평등하게 사회배당으로지급받고 추가로 쿠폰지분을 통해 기업의 주식을 사고팔 수 있는 시장사회주의 모델을 제시한다는 점에서, 그는 자본의 소유문제에 대해 사회성원들의 공동소유와사유화라는 모순된 두 가지 요소를 절충적으로 결합시키고 있다. 이에 따라 자본가와 지주가 독점했던 이윤은 부분적으로 사회의 모든 성인 구성원들에게 평등하게지급되는 사회배당으로 전환된다. 하지만 다수 사회성원들이 광범하게 각자 분배받은 쿠폰을 통해 투기적인 주식시장에 참여하도록 조장하면서 각종 사회경제적낭비와 비효율을 낳는다. 이러한 문제점은 쿠폰이라는 우회로를 통할 필요 없이 마르크스의 원리에 따라 모두가 공유하는 생산수단 및 자본의 수익으로부터 유래하는 사회주의적 기본소득을 통해 극복될 수 있다. 또한 이를 위해 사회주의에서 토지 및 생산수단에서 유래하는 수익의 분배를 주로 노동자에 한정할 것인지 아니면 사회의 모든 성원에게로 확장할 것인지에 대한 마르크스의 양가성은 비판적으로재구성될 필요가 있다.",
-      "keywords": "사회배당, 쿠폰 사회주의, 기본소득, 로머, 착취, 마르크스."
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -1915,7 +566,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "인문사회과학연구",
       "is_first": true,
       "abstract": "재건축초과이익환수제의 부활을 추구하는 정부여당의 경우도 종합부동산세의 경우처럼 이 환수액을 누구를 위해서 쓸 지에 대해 모호한 개념을 갖고 있는 것으로 보인다. 기존 재건축초과이익 환수제가 부활되면 국토교통부가 관할하는 주택기금을 매개로 하여 결국 기초지자체에 55%, 광역지자체에 45%가 배분된다. 그리고 이렇게 배분된 재원은 다시 지자체의 도시·주거환경정비기금, 재정비촉진특별회계, 국민주택사업특별회계의 재원으로 귀속되어 사용된다. 그런데 이 중 국민주택사업특별회계는 지역의 주거약자를 위해 사용될 개연성이 크지만, 도시·주거환경정비기금이나 재정비촉진특별회계는 오히려 부유한 건물주 또는 외지에 거주하는 부동산소유주들에게 공짜선물을 안겨주는 통로가 될 가능성도 있다. 그러나 사회적으로 환수될 건축초과이익부담금은 미래세대를 포함한 모든 사회성원들에게 1/N로 귀속되어야 정당하다. 단, 이 재원의 일부가 특정집단에게 선별적인 혜택으로 쓰여지는 경우는 액커만(Ackerman)과 판 빠레이스(Van Parijs)가 제시한 ‘비우월적 다양성(undominated diversity)’의 원칙에 따라 누구라도 현 사회제도로부터 불이익을 겪는다고 인정할 무주택 취약계층의 주거복지로 한정할 필요가 있을 것이다. 이러한 사회정의 원칙에 따라 이글은 건축초과이익 환수액을 ‘모두에게 돌아가는 토지기본소득 + 취약계층 주거복지재원’으로 사용하는 걸 적극 검토할 것을 제안하고 있다.",
-      "keywords": "재건축초과이익, 공시가격, 비우월적 다양성, 공유지의 역설, 토지기본소득"
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -1923,7 +574,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "인문연구",
       "is_first": true,
       "abstract": "판 빠레이스는 로머에 대한 비판적 재구성을 통해 확립한 착취개념의 외연을 확장하면서 최근에는 고용지대의 외연을 축소시키고 자본과 부동산의 불로소득 및 자연자원수익 등을 기본소득의 새로운 재원의 범위로 편입하고 있다. 이를 통해 노동에 의한 착취(고용지대) 개념이 포함된 기존의 사회정의론과 기본소득모델을 새롭게 재구성한다. 그럼에도 불구하고 주어진 외부천부자산 내지 외부공유지만이 아니라, 인터넷으로 연결된 다수의 사람들이 공동으로 생산하는 빅데이터와 같은 개방된 공유지의 수익을 기본소득으로 공유하는 전망을 자신의 착취 개념 및 사회정의론과 연계시킬 필요가 있는 것으로 보인다. 이처럼 판 빠레이스의 사회정의론을 모두가 함께 생산하는 공유지의 개념과 연계시켜 또다시 재구성한다면 호혜성 위배나 노동자에 대한 착취를 이유로 한 기본소득 반대론을 넘어서서, 노동소득+기본소득(공유지배당)이 결합되어 노동유인을 유지하면서도 실질적 자유를 최소극대화 하는 새로운 공유사회경제 패러다임을 구축할 수 있을 것이다.",
-      "keywords": "호혜성, 공정성, 사회정의, 착취, 기본소득, 공유지"
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -1931,7 +582,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "인문사회 21",
       "is_first": true,
       "abstract": "마르크스 연구자들 중 하워드처럼 기본소득을 옹호하는 연구가 늘어나고있다. 그러나 마르크스의 자유개념과 기본소득의 사회철학을 연계한 고찰은 아직 없다. 이 글은 마르크스의 자유개념을 자본주의에 포섭된 계몽주의의 법적･형식적 자유개념의 한계를 넘어서는, ‘연합사회의 자유’ 개념으로 재구성하는 것을 목표로 한다. 연구는 마르크스의 초기저작에 대한 연구와 중･후기 저작에 대한 연구로 나뉘어 진행된다. 초기 마르크스의 자유에 대한 논의는, ‘필연의 인식에 기초한 자기실현’이라는 계몽주의적 틀에서 크게 벗어나지 못하고 있다. 자유에 대한 논의가 현실에 존재하는 개인들의 자유라는 형태로 전개되지 못한다는 한계 역시 극복하지 못하고 있다. 그러나 약한 비결정론과 역사적 및 전체론적인 문제틀에 기초하여 “현실적 개인들”의 해방과 자유를 위해 현실을 새롭게 연구하게 되는 중기부터, 사정은 달라진다. 이 글에서는 한편에서는 중･후기마르크스의 자유개념을, 『루이 보나파르트의 브뤼메르 18일』에서 시사되는 ‘연합사회의자유’개념으로 재구성해 낸다. 다른 한편, 마르크스가 요청하는 생계유지를 빌미로 강제되는 노동으로부터의 자유를, 모든 개인의 생존권을 보장하는 ‘경제적 자유’로 재구성한다. 또한 이 자유개념에 연계하여, 그의 사회주의 사회 안에서 또 이 사회로의 이행을 위해기본소득제가 옹호될 수 있다고 주장한다. 나아가 이런 측면에서 마르크스의 기획이 판빠레이스나 페팃, 라벤토스 같은 현대 기본소득론자들의 자유를 위한 기획을 선취한다고 주장한다. 이 연구는 향후 마르크스 연구자들의 기본소득 연구에 디딤돌이 될 것으로 기대된다.",
-      "keywords": "마르크스의 자유개념, 경제적자유, 계몽주의, 기본소득"
+      "keywords": ""
     },
     {
       "year": 2015,
@@ -1939,7 +590,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "이 논문에서는 드워킨의 분배정의론, 곧 그의 자원평등론을 비판적으로 연구한다. 그 결과 그의 분배정의론이 가능한 복지수혜의 대상을 원칙적으로 공동체의 개별성원 전체로 확장하고 보편복지정책의 효율성을 인정한다는 점에서, 노동중심주의적․선별적인 전통적 복지패러다임의 한계를 어느 정도 넘어섬을 보일 것이다. 또한 그가 자원평등론을 구성하기 위해 요청하는 가설적인 시초의 평등한 상태, 곧 ‘시초평등’이 함축하는 ‘평등한 자원분배’를 단순한 방법론적 전제로 ‘약’하게 해석하는 것이 아니라 추구해야 하는 이상으로 ‘강’하게 해석할 때, 분배정의에 대한 그의 원칙들이 기본소득제를 지지함을 보일 것이다. 나아가 이렇게 해석하는 것이 그의 분배정의론의 여러 난점들에 대한 해결책이 된다는 점을 보일 것이다. 마지막으로 그의 연구가 다 포괄하지 못하는 자본주의적 분배부정의를 고려할 때, 그의 분배정의론에 대한 이 글에서의 해석 또는 비판적 재구성이 그의 분배정의론을 보다 생산적으로 연구하는 방식이 될 수 있음을 보일 것이다. 드워킨의 복지이론이 전제하는 ‘시초평등’을 이글에서처럼 강하게 해석하여 이에 함축된 기회의 절대적 평등을 추구해야 할 분배정의로 수용하고 ‘누구도 선행하는 권리를 갖지 않는 자원’, 곧 “모든 자연 및 사회역사적으로 유증된 자원과 기회”에 대한 모두의 평등한 권리 및 그 제도화로서의 기본소득제를 인정할 때, 이는 자본주의 사회경제에 의해 구조화된 불평등의 시정을 견인할 수 있다.",
-      "keywords": "드워킨, 분배정의, 자원평등, 기본소득, 기회의 평등"
+      "keywords": ""
     },
     {
       "year": 2015,
@@ -1947,7 +598,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "마르크스주의 연구",
       "is_first": true,
       "abstract": "리프킨의 말대로 자율적인 공유지와 공유경제가 확대되면서 사유경제모델을 뛰어넘어 새롭게 지속가능한 공유경제모델의 시대가 열리고 있다. 하딘의 ‘공유지의비극’론을 비판한 로즈의 ‘공유지의 희극’론과 오스트롬의 공유지에 대한 역사적고찰도 국가/시장의 이분법의 틀을 깨는 공유지와 공유경제의 우월성과 지속가능성을 보여주고 있다. 그러나 이들의 공유지론은 1만 5000명 이하의 성원을 가진 공동체에서만 입증되었다. 그리고 좀 더 큰 규모에 대해서 오스트롬은 각각의 공유지를갖춘 다양한 공동체들 간에 ‘다중심의 질서’를 제시한다. 하지만 하비가 비판했듯이이러한 ‘다중심의 질서’는 파편화된 지자체의 분할이 양극화와 불평등을 확대한다는 것을 보여준 ‘티뷰’ 가설의 함정에 빠질 가능성이 크다. 이러한 ‘티뷰’ 가설의함정을 피하기 위해서는 공유와 공동체를 소규모 지역공동체에 한정하지 않고 지역/도시/국가/지구라는 여러 공간차원에서 겹치는 것으로 볼 필요가 있다. 이에 기초해서 공유도시는 지역이나 국가 등과 겹치면서도 도시 전체를 아우르는 도시공동체로서 다차원적인 공유지를 갖는 장소로서 재정식화될 수 있다. 그리고 이렇게 재정식화됨으로써 공유도시는 도시 내 소규모 마을공동체적인 공유지의 틀을 벗어나서지역 및 국가와 겹치면서도 도시 전체를 아우르며 공유지의 복원과 확대라는 입체적인 전망을 얻을 수 있다. 이러한 전망 속에서 서울의 공유도시 어젠다도 새롭게진화할 수 있는 계기를 얻게 될 것이다.",
-      "keywords": "공유지, 공동체, 공유도시, 리프킨, 하비, 서울."
+      "keywords": ""
     },
     {
       "year": 2015,
@@ -1955,7 +606,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "철학연구",
       "is_first": true,
       "abstract": "이 글에서는 판 빠레이스의 ‘실질적 자유지상주의’와 ‘자유’에 대한 연구가 이루어진다. 이에 대한 연구는 크게 두 부분으로 이루어진다. 먼저 실질적 자유지상주의와 그 자유개념을 자유지상주의와의 연관 아래 연구한다. 그 결과 실질적 자유지상주의가 자유지상주의 및 그 자유개념과 무관함을 보일 것이다. 나아가 자유지상주의를 사실상 해체함을 보일 것이다. 이어서 실질적 자유지상주의와 그 자유개념을 ‘적극적 자유’와 ‘소극적 자유’에 대한 기존논의와 연관하여 연구한다. 그 결과 판 빠레이스의 자유개념이 꽁스땅과 벌린의 소극적 자유개념 또는 개인적 자유개념, 특히 존 스튜어트 밀의 자유개념을 계승하고 발전시킴을 보일 것이다. 동시에 자신의 ‘실질적 자유’ 개념 및 이에 기초한 기본소득론을 통해 적극적 자유 또는 정치적 자유를 위해서도 새로운 전망을 열어줌을 보일 것이다.",
-      "keywords": "질적 자유지상주의, 자유지상주의, 소극적 자유, 적극적 자유, 기본소득, 판 빠레이스"
+      "keywords": ""
     },
     {
       "year": 2009,
@@ -1963,7 +614,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "Globalization and the revolution in information have brought aboutpostmodern notions of space such as cyber space and overlappingspace. In her discussion of the dual systems of global cities, SaskiaSassen argues that overlapping space becomes predominant in globalcities, in which the global space is overlapping to the State and thelocal. Examining the specific ways of overlapping space, Sassenattempts to extend the space for political practices to the global space. However, for the effective construction of that kind of space, Sassen'snotion of global city seems to need to be revised. In Sassen'sframework, heterogeneous and different dimensions of communities inglobal cities are understudied and instead often easily reduced to economic dimension. Here David Harvey's recent discussion of spaces of hope seems to behelpful to rethink of what is understudied in Sassen's work. Proposingopen spatiotemporal utopianism, Harvey attempts to envision alternativeutopian spaces as a combination of dynamic socialisticcompetition-space with security-space which enables every citizen toreceive partially equal benefits from community. But Havery'sspatiotemporal utopianism moves between Keyensianism and utterutopianism that is imagined but not realizable. In a critical dialogue with Sassen's discussions of global cities andHarvey's spaces of hope, I will explore the ways in which we canenvision and open up the positive possibility of communities in globalcities. In doing so, I'd like to propose 'global-polis' ('polis' as acommunity of public encounter and solidarity like in the traditionalGreek sense) as an alternative term for global city. By 'global-polis' asa humanistic community of contradictory (neoliberal vs. alter-)globalizing age, I mean to open up the possibilities of realizable openutopian community. As Harvey formulated, combining dynamicsocialistic competition-space with security-space for such open utopianspaces, I will discuss how such spaces can be concreted with myprinciple of 'socialistic competition to enhance the value of each otherin security'.",
-      "keywords": "Global city, Space of Hope, Sassen, Harvey, Global-polis."
+      "keywords": ""
     },
     {
       "year": 2006,
@@ -1971,7 +622,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "마르크스주의 연구",
       "is_first": true,
       "abstract": "이 논문은 마르크스의 사회(공산)주의 생산양식 이론의 미래 현실 적합성을 극대화시키려는 시도이다. 이를 위해 신자유주의적 세계화라는 자본주의의 변화 및 현대 사회(공산)주의 이론과 마르크스의 이론을 대결시켰다. 21세기에 확대재생산할 수 있는 사회(공산)주의 생산양식은 금융자본과 주식회사의 사회화를 ‘시초축적’의 계기로 활용하여 신용과 주식회사 나아가 모든 자본관계를 폐기함으로써 사적 소유를 단일한 사회적 소유(이를 ‘사회기금’으로 명명하였다) 로 전환하고 투자와 생산뿐 아니라 기업경영도 기업별로 직접 생산자에게 결정하도록 하며 나아가 필요에 따른 분배와 성과에 따른 분배를 통합하는 체계이다. 필요에따른 분배 또는 이와 분리된 성과에 따른 분배 두 가지 중 하나가 아니라 두 가지분배원리가 하나로 통합될 때만 사회 전체 성원이 직간접적으로 능력에 따라 기여하는 생산관계에 적합하게 될 뿐 아니라 연대와 혁신을 동시적으로 확대재생산할수 있다. 그리고 ‘계획’은 중대한 몇몇 사안으로 제한될 때, 사회 성원이 최대한 민주적으로 참여할 수 있게 된다는 점을 보이고자 하였다. 따라서 최근 활발하게 논의되고있는 데바인과 앨버트의 ‘참여계획’ 테제는 모든 생산을 관장하는 원리가 아니라, 기업별 투자‧생산의 결정과 나란히 사회(공산)주의 생산양식의 두 축이 될 수 있다.",
-      "keywords": "Widerspruch der marxschen Sozialismus und Sozialismus des 21. Jahrhunderts"
+      "keywords": ""
     }
   ],
   "김태연": [
@@ -1981,7 +632,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "이 글은 현재 체첸에서 1944년 체첸인 강제추방을 기억하는 특징적인 양상을 살펴보는 것을 목적으로 한다. 소비에트 시기 동안 강제추방의 기억은 체첸 민족의 ‘선택된 트라우마’가 되었는데, 소련이 해체되면서 이 민족적 트라우마의 애도와 치유가 가능해졌지만, 전쟁의 발발은 그 가능성을 닫아버렸다. 2000년대 중반 이후로 체첸 정부를 이끌고 있는 람잔 카듸로프는 자신의 정치적 필요에 따라 다양한 방법으로 체첸인 강제추방의 기억을 억압하고 있다. 이에 따라 1944년 강제추방의 기억이라는 체첸 민족의 ‘선택된 트라우마’는 아직도 온전히 애도ㆍ치유되지 못하고 있다.",
-      "keywords": "체첸, 강제추방, 기억, 선택된 트라우마, 러시아-체첸 관계, 람잔 카듸로프"
+      "keywords": ""
     },
     {
       "year": 2022,
@@ -1989,7 +640,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": false,
       "abstract": "이 연구는 코로나19 팬데믹 이후 도시 공동체가 한국 사회의 차별과 혐오의 정동에 기반해 재구성되는 현실을 비판적으로 성찰하는 데 목적을 둔다. 이를 위해 코로나19 확산 초기의 언론보도가 서울의 대표적인 민족 거주지(ethnic enclave)인 대림동에 어떤 장소성을 부여하였는지를 살펴보았다. 1990년을 기점으로 시작된 조선족들의 국내 이주가 대림동으로 수렴하는 과정은 한국 주류 사회가 대림동과 조선족을 중국(인)으로 타자화하는 경향과 공존하고 있었다. 코로나19 위기에 직면한 직후, 국내 언론보도는 주류 사회의 표상을 답습해 대림동과 조선족을 중국(인)으로 표상함으로써 중국(인)의 문제인 코로나19로부터 한국 사회의 안정성을 도모하고자 하였다. 주류 사회의 편견이 언론 보도에 의해 재생산되는 상황은 팬데믹 시기 더욱 심화되는 주류사회와 소수자 간의 불평등한 위치를 드러내고 있다.",
-      "keywords": "코로나19, 중국인, 조선족, 대림동, 장소성"
+      "keywords": ""
     },
     {
       "year": 2020,
@@ -1997,7 +648,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "이 글의 목적은 리쾨르의 실천적 차원에서의 기억의 실행 개념에 의거하여 포스트소비에트 카자흐스탄에 건립된 2차 세계대전 기념물의 사회정치적 역할과 의미를 논의하는 것이다. 이들 기념물은 주로 에스닉 카자흐인을 형상화하고 있으며 소비에트 전쟁 기념물의 그것과 상이한 조형성을 나타내고 있다는 점에서 일종의 ‘다르게 말하기’를 실행하고 있다고 할 수 있다. 그러나 이는 리쾨르가 제시한 타인에게 그 자신의 경험과 기억을 말하게 하기라는 ‘다르게 말하기’ 개념과는 다르다. 한편 이들 기념물이 승전에 기여한 이들로 에스닉 카자흐만을 재현하고 있으며 역사적 사실과 부합하지 않는 방식으로 형상화되었다는 점은 이들 기념물이 ‘기억의 조작’ 또한 실행하고 있음을 말해준다. 이처럼 이들 기념물 건립을 통한 기억의 실행은 ‘다르게 말하기’와 ‘기억의 조작’의 성격을 모두 나타내는데, 이는 기념물 제작을 주도하고 있는 정권의 국가 중심적 사고에서 비롯된 것이라고 할 수 있다.",
-      "keywords": "카자흐스탄, 2차 세계대전, 전쟁 기념물, 전쟁의 기억, 기억의 실행, 도시공간"
+      "keywords": ""
     },
     {
       "year": 2019,
@@ -2005,7 +656,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "본 논문은 중국 윈난성 시솽반나 지역에 거주하는 소수민족인 다이족에 의해 전승되는 발수절 축제를 연구대상으로 삼는다. 즉, 중국 서남부 변경 지역의 소수민족 축제가 오늘날 ‘동방의 카니발’이라는 별칭으로 불리면서 중국의 주요 축제 중의 하나로 확대되는 과정을 고찰하며, 그 과정에서 발수절이 어떻게 ‘중국’의 축제라는 내셔널리티를 부여받고 통합적 국가 이데올로기에 귀속되는지 살펴보는 한편, 동시에 오늘날 발수절이 대중들에게 소비되는 과정 속에서 소수민족의 이국적 정취라는 특성이 부각되면서 통합적 국가 이데올로기로부터 탈주하는지 살펴보았다. 이를 위해 시솽반나 발수절의 주요 프로그램과 그 의미를 살펴보고, 초등학교 교과서에서 발수절에 대해 다루고 있는 본문들을 분석하였으며, 시솽반나 지역 언론 및 중국 중앙의 언론들에서 발수절의 이미지를 어떻게 형성하고 고착화하는지 고찰하였다. 발수절은 윈난성, 태국, 미얀마 등지에 걸쳐 고루 분포하는 타이족의 전통문화이지만, 1949년에 중화인민공화국이 건설되고 미얀마 등과 맞닿아 있는 중국 서남부 국경선이 확정된 뒤로는 중국의 발수절로 독자적인 축제가 되었다. 특히 1960년 저우언라이의 축제 방문 등을 통해 발수절은 통합적 국가 이데올로기와 긴밀하게 연결되었으며, 이는 오늘날 초등학교 어문 교과서에서도 관련 양상을 찾아볼 수 있다. 하지만 2000년대 이후로 발수절이 중국의 인기 관광상품의 하나로 부상하면서 발수절은 주요 고객인 도시 중산층 한족 남성들에게 있어 낯설고도 신비한 일종의 이국적인 체험으로 소비된다. 이처럼 상반되는 수요와 관점에 의해 발수절은 중국 내에서 이중적인 정체성을 갖게 된다.",
-      "keywords": "발수절, 다이족, 국가 담론, 교과서, 에스니시티"
+      "keywords": ""
     },
     {
       "year": 2019,
@@ -2013,7 +664,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "이 글은 포스트소비에트 우즈베키스탄, 카자흐스탄, 키르기스스탄에 건립된 4개 탄압의 희생자 박물관—타슈켄트 박물관, 카를락 박물관, 알지르 박물관, 아타-베이트—에 대한 비교연구이다. 우선 이 글은 박물관 전시 구성 및 박물관 건립 의도와 관련되며 박물관 관람객의 체험과 인지에 영향을 미치기도 하는 이들 탄압의 희생자 박물관의 위치적ㆍ공간적 특성을 분석한다. 다음으로 이 글은 4개 박물관의 전시 구성과 전시 서사, 즉 이들 박물관에서 전시가 조직된 방식과 이를 통해 박물관이 전달하려는 전시의 주제를 비교하여 살펴본다. 마지막으로 이 글은 중앙아시아 각국 정권이 탄압의 희생자 박물관을 건립한 의도와 그 사회정치적 의미를 논의한다. 이는 중앙아시아 탄압의 희생자 박물관을 각국의 사회정치적 구조ㆍ과정ㆍ맥락 속에 위치시켜 고찰하고 이해하려는 시도이다.",
-      "keywords": "중앙아시아, 우즈베키스탄, 카자흐스탄, 키르기스스탄, 탄압의 희생자 박물관, 기억"
+      "keywords": ""
     },
     {
       "year": 2018,
@@ -2021,7 +672,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "이 글의 목적은 분쟁 이후 오쉬 도시공간에 건립된 기념물의 형상화와 공간성을 살펴보고, 리쾨르의 기억의 실행 개념에 의거하여 기념물 건립을 통해 의도된 기억이 실행된 결과와 의미를 분석하는 것이다. 1990년 및 2010년 오쉬 분쟁 이후 세워진 애도와 화해의 기념물을 통해 실행된 기억은 치료적 차원에서의 기억의 오용, 즉 ‘차단된 기억’이며, 2010년 오쉬 사태 이후 들어선 민족정체성 표상의 기념물을 통해 실행된 기억은 실천적 차원에서의 기억의 오용, 즉 ‘조작된 기억’이다. 한편 민족정체성 표상의 기념물이 의도한 목적과 수반한 결과는 민족적 차이의 가시화이기도 하다. 그리고 두 유형의 기념물 모두를 통해 실행된 기억은 윤리적 차원에서의 기억의 오용, 즉 ‘충분치 못한 기억’이기도 하다. 이러한 기억의 오용을 바로잡기 위해서는 무엇보다도 사건의 희생자에 대한, ‘사건의 잉여’에 대한 ‘공정한 기억’이 실행되어야 한다.",
-      "keywords": "키르기스스탄, 오쉬, 기념물, 기억, 분쟁 이후"
+      "keywords": ""
     },
     {
       "year": 2018,
@@ -2029,7 +680,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "본 논문은 중국대중음악이 영화와 밀접한 관계를 맺으며 질적, 양적 성장을 이루게 되는 과정을 고찰하는 과정에서 중국 대중음악의 ‘鼻祖’로 호칭되는 리진후이(黎錦暉)가 이끌었던 롄화가무반(聯華歌舞班)이라는 단체를 중요한 고리로 설정한다. 1931년에 결성되어 1932년에 해산한 이 단체는 이름에서 유추할 수 있듯이 롄화 영화사(聯華影業公司)와 리진후이의 가무단이 결합한 조직으로서, 롄화 영화사가 유성 영화 제작을 위해 필요한 인력—영화음악의 작곡자, 연주자, 가수 및 배우—을 확보하고 양성하기 위해 당시 가장 인기 있던 리진후이의 가무단을 인수한 것이다. 롄화가무반은 중국 대중음악의 탄생과 밀접한 관련을 맺는 가무단이 영화계로 진입하는 단계를 보여준다. 따라서 롄화가무반이 결성되는 맥락, 롄화가무반의 구성 및 활동, 롄화가무반의 특성과 해체 후의 향방 등을 추적하는 것은 중국 대중음악이 영화와 결합하면서 어떤 형태적, 질적 변화를 겪게 되었는지 살펴볼 수 있는 의미 있는 작업이 될 것이라고 생각한다. 물론 중국 30-40년대의 대중음악과 영화산업의 관계는 사실 매우 방대한 주제이기 때문에 본고에서 다룬 것 외에 고찰해야 할 부분이 매우 많이 남아있다. 본고에서는 연구의 실용성을 위해 롄화가무반이라는 하나의 고리를 중심으로 연구를 진행하였는데, 이 하나의 고리에 대한 연구를 시작으로 향후 작업에서는 더욱 광범위하고 전면적인 시각에서 중국의 대중음악이 영화산업과 결합하여 어떠한 질적·양적 변화를 창출해내는지에 대한 연구가 진행될 것이다.",
-      "keywords": "롄화가무반, 리진후이, 대중음악, 유성영화, 가무단"
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -2037,7 +688,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "본 논문은 선전(深圳)이라는 도시를 기반으로 하여 선전에 거주하는 작가가 선전의 삶을 다양한 방식으로 표현해낸 문학 작품들을 '선전 문학'으로 헐겁게 규정하고, 이 선전 문학의 창작과 성장이 기실 선전의 도시 경쟁력을 제고시키는 과정에서 매우 중요한 문화산업 육성의 일환으로 의미를 부여받음을 주장하면서 오늘날 중국에서 도시의 행정과 문학이 매우 밀접하게 전략적 관계를 맺는 양상을 살펴 보았다. 그를 위해 본문에서는 선전 지역 작가들의 작품 속에서 선전이라는 도시가 재현되는 양상을 먼저 살펴보았다. 선전의 특수성이 문학 작품의 창작에도 반영되는 것을 알 수 있었는데, 선전문학의 대표적인 장르인 노동자문학, 저층문학처럼 농민공의 삶을 반영한 작품이 있는 반면, 선전의 경제발전을 반영하는 기업인 문학, 경제문학 같은 장르도 있다. 또한 청춘문학은 선전의 문화소비층의 주류취향을 반영하는 장르로 규정지을 수 있다. 그리고 이러한 작품들을 생산해내는 선전의 문학장을 살펴보았다. 특히 노동자문학의 경우 노동자들이 문학작품을 창작하고 발표할 수 있는 플랫폼이 다양한 방식으로 존재한다는 점을 발견할 수 있었는데, 이는 곧 선전시의 문화 전략과 맞닿아있음을 확인할 수 있다. 경제특구로 시작해 매우 짧은 도시의 역사와 미약한 문화적 자원을 가진 선전의 경우, '선전 문학'의 육성은 도시의 시급한 과제인 문화적 경쟁력 강화와 직결되기 때문에 매우 중요한 당면 과제로 인식되어 많은 투자와 관리가 투입되고 있다. 그 일환으로 작가 양성을 위한 다양한 플랫폼의 설치, 시 주도의 발전 전략 수립, 각종 문화행사의 개최 등의 노력이 이루어진다. 오늘날 중국 도시들이 각자의 경쟁력을 강화하는 과정에서 문화적 역량과 매력, 즉 도시의 소프트파워의 중요성은 갈수록 강조되고 있다. 본고에서 살펴본 선전의 경우는 도시 소프트파워의 증진을 위해 문학이 어떻게 인식되고 활용되는가를 연구할 수 있는 좋은 실례가 될 것이다.",
-      "keywords": "선전(深圳)문학, 노동자문학, 저층문학, 소프트파워, 도시문화행정"
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -2045,7 +696,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "이 글의 목적은 포스트소비에트 카자흐스탄의 새로운 수도 아스타나의 도시풍경에 그 정체성이 표현되는 과정에서 나타난 딜레마를 고찰하는 것이다. 소비에트 과거는 포스트소비에트 정체성 건설 과정에서 배제되어야 하는 대상임에도 불구하고, 이를 표상하고 기억하는 건축물과 기념물이 도시 공간에 여전히 존속하고 있다는 점에서 소비에트 과거의 딜레마를 찾을 수 있다. 카자흐성은 나자르바예프 정권이 표방하는 새로운 정체성 비전의 하나지만, 역사적ㆍ현실적 조건과 요인으로 인해 아스타나 도시풍경에서 불완전하게 때로는 모호하게 표현되고 있는 딜레마를 노정한다. 현대성 또한 정권이 아스타나 도시풍경의 (재)구성을 통해 표출하려 하는 정체성 중의 하나지만, 카자흐성처럼 불완전함의 딜레마뿐만 아니라 이상과 현실의 괴리라는 딜레마도 안고 있다.",
-      "keywords": "카자흐스탄, 아스타나, 도시풍경, 소비에트 과거, 카자흐성, 현대성, 정체성 건설"
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -2053,7 +704,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "중국현대문학",
       "is_first": true,
       "abstract": "This article aim to study the birth of Chinese popular music from the perspective of urban cultural environment in the early 20’s Shanghai. To make this point clear, I chose gramophone industry and dance hall as the key elements new urban musical environment. A phonograph and dance halls are both introduced from the west, and lead an unprecedented modern pop culture industry in Shanghai. Shanghai dance hall and music industry, the results of these factors, played a big role to changing musical tastes of Chinese people, including the citizens of Shanghai. The initial form of Chinese pop music is a new urban cultural content that reflects the trend of the time and industry in the early 20th century. So formal features of Chinese initial pop music meet the features and demands of pop culture industry that formed through these media. It is helpful in explaining how the Chinese pop music ― first appeared in the late 20's ― quickly accepted by the public and developed, and continued to sustain its vitality.",
-      "keywords": "Chinese popular music, gramophone, dance hall, Shanghai, music industry, Shidaiqu(時代曲)"
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -2061,7 +712,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "중국현대문학",
       "is_first": true,
       "abstract": "The thesis studies on the division of space in the city of Beijing in the 1920’s and 1930’s focusing on people so called ‘the literary youth’, The most well known part of their spaces is the so called 'Beijing's Quartier Latin', in the heart of the old Beijing. And we especially focus on the spaces where the ‘literary youth’ people made living in Beijing. These young people were totally linked to the space of the university and alinated from the university at the same time, so when viewed from the perspective of cultural aspects, the spaces of the literary youth in the 1920's and 1930’s show the most obvious characteristic the division of space. They lived in a small ‘gongyu(apartment)' near Beijing University, attending classes in the university and reading books in the university library. They developed a special cultural space of their own in the center part of the city. And this so called ‘Beijing's Quartier Latin' eventually created a special kind of self identity as a space for the modern, literary young people who are committed to the New Culture Movement.",
-      "keywords": "Beijing, literary youth, Quartier Latin, gongyu, Beijing University"
+      "keywords": ""
     }
   ],
   "정희원": [
@@ -2071,7 +722,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "영국의 영화감독 패트릭 킬러(Patrick Keiller)는 <런던>(London, 1994), <공간 속의 로빈슨>(Robinson in Space, 1997), <폐허 속의 로빈슨>(Robinson in Ruins, 2010)으로 이어지는 ‘로빈슨 삼부작’을 통해 런던을 비롯한 영국의 정치·경제적 경관에 대한 비판적 재현에 몰두해 왔다. 이 논문에서는 ‘로빈슨’ 시리즈 중에서 <런던>의 속편 격인 <공간 속의 로빈슨>을 중심으로 킬러가 재현하는 1990년대 영국의 시공간과 신자유주의 시대의 경관이 현실을 반영하고 비판적으로 구축하는 양상에 대해 분석한다. 이 글은 경관(landscape)이 하나의 의미 체계로서 갖는 텍스트성에 주목하면서 킬러 작품에서 이미지를 둘러싼 “상상력”과 “현실”이 서로를 매개하는 방식에 관심을 갖는다. 논문의 전반부에서는 영화가 18세기 드포우의 시대로 거슬러 올라가 역사의 지층이 겹겹이 쌓여 있는 중층적 의미의 텍스트로서 잉글랜드 곳곳의 경관에서 ‘영국식’ 자본주의의 기원을 찾아가는 과정을 추적한다. 논문의 후반부에서는 17세기부터 시작된 ‘인클로저’ 현상으로 인하여 잉글랜드의 경관이 드러내는 배제의 공간성에 대해 논한다. 결론에서는 ‘보이는 것’과 프레임 안팎의 세계에 대해 생각해보면서 픽션과 논픽션이 공존하는 에세이 영화에서 “상상력”과 “현실”이 매개되는 방식에 관해 고민해 본다.",
-      "keywords": "패트릭 킬러, <공간 속의 로빈슨>, 영국식 자본주의, 인클로저, 에세이 영화"
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -2079,7 +730,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "기존의 1980년대 이스트 빌리지 연구에서 젠트리피케이션을 비롯해 공간을 둘러싼 자본과 거주민들 간 권력투쟁의 역사가 중점적으로 다뤄진 것에 반해, 지역 주민의 상당 비율을 차지했던 성소수자 공동체에 관한 연구는 상대적으로 홀대되어 왔다. 이 논문에서는 1970년대부터 가속화된 이스트 빌리지 젠트리피케이션에 관한 기존 사회학적 연구에서 충분히 다루어지지 않은 레즈비언 예술가 공동체와 그 재현으로서 새라 슐만(Sarah Schulman)의 『여자들, 꿈, 모든 것』(Girls, Visions and Everything)을 매개로 1980년대 이스트 빌리지에 대한 기존 지역연구 담론에 개입해 보고자 한다. 이를 위해 슐만 소설의 아카이브적인 함의와 가치를 전제하는 동시에 그 이면에서 어떤 식으로든 재현일 수밖에 없는 소설 속에서 장소성이 구성되고 젠트리피케이션이 개념화하는 방식을 모두 고려하고자 하였다. 아방가르드 예술가로서의 미학적 실천과 투사를 통해 수행되는 이들의 공동체성은 스콧 래쉬(Scott Lash)가 정의하는 ‘성찰적’ 공동체성에 가까운 것으로 볼 수 있다. 더불어 이 연구에서는 젠트리피케이션이 그 지리적·경제적 정의를 넘어 백인 이성애자 중산층 중심의 균질성을 확대해나가는 ‘균질화’의 원리로 작동하게 되는 사회문화적 함의에 주목한다. 인종이나 성적 지향, 계급의 균질화 원리에 따라 공간을 재편하고자 하는 전지구적 자본의 촉수로서 젠트리피케이션이 성소수자 공동체 구성원들의 수행적 주체성, 그 집단적 투사와 실천으로 구성되는 공동체성과 필연적인 길항 관계에 놓인다면, 젠트리피케이션이라는 현상에 대해 신자유주의적 경제적 논리를 넘어서는 문화적·사회적·정치적 차원에서의 담론적 대응이 절실하다.",
-      "keywords": "새라 슐만, 젠트리피케이션, 성소수자 공동체, 성찰적 공동체, 이스트 빌리지"
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -2087,7 +738,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "19세기 영어권 문학",
       "is_first": true,
       "abstract": "Victorian Manchester is admittedly identified as the ur-scene of industrialization and urbanization during the Industrial Revolution since Engels’s appalling description of the city. Engels’s influence on studies of nineteenth-century Manchester is still pervasive, yet this overriding image of Manchester as the typical industrial town might not fully represent the cultural capacity of the city considering the emergence of working-class literary culture and poetic community in the early Victorian age. Based on Raymond Williams’s analysis of culture of England during the 1840s in The Long Revolution, this paper expands the object of analysis into the works of self-taught artisan poets and their literary culture. Aside from the famous industrial fictions of Elizabeth Gaskell, Manchester had a kind of literary public sphere of working-class writers and printers that could be built into a community of culture. Especially the Manchester Poets, or the Sun Inn group of the late 1830s and early 1840s formed their own literary community based on local writings and their reciprocal feelings circulated among them. One of the Sun Inn group members John Critchely Prince’s identification of himself as the mediator of cultural reproduction among his own class reveals his belief of the possibility of cultural community. In the conclusion, this paper suggests that future research of female artisan writers will provide the more profound portrait of the city.",
-      "keywords": "빅토리아 시대 맨체스터(Victorian Manchester), 노동자계급 문학(working-class literature), 글 문화(literary culture), 문학 공동체(literary community)"
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -2095,7 +746,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "비교문학",
       "is_first": true,
       "abstract": "패트릭 킬러(Patrick Keiller)의 <런던>(London, 1994)은 <공간 속의 로빈슨>(Robinson in Space, 1997), <폐허 속의 로빈슨>(Robinson in Ruins, 2010)과 함께 흔히 ‘로빈슨’ 삼부작으로 불리는 장편 시리즈의 중요한 시발점이 되는 작품이다. 이 논문에서는 도시공간의 불평등과 이를 낳는 사회구조에 대한 비판을 통해 도시 유토피아를 지향하는 텍스트로서 <런던>을 읽고자 한다. 이 글에서는 영화의 피사체로서 1992년 영국 총선 전후의 암울한 도시풍경이 전달하는 사회적 의미와 역사적 배경에 관심을 갖되, 다음과 같은 요소를 모두 고려함으로써 <런던>을 정치적 선언화하는 편향성으로부터 거리를 두려 한다. 첫째는 도시공간을 재현하는 매체로서 영화가 세계와 맺는 관계에 대한 킬러의 깊은 자의식이다. 이에 본문의 첫 장에서는 매체 비평가로서 킬러가 개진하는 도시와 공간, 영화론에 대해 살펴본 후 이를 통해 <런던>이 발휘하는 사회비판적 힘이 작품의 미학적 성취와 불가분의 관계에 놓여 있음을 설명해 보고자 한다. 두 번째로는 에세이 영화로서의 장르적 특징에 주목하는 방식이다. 전통적 다큐멘터리 장르의 특징인 시점과 문제의식의 사회성·공동성을 갖는 동시에 지극히 개인적인 미적 주체로 여전히 성립하는 ‘에세이’적 주체의 특징이 <런던>의 재현 방식과 맞물리는 양상에 대해 살펴볼 것이다. 또한 런던 도시풍경의 ‘표면’들을 연속해서 담아내고 있는 영화에서 이 불가해한 표면들이야말로 언론 매체나 여타 권력의 시선을 통해 매개되지 않은 런던의 진실에 다름 아님을 주장함으로써 이 작품에서 도시공간을 비판적으로 해석하고 재현하는 독특한 성취를 논해 보려 한다.",
-      "keywords": "패트릭 킬러, <런던>, 도시 유토피아, 에세이 영화"
+      "keywords": ""
     },
     {
       "year": 2016,
@@ -2103,7 +754,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "문학과 영상",
       "is_first": true,
       "abstract": "This paper interprets Gina Kim’s essay film Faces of Seoul (Seo-ul eui eolgul, 2009) as a text portraying an urban subject constructed from traumatic experiences and her spatial practices of the city of Seoul. The possibility of impossible representation of traumatic experience of eyewitnessing the collapse of the Sampoong Department Store stems from her ethical flânerie of the streets of Seoul. The entire film embodies the interrelationship between urban trauma, subjectivity, and ambivalent possibility of female flânerie. This paper argues that the film’s entitling of Faces of Seoul instead of, for example, Cityscapes of Seoul, reveals its deep concern regarding otherness of people of the past and the present, and the intertextuality of urban spacetime and urban subjectivity. In this film, the time-space of urban storytelling constructs the walker-narrator’s private history unfolded in tandem with the modern public—also traumatic—history of the city and the country under the development of compressed modernity. Through her perambulatory performance of the city as the process of facing its traumatic history and also the trauma of witnessing the death of the other, the director-narrator documents the rise of a certain kind of urban subjectivity based on anamnesis and mourning.",
-      "keywords": "김진아, <서울의 얼굴>, 도시 트라우마, 도시 주체, 여성적 산책"
+      "keywords": ""
     },
     {
       "year": 2016,
@@ -2111,7 +762,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "19세기 영어권 문학",
       "is_first": true,
       "abstract": "This article traces the ways in which Charlotte Perkins Gilman explores the possibility of rebuilding and reforming the domestic and private spaces, and as its consequence, of construction of experimental urban communities. Starting with her most famous short story “The Yellow Wall-paper,” this study reads Women and Economics, The Home: Its Work and Influence, and other fictions from the journal Forerunner, focusing Gilman’s ideas of reformation of general feeling concerning the domestic spaces in order to achieve the liberation of women that will necessarily yield the common good as well as the private good. As a member of the material feminists who saw that a collectively innovative architecture would be important to the empowerment of women, Gilman claims that the apartment as a new urban community does not need an individual kitchen in each housing for which will be substituted by communal kitchens that would serve excellent meals by professional social workers. Gilman’s ideas of socialization of domestic labor and provision of day nurseries and kindergartens in the apartments are currently realized in our society, but without the crux, the reformation of gendered domestic spaces that will lead to the achievement of common weal in the ideal feminist cities.",
-      "keywords": "Charlotte Perkins Gilman, material feminist, domestic space, urban community"
+      "keywords": ""
     },
     {
       "year": 2016,
@@ -2119,7 +770,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "영미문학연구",
       "is_first": true,
       "abstract": "Paul Auster’s The New York Trilogy has been hailed as a postmodern novel that comprises the world of uncertainty inhabited by fragmented subjects, and has also been acclaimed as one of the canonical postmodern fictions. Recent criticisms, however, tend to rethink the equation between Auster’s novel and postmodernism, suggesting that, for example, the subjectivity represented in City of Glass seems less like the decentered postmodern subjectivity than a figure based on the desire to reconstitute the modern self. This paper attempts to reassess Auster’s novel in view of its reconfiguration of the dialectics of modernity and postmodernity, focusing on its topographical representations of New York City as utopias and heterotopias. In City of Glass, Daniel Quinn’s de Certeaurian urban practices of lacking a place construct his textual subjectivity by producing counterspaces of heterotopias against Stillman’s project of appropriating Manhattan as a (pre)modern utopia. The (dialectical) outcome of Quinn’s postmodern spatial practices that work as a counter-commentary against Stillman’s search for totalizing visions of a utopia in a unitary, thus implicitly negative, way turns out to be not synthesis, but only loss. Ghosts, the second part of the novel, is also preoccupied with the dialectic relationship between modernity and postmodernity, the interrelationship among subjectivity, space, and textuality, and the uncanniness of doubling subjects mirroring each other. In the conclusion, this paper reconsiders the possibility of Jamesonian “cognitive mapping” as an inevitable way of trying to recognize the impossible totality as possible in this era of the impossibility of representation.",
-      "keywords": "Paul Auster, The New York Trilogy, New York City, utopia, heterotopia"
+      "keywords": ""
     },
     {
       "year": 2015,
@@ -2127,7 +778,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "19세기 영어권 문학",
       "is_first": true,
       "abstract": "This study deals with ghosts and the dead haunting London in Dickens’s essays Sketches by Boz(1836) and The Uncommercial Traveller(1861) in relation to his representation of London as a gothic city. This study contemplates the possibility of dialectics of unknowability and perceptibility, the everyday and the impenetrable, and the city as gothic labyrinth and the city as urban community based on communal feelings. In his essays, Dickens depicts the invisible ghostly others as the products of Victorian social structure that enhances the division between the poor and the middle class, and in doing so, he criticizes moral complacency of the middle sorts. Simultaneously, however, he provides visibility to the invisible through the uncanny encounter with them and discovers their viability through the eyes of a sympathetic (non)spectator. This study defines Dickens’s narrative style of journalism as the virtual expression of the Benjaminian dialectical images, for his essays care less for coherence and unity than for the immediacy of urban experiences constructed from discontinuous fragments of reality both from the past and the present.",
-      "keywords": "『보즈의 스케치』, 『비상업적인 여행가』, 런던, 유령, 공동체성"
+      "keywords": ""
     },
     {
       "year": 2015,
@@ -2143,7 +794,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "문학과 영상",
       "is_first": true,
       "abstract": "Virginia Woolf and Agnès Varda, respectively the modernist novelist of the first half of the twentieth century and the Novelle Vague director of the second half of the century, share in common their artistic creativity unfolded in the modern city through the figure of flâneuse. This paper offers comparative reading of Woolf’s essay “Street Haunting: A London Adventure” and Varda’s film Cléo de 5 à 7 in respect of women’s walking/writing the city and female spatial practices. Woolf’s narrator, while walking the streets of London, rewrites her desiring subjectivity against the backdrop of the dominant gender ideology that restricts female urban experience as undesirable. Like her walking as the expression her desiring subjectivity, the camera walk of Varda's L'Opéra-Mouffe does not hesitate to reveal the (un)conscious desire and angst of the female subjectivity, which, in this short film, are mainly brought up with pregnancy. Cléo Victoire, Varda’s eponymous heroine of Cléo de 5 à 7, is also dominated by angst, this time angst of death. She strolls the streets and boulevards of Paris while waiting the result of autopsy that might turn out to be fatal to her life. Nonetheless, while walking the streets of Paris, from right to left, from 17h to 19h, she embraces more liberating perspectives on her body, on her way of looking and being looked, and, most of all, on her subjectivity so far mainly constructed from the fantasizing gaze that interpellates her as goddess-like-Cléopatra. Thus this paper argues that Cléo's itinerary of dérive delineates the time-space of détournement that shares the utopian impulse of everyday life with the Woolf's haunting the streets of London.",
-      "keywords": "Virginia Woolf, Agnès Varda, “Street Haunting: A London Adventure, ” L'Opéra-Mouffe, Cléo de 5 à 7"
+      "keywords": ""
     },
     {
       "year": 2015,
@@ -2151,7 +802,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "현대영미소설",
       "is_first": true,
       "abstract": "This paper explores various ironical facets of the idea, or the ideal, of a cosmopolis in Don DeLillo’s Cosmopolis. This essay also offers a critical reflection upon cosmopolitan irony as cosmopolitan virtue. Having been reviewed as DeLillo’s first post-9/11 novel, Cosmopolis has been much acclaimed as describing the collapse of homo technologicus through its analogy between the novel’s protagonist Eric Packer and the World Trade Center. This article relocates the focus of reading from the aftermath of 9/11 to its titular ironic embodiment of cosmopolis in New York City, the center of global capitalism. This approach presupposes that the diachronic point of view that originates from eighteenth-century Enlightenment Cosmopolitanism is more helpful in tracing the complicated ironical aspects of (anti-) cosmopolitan practices in DeLillo’s novel. This paper traces the history of cosmopolitanism and the meaning of the term cosmopolitan, especially from Kant’s “Toward Perpetual Peace” through Marx and Engels’s Communist Manifesto and finally to cosmopolitanisms of the present. Then it interprets Cosmopolis as the product of a contemporary cosmopolitanism as part of the project of capitalism, a cosmopolitan- ism also known as neoliberalism.",
-      "keywords": "들릴로, 『코스모폴리스』, 칸트, 코스모폴리타니즘, 신자유주의"
+      "keywords": ""
     }
   ],
   "오창룡": [
@@ -2161,7 +812,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "안과밖:영미문학연구",
       "is_first": true,
       "abstract": "This article analyses the context of recent European terrorism focusing on its justification mechanism extended by immigrant conflicts. Firstly, European terrorism is characterized as a propaganda war which aims to gather supports from Muslims over the world. As the movie The Battle of Algiers shows, current terrorism tries to justify its attacks as Muslims’ resistance against the colonial invasion by the West. Secondly, the recent conflicts between Europeans and Muslims are occurred throughout major European cities where different ethnic groups live together like European colonies of the past. Since today’s terrorist attacks tend to be organized by young immigrants holding European citizenships, existing border controls are no longer feasible solutions to prevent lone wolf terrorist attacks. Most immigrant youths, who have gone through social separation, discrimination and sense of alienation, are easily affected by Islamic extremism. In addition, the refugee crisis after 2015 and the rise of antiimmigrant sentiments may heighten the tension between Europeans and Muslim immigrants.",
-      "keywords": "The Battle of Algiers, European Terrorism, Lone Wolf Terrorist, Islamic Extremism, Refugee Crisis"
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -2177,7 +828,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "문화와 정치",
       "is_first": true,
       "abstract": "본 연구는 프랑스 제5공화국의 정부 주도 문화정책이 분권화 및 시장화 경향을 띠게 된 맥락을 분석한다. 프랑스 정부는 문화 민주화를 목표로 문화와 예술을 대중적으로 보급하는 중앙집권적인 정책을 추진했으나, 1990년대 이후 문화부문 재정과 행정권한이 지방자치단체로 위임됐다. 이와 관련하여 기존 연구들은 거시적 측면에서 프랑스 문화정책의 연속성에 주목하는 입장을 취하고 있으나, 본 연구는 리옹의 창조도시정책 사례를 중심으로 1990년대 문화정책 분권화가 갖는 단절적인 특징에 주목한다. 리옹 사례는 문화정책을 통한 사회통합과 지역 산업 육성이 어떠한 맥락에서 결합할 수 있었는가를 잘 드러냈다. 리옹이 지방자치단체 차원에서 육성한 댄스 비엔날레와 문화협력헌장은 기본적으로사회적 소수자의 발언권을 확대하는 취지로 기획되었으며, 동시에 창조산업 육성과 투자에 필수적인 문화 인프라를 구축하는 데에 기여했다. 이러한 맥락에서문화의 도구화 및 시장화라는 비판에도 불구하고, 문화기구참여연맹(UFISC)은사회연대를 추구하는 문화정책이 국가와 시장의 한계를 극복할 수 있는 지속가능한 발전의 대안이 될 수 있다고 본다.",
-      "keywords": "문화 민주화, 창조도시, 리옹 댄스 비엔날레, 문화협력헌장, 문화기구참여연맹"
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -2185,7 +836,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "마르크스주의 연구",
       "is_first": true,
       "abstract": "상황주의자 인터내셔널은 두 개의 서로 다른 기원을 갖는 대안을 발전시켰다. 하나는 초현실주의 아방가르드 운동에 뿌리를 둔 일원적 도시론이며, 다른 하나는 파리 코뮌과 러시아 소비에트의 전통을 잇는 ‘일반화된 자주관리’ 이념이다. 기존 연구들은 대체로 상황주의 인터내셔널의 자본주의 도시비판에 초점을 맞추었으며, 노동자평의회와 관련된 실천적 지향에 대해서는 충분히 조명하지 않았다. 본 연구는두 개념 사이에 존재하는 문맥적 간극이 상황주의자 인터내셔널의 이론적 함의를보다 확장시킨다고 주장한다. 표류는 무의식적인 흐름이고 특별한 목표를 지향하지않는 반면, 자주관리는 자본과 국가에 맞서는 자기 통제적 사회를 선명하게 지향한다. 하지만 두 개념은 자본주의 사회의 소의를 지양하고 공동체적 사회관계 복원을추구했다는 점에서 공통점을 가지며, 그리고 상황주의자 인터내셔널은 자본주의 스펙터클에 저항하는 두 지향의 결합 가능성을 밝혔다.",
-      "keywords": "상황주의자 인터내셔널, 일원적 도시론, 표류, 노동자평의회, 일반화된 자주관리."
+      "keywords": ""
     },
     {
       "year": 2017,
@@ -2193,7 +844,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "유럽연구",
       "is_first": true,
       "abstract": "1970년대 반핵운동을 계승한 프랑스 녹색당은 1990년대 이후 제도 정당으로 성장했으며, 2000년대 후반에는 전례 없는 전성기를 맞이했다. 2012년 대선에서는 사회당과 선거연합을 구성하여 사회당 내각에 참여하는 데에 성공했다. 하지만 최근 녹색당은 주요 선거에서 득표율이 급락하는 위기에 직면했다. 기존 연구들은 녹색당의 성장을 대체로 정치적 기회구조의 관점에서 분석했으나, 본 연구는 프랑스 녹색당의 단기간 급성장과 몰락을 설명하기 위해 정당 정체성을 둘러싼 이념적 갈등에 주목한다. 2011년 후쿠시마 핵발전소 사고 이후 프랑스 핵에너지 정책에 대한 비판 여론이 증가했고, 녹색당과 사회당이 함께 추진한 에너지 전환법에 대한 기대가 컸다. 그러나 사회당 정부가 논란 중인 페센하임 원자력 폐쇄를 지연시키고 구체적인 핵 감축 프로그램을 제시하지 못하자 녹색당의 당내 분열이 가속화됐다. 프랑스 녹색당 사례는 생태주의 정당이 내각 참여에 성공할지라도 반핵강령과 현실 정치의 간극 속에서 심각한 난관에 봉착할 수 있다는 점을 드러냈다.",
-      "keywords": "유럽생태녹색당, 프랑스 사회당, 후쿠시마 원전 사고, 에너지 전환법, 페센하임 발전소"
+      "keywords": ""
     },
     {
       "year": 2016,
@@ -2201,7 +852,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "지중해지역연구",
       "is_first": true,
       "abstract": "This article explores how Algerian foreign policy toward the European Union has changed since the Arab Spring. Existing research related to the Euro-Mediterranean partnership has mainly focused on whether the Middle Eastern and North African states could comply with EU-demanded democratic reforms. However, their Mediterranean partners’ interests should correspondingly be analyzed. In the case of Algeria, President Bouteflika’s authoritarian regime attempted to mend fences with the EU in order to clear Algeria’s reputation as a rogue state. But as Algeria is one of the largest oil-rich countries in Africa, it does not need to depend on financial assistance from the EU, and it gave a tepid response to the regional cooperation led by France, which colonized Algeria for 130 years. Since the Arab Spring, the regional security order in North Africa has broken down, and Algerian foreign policy has changed, especially after Islamic extremist terrorism and the Mali Civil War. In this context, this article shows that the effects of Algeria’s colonial history and its oil-rentier economy have decreased and that the importance of regional security has heightened the necessity of cooperation between Algeria and the EU.",
-      "keywords": "알제리, 유럽연합, 유럽-지중해 파트너십, 부테플리카, 비개입주의"
+      "keywords": ""
     },
     {
       "year": 2016,
@@ -2209,7 +860,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "한국프랑스학논집",
       "is_first": true,
       "abstract": "Le but de cet article est d’analyser le fait que le ghetto français peut devenir un facteur interne du conflit racial et de la violence extrême. L’application du mot ‘ghetto’ dans le contexte français avait été considérée comme un abus de langage qui justifie la discrimination raciale en France. Cependant, les chercheurs français ont commencé à définir le ghetto comme un lieu de conflits sociaux durs surtout après les événements des émeutes d'immigrés. Les recherches existantes ont souligné la forme de ségrégation urbaine et l’institution résidentielle. Cette étude insiste sur la nécessité de démontrer non seulement l’externalité spatiale de ghetto mais aussi le processus de structuration de sentiment antiétatique tel que la notion de ‘machine de guerre’ qui vient de Mille plateaux de Deleuze et Guattari le suggère. Dans la discrimination sociale et raciale, les jeunes résidents des ghettos étaient privés de leurs futures opportunités. L’affect de haine leur permet de se former une identité spatiale collective. De plus, le discours sur l’identité nationale, qui été provoqué par le gouvernement de centre- droit depuis mi-2000, pouvait fonctionner en tant que détonateur de l'explosion des griefs ethniques dans la zone du ghetto.",
-      "keywords": "게토, 도시 분리, 전쟁기계, 외부성, 정서"
+      "keywords": ""
     }
   ],
   "노영희": [
@@ -2219,7 +870,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "인문사회 21",
       "is_first": true,
       "abstract": "본 연구는 월간인문여행 프로그램이 지역경관에 대한 인식에 긍정적인 영향을 주는 지와 이를 통해 지역 공동체의식 함양에 긍정적인 효과가 있는지 조사･분석하였다. 이를 위해 C도시 아동 20명을 대상으로 생각그물을 활용한 인식조사와 공동체의식 측정 도구를 통한 검사를 시행하고, 그 결과를 생각그물 줄기 수 비교와 Wilcoxon signed-rank test를 통해 분석하였다. 그 결과 지역 지명과 관련된 역사 및 지역 경관에 대한 관심이 증가하였으며, 지역학습에 대한 참여동기가 증가하는 등 애착심이 형성되는 모습을 발견할 수 있었다. 또한, 지역 공동체 의식 사전-사후 검사를 지역 공동체의식 함양에 통계적으로 유의미한 영향을 주고 있음을 확인하였다. 본 연구를 기초로 하여 아동을 대상으로 하는 경관학습의 교육내용 및 방법이 다양화되기를 희망하며, 이를 위한 행정적･제도적 기반이 정비되기를 기대한다.",
-      "keywords": "인문학, 인문학 프로그램, 인문도시, 경관학습, 인문학 대중화"
+      "keywords": ""
     },
     {
       "year": 2020,
@@ -2227,7 +878,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "인문사회 21",
       "is_first": true,
       "abstract": "본 연구는 결혼이주여성을 대상으로 운영된 인문학 기반 신체활동 프로그램의 구성과 내용을 살펴보고, 이 프로그램의 교육 효과와 바람직한 교육 방향을 분석함으로써 결혼이주여성들의 다양한 다문화 교육의 확대와 효과적인 다문화 교육 프로그램 개발에 시사점을 제공하는데 목적이 있다. 이를 위해 C지역 다문화지원센터에서 프로그램에 참여한 이주 여성 3명을 대상으로 면담을 진행하였고, 그 결과를 유목화 하여 분석하였다. 근거이론을 활용하여 분석한 결과는 한국생활에 대한 인식, 스트레스에 대한 대처, 심리적 변화, 신체적 변화의 4가지 항목으로 크게 유목화 할 수 있었다. 그 유목 아래 한국인에 대한 긍정적 인식의 확대, 스트레스에 유연하게 대처하게 되었고 예민함이 줄어듦, 심리적으로 편안해짐, 신체적으로 몸무게가 줄어들고, 피부가 좋아졌으며, 몸의 통증이 사라지는 긍정적인 효과를 확인할 수 있었다. 본 연구 기초로 하여 결혼이주여성을 위한 인문학신체 활동에 대한 체계적인 홍보 시스템, 환류시스템 및 확대 운영을 위한 정책적 노력이 필요하다.",
-      "keywords": "인문학, 신체활동, 인문도시, 이주여성, 정신건강"
+      "keywords": ""
     },
     {
       "year": 2020,
@@ -2235,7 +886,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "인문사회 21",
       "is_first": true,
       "abstract": "본 연구에서는 지역문화에 대한 강의와 체험으로 구성된 구석구석 충주탐험대 프로그램이 아동의 지역공동체 의식과 애향심에 어떤 영향을 미치는지 분석하여 프로그램의 효과를 검증하고자 하였다. 이를 위해 프로그램에 참여한 충주시 아동 37명을 대상으로 지역공동체의식 검사와 애향심 검사를 사전-사후에 실시하고 그 결과를 t-test를 통해 분석하였다. 연구결과 지역문화체험 활동이 지역공동체 의식과 애향심 향상에서 통계적으로 유의미한 영향을 미친다는 결과가 도출되었다. 이는 본 프로그램이 아동에게 지역공동체 의식과 애향심 향상에 긍정적인 영향을 미침을 시사한다. 본 연구를 기초로 하여 아동을 대상으로 하는 지역문화 체험 프로그램의 교육내용 및 방법이 다양화되기를 희망하며, 이를 위한 행정적․제도적 기반이 정비되기를 기대한다.",
-      "keywords": "인문학, 인문도시, 역사교육, 지역공동체의식, 애향심"
+      "keywords": ""
     },
     {
       "year": 2019,
@@ -2243,7 +894,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "인문사회 21",
       "is_first": true,
       "abstract": "본 연구는 인문학 중심 신체활동 프로그램의 참여 동기가 만족도에 미치는 영향을 조사 분석하였다. 이를 위해 충주문화원에서 프로그램에 참여한 만 40세 이상 성인 78명에 대하여 참여 동기 척도와 만족도 척도를 활용하여 설문하고, 결과를 분석하였다. 자료 분석은 SPSS ver.25.0을 이용하여, 평균분석, t-test, ANOVA, 상관분석, 다중회귀분석을 실시하였다. 연구결과 참여 동기 요인 중 취미오락형, 자기계발형은 심리적 만족, 신체적 만족, 교육적 만족에 유의미한 영향을 미치는 것으로 나타났으며 취미오락형, 사교지향형은 사회적 만족에 유의미한 영향 미치는 것으로 나타났다. 참여 인원수 부족 및 지역적 한계를 지니고 있으나 인문학 중심 신체활동 프로그램의 참여 동기와 만족도의 관계에 대한 기초정보를 확인할 수 있었다. 본 연구를 기초로 하여 프로그램에 대한 참여 동기와 만족도를 높일 수 있는 방안을 찾는 노력이 필요하다.",
-      "keywords": "인문학, 인문학 프로그램, 인문도시, 효과, 인문학 대중화"
+      "keywords": ""
     },
     {
       "year": 2019,
@@ -2251,7 +902,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "인문사회 21",
       "is_first": true,
       "abstract": "본 연구에서는 인문학의 대중화를 위해 인문학 프로그램에 대한 이용자 만족도를 기반으로 인문학의 사회적 인식 확산 및 위상을 높이기 위한 인문학 프로그램의 개선 방향을 제시하고자 한다. 이를 위해 C도시 시민을 대상으로 진행한 인문학 프로그램에 대한 이용자 만족도 및 개선 방안 등의 의견수렴을 진행하였다. 연구결과, 인문학은 남녀노소 불문하고, 개인의 내면･사회적･문화적 교양･사회 발전 등과 같은 사회의 전반적인 측면에서 영향을 주는 학문으로 유익한 강의 내용을 구성하여야 이용자들의 관심이 증진될 수 있으며, 강좌 및 체험 프로그램 계획 시 프로그램의 종류(내용)와 강사가 이용자의 참여도와 인문학 강좌 인식 확산에 기여할 것으로 파악되었다. 따라서 인문학 프로그램 개선을 위해서는 시민을 위한 재밌는 맞춤 강의, 깊이 있는 사회적 이슈를 인문학에 도입해 다루는 문제에 대한 주제, 다양한 분야의 전문 강사 초청 등에 대한 방안을 강구해야 함을 제시하였다.",
-      "keywords": "인문학, 인문학 프로그램, 인문도시, 이용자 만족도, 인문학 대중화"
+      "keywords": ""
     },
     {
       "year": 2019,
@@ -2259,7 +910,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "인문사회 21",
       "is_first": false,
       "abstract": "본 연구는 인문학 프로그램의 강좌 및 체험을 통해 시민들의 인문학 필요성과 만족도를 조사하여 인문학 인식을 고취시키고 확산시키는데 목적이 있다. 이를 위해 회귀분석과 다중회귀 분석 등의 이론에 기반을 두고 분석모형을 구성하였다. 분석결과 첫째, 인문학 프로그램의 서비스 품질, 즉 강의 및 체험의 시간, 내용, 시설, 공간, 강사의 질, 전문성 등이 시민들의 인문학 프로그램 만족도 즉, 운영시간, 교육기간의 인지도, 강사의 능력 등에 영향을 미치는 것으로 나타났다. 둘째, 인문학 프로그램의 서비스 품질은 시민들의 인문학 만족도에 영향을 미치는 것으로 나타났다. 셋째, 인문학의 필요성이 시민들의 인문학 프로그램 만족도에 영향을 미치는 것으로 나타났다. 넷째, 인문학 프로그램의 서비스 품질은 인문학 필요성을 매개로 하여 시민들의 만족도에 영향을 미치는 것으로 나타났다. 따라서 인문도시지원사업의 효율성을 극대화하기 위해서는 시민들의 다양한 수요조사가 필요하다. 이를 바탕으로 설계 단계부터 시민들이 참여하게 할 수 있어야 한다. 그것이 시민들의 인문학에 대한 인식을 드높이고 관심을 확산시키는 요인이기 때문이다.",
-      "keywords": "인문학, 인문학 프로그램, 인문학 프로그램 만족도, 서비스 품질, 인문학 필요성"
+      "keywords": ""
     }
   ],
   "심광현": [
@@ -2269,7 +920,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "최근 미국-유럽의 금융위기의 세계적 확산과 중국과 인도의 급부상 등으로 인한 세계경제의 거시적 환경 변화, 유비쿼터스 시대의 도래와 함께 나타나는 산업구조의 변화와 가파른 기술-조직 혁신 등으로 2010년대에는 이제까지와는 전혀 다른 시대변화가 예상되고 있다. 이런 변화들에 대응하기 위해 국내외 주요 도시들은 크게는 글로벌 폴리스로부터 작게는 창조도시, 문화도시, 인문도시, 인권도시, 명품교육도시, 평생학습도시, 혁신도시, 녹색성장도시, 유비쿼터스도시, 여성친화도시, 평화도시 등 다양한 도시개념을 채택하기에 분주한 실정이다. 그러나 이런 도시발전전략들은 세계적으로 유례 없이 90%가 넘는 한국의 초고밀도 도시화율에 대한 고려 없이 과거의 산업도시 발전모델 수립 방식과 유사하게 경제적, 기술적 변화와 일자리 창출 등에 역점을 맞추거나 혹은 해당 도시가 지닌 장점이나 강점을 특화시키거나 정체성을 수립하는 데에 초점을 맞추는 쪽으로 치우쳐 가고 있다. 이에 반하여, <생태문화도시> 라는 도시발전모형은 이런 고밀도 도시화가 안고 있는 문제점들을 해결하면서 도시적 삶의 질을 높일 수 있는 현실적 대안이다. 동시에 이 모델은 최근 종종 이분법적으로 비교되는 <산업도시>와 <창조도시> 간의 대립구도를 비판적으로 점검할 수 있는 매개적 역할을 수행할 수 있는 이점이 있다. <생태문화도시>의 이런 장점은 도시계획과 도시재생의 전 과정에 시민들의 능동적 참여를 전제로 한 것이다. 이런 점에서 시민참여도시계획은 생태문화도시의 발전전략의 강력한 엔진이라고 할 수 있다.",
-      "keywords": "경제위기, 유비쿼터스 시대, 산업도시의 한계, 창조도시의 문제점, 생태문화도시, 시민참여계획도시"
+      "keywords": ""
     },
     {
       "year": 2011,
@@ -2277,7 +928,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "신자유주의적 생산관계 하에서 가속화되는 자동기술화가 단지 노동의 절감과 비자발적 자유시간의 증대만을 가져올 경우, 광범위한 사회적 배제와 빈곤의 심화, 그리고 ‘만인에 대한 만인의 전쟁 을 동시에 초래할 것이라는 앙드레 고르의 경고(1988)는 이제 미국과 유럽은 물론 한국에서도 “가공할 기술적 야만성”의 결과를 야기하고 있다. 이런 격랑에 대해 수세적으로 대응해 왔던 노동운동과 사회운동도 이제는 “기본소득을 매개로 한 근본적인 이행”을 고민하지 않고서는 어떤 해법도 찾기 어려운 상황으로 내몰리게 되었다. 하지만 한국에서도 2009년 1월 <기본소득 네트워크>가 결성되어 체계적인 경제적 분석에 기초하여 기본소득의 운동적 의제화가 본격적으로 이루어지기 시작했고, 이를 계기로 그 동안 신자유주의에 대한 반대와 공공성 사수 및 복지국가로의 전환이라는 수세적 과제에 매몰되어 온 노동운동과 사회운동 전반이 새로운 공세로 전환할 수 있는 가능성도 함께 열리고 있다. 물론 <기본소득> 운동 하나만으로 신자유주의를 넘어 대안사회로 나아갈 수 있는 현실적이고도 공세적인 운동이 가능한 것은 아니다. <기본소득> 운동은 다른 운동들과 효과적인 연결망을 이루어 자본주의 극복으로 나아가기 위한 입체적인 투쟁의 유기적 부분이 되지 못할 경우, 그것이 정작 실현되더라도 내수시장 활성화를 위한 일시적인 보조금 지급이나 케인스주의적 타협으로 회귀하기 위한 보조수단으로 전락하기 쉽기 때문이다. 기본소득운동이 자유주의적 진자운동을 넘어설 수 있는 현실적이고도 공세적인 운동이 되기 위해서는 두 가지 전제 조건이 필요하다. 1) 기본소득은 전국민을 상대로 일정 수준 이상의 현금 및 현물 지급을 지속적으로 유지(및 확대)할 수 있어야 하며, 그 결과가 국민경제 전체를 위축시키지 않고 지속 가능하게 하는 데에 긍정적으로 기여해야 한다. 2) 동시에 기본소득의 지급이 국가에 대한 사회구성원들의 타율적 의존을 강화하는 것이 아니라 사회구성원들 간의 자유-평등-연대를 확장하는 데 기여하기 위해서는, 늘어난 자유시간이 ‘신자유주의적 자기계발’이나 소비자본주의를 넘어서는 자율적이고 연대적인 형태의 문화적 향유와 교통에 사용되어야 한다. 이 글은 이런 관점에 서서, 1)의 측면에서 그간 기본소득운동이 이루어낸 경제적 타당성 분석과 그것의 정치적 함의에 대한 해석에 기초함과 아울러, 그 주요 골자 중에서 아직 부족하다고 생각되는 부분을 앙드레 고르와 홀거 하이데와 마이클 앨버트 등의 논의를 매개로 보완하고, 2) 기본소득을 통해 늘어날 자유시간과 재원을 비자본주의적인 문화적 향유와 교통을 위해 자율적-연대적으로 사용할 수 있는 대중적인 문화정치적인 프로그램(노동조합과 지역주민들 모두가 적극 활용할 수 있는 참여적 프로그램)을 준비하고 실험할 수 있는 새로운 사회문화운동의 과제와 전망을 개략적으로 그려보고자 한다.",
-      "keywords": "자동기술화, 무조건적 기본소득, 코뮌주의적 사회연대소득, 보편적 노동권과 문화권, 시간해방정책, 노동운동과 문화운동의 선순환 고리, 참여계획경제"
+      "keywords": ""
     },
     {
       "year": 2010,
@@ -2285,7 +936,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "시대와 철학",
       "is_first": true,
       "abstract": "GDP가 자본 축적의 화폐적 표시라면 도시화율은 그것의 공간적 표시이다. 현재 전 세계의 평균 도시화율은 50%를 상회하는 데 반해, 한국은90%를 넘고 있는데, 이 놀라운 고정자본의 집적 및 공간적 압축은 곧 인간신체에 내재된 ‘다감각적 공간’이 세계 평균의 두 배에 가깝게 이루어지고 있음을 뜻한다. 개체 생태학적 위기의 지표라고 할 자살률과 이혼율이 꾸준히증가하여 세계적으로 수위를 달리고 있다는 점도 이런 압축적 성장과 무관치 않다. 에드워드 홀에 의하면 다양한 신체 감각들과 맞물린 다감각적 공간(및 ‘치명적 거리’)들이 파괴될 경우 인간의 행동 및 사고 능력은 무의식적으로 심각한 손상을 받아 ‘트라우마’ 혹은 ‘외상 후 스트레스’로 신체에 각인되어 심각한 우울증과 자살을 유발할 수 있다고 한다. 제한된 공간에 최대한 많은 용적의 건축물을 지어 최대한의 수익을 올리려는 개발업자와 투기꾼의 입장에서는 복잡한 공간적 거리를 필요로 하는유동적인 인간의 신체적 공간을 1평방 미터 이내의 고정된 크기를 지닌 물체적 공간으로 인식하는 것이 유리할 것이다. 인간적 접촉이 사라지고 인간이 개미나 점처럼 지각되는 원거리 시점에서 바라보게 되면 인간을 공간적으로 포개고 이동시킬 수 있는 하나의 물체로 간주하는 것은 거리낌 없고,자연스러운 일이 될 것이다. 하지만 이런 시점은 ‘자연스러운’ 것이 아니라‘본원적 축적’에 의해 농촌에서 내몰린 대규모 인구의 도시 유입과 더불어 도시와 농촌, 지식노동과 육체노동 간의 시공간적 분리와 모순을 격화시켜 온자본주의적 세계화의 산물이다. 이 과정에 숨겨진 모순과 위험의 심화 과정을 데이비드 하비의 시공간의 변증법을 통해 규명하고, 레이몽 윌리엄즈와 발터 벤야민, 레이코프/존슨등의 분석에 의거하여 개인과 집단의 능동적으로 신체화된 공간적 역량의활성화에 기여할 비판적-대안적 도시인문학의 ‘철학적 기반’을 탐색하는 데이 글의 목적이 있다.",
-      "keywords": "근접학, 공간적 실존, 절대적-상대적-관계적 시공간의 변증법, 신체화된 마음의 다중감각적 공간, 신체-정치, 공간적 투사"
+      "keywords": ""
     },
     {
       "year": 2009,
@@ -2293,7 +944,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "마르크스주의 연구",
       "is_first": true,
       "abstract": "현재 세계는 미국발 금융 위기를 매개로 지구적으로 확산된 카오스적 요동 상태에 처해 있다. 카오스적 요동이 커질수록 ‘나비효과’ 역시 커질 수 있다. 미국을 위시한 선진자본주의 국가들은 NBIC/GNR 형태의 학문 간 융·복합을 통해 공간-기술-사람을 연결하는 ‘유비쿼터스 도시’ 네트워크 구축이라는 새로운 축적전략을 위기 극복을 위한 ‘나비 효과’로 채택하고 있는 듯하다. 한국도 2008년 9월 관련 법률 시행령이 공포되어 그간 전국적으로 추진해온 40여 개 신도시 계획을 유비쿼터스 도시계획으로 전환하는 작업을 시작하고 있다. 이 계획은 향후 학문 간, 기술 간, 기업 간 융·복합을 통한 전국적 공간 조정의 테스트베드가 될 것이다. 이 과정에서 나타날 공간-사물-사람 간의 미시적 관계와 전체 학문의 지형 변화 및 거시적인 문화적·정치경제적 지형 변화를 가늠하는 데 도움이 될 인식 지도 그리기가 시급한 형편이다. 이 글은 유비쿼터스 도시 계획의 내용과 성격 분석을 통해 새로운 축적전략인 ‘유비쿼터스 사회’에 내재한 대안적 이행의 길의 모색(데이비드 하비의 변증법적 유토피아주의)에서 중추 역할을 할 대안적 학문 간 융·복합 연구의 촉매제로서의 대안적 도시인문학 연구의 실마리를 끌어내려는 ‘가추법 적인’ 시론이다. 가추법은 현실의 특정 사례로부터 그 발생의 원인과 미래의 개연성을 가설과 추론을 통해 가늠하는 ‘과학적 발견’의 방법이다. 필자는 ‘유비쿼터스 도시’ 계획 과 그 기반이 될 학문 간 통섭 연구가 21세기 세계 자본주의 위기 극복의 분기점의 향방을 가늠할 새로운 역사적 프로젝트라고 본다. 이 프로젝트의 중요한 특징은 과거에는 허구에 불과했던 ‘SF 영화’의 시나리오를 컴퓨터 시뮬레이션한 결과를 토대로 가상공간과 물리공간을 실시간으로 결합하여 제3공간을 만들어내려는 ‘신문명’ 건설이라는 점에 있다. 최근 신도시 계획에서 스토리텔링이 중요해지는 이유가 여기에 있고, 대안적 도시연구에 문학과 영화와 여타의 모든 예술을 포함하는 통섭형 인문학 연구가 새롭게 결합할 수밖에 없는 이유도 여기에 있다. 도시공간의 새로운 생산과 재구성 과정의 대안적 설계를 제안하고 논의해 나갈 수 있도록 ‘도시인문학’ 자체의 융·복합화 과정을 통해 예술과 학문 전체의 대안적 통섭 네트워크의 프로토콜을 만드는 일이 시급하다.",
-      "keywords": "유비쿼터스 도시, 제3공간, 가추법, 정동적 전회, 신체화된 공 간, 변증법적 유토피아주의, 비환원주의적 학문 간 통섭."
+      "keywords": ""
     },
     {
       "year": 2009,
@@ -2301,7 +952,7 @@ const CORE_AUTHOR_PAPERS = {
       "journal": "도시인문학연구",
       "is_first": true,
       "abstract": "도시 공간은 언제나 사람과 사물의 집적의 중심지였을 뿐만 아니라 교통의 중심지로서정보기술의 발전에 의해 크게 영향을 받아 왔다. 20세기 초 전화 기술은 공간분업을통해 도시공간의 재배치를 야기했고, 20세기 말 인터넷 기술 역시 도시공간의 성격을크게 변화시켰다. 그러나 최근 상용화되기 시작한 유비쿼터스 컴퓨팅 기술은 그간 분리되어 있던 물리공간과 가상공간을 실시간으로 연결하여 제3공간이라는 새로운 공간(“증강현실”)을 출현시킴으로써 또다시 대대적인 사회변동을 야기하고 있다. 2008년봄에 ‘Wi-bro’ 기술이 세계 최초로 수도권에서 상용화되면서 가능해진 물리공간과 가상공간의 실시간 연결은 2008년 여름 100일간 지속된 촛불시위에서 새로운 놀이형식의 문화ㆍ정치적 참여를 촉진했다. 막 시작된 이런 변화의 폭과 성격을 예측하기 위해서는 두 가지 분석을 연결하는 작업이 선행되어야 한다. 하나는 90년대 정보화가 신자유주의 세계화와 맞물려 도시와 사회 전반에 미친 변화의 내용과 의미에 대한 분석이다. 다른 하나는 2000년대에 들어첨단화되고 있는 디지털 미디어의 문화적 형식과 논리에 대한 분석이다. 그간 이 두가지 분석은 물리공간과 가상공간이 분리되어 있었듯이 서로 분리되어 진행되어 왔다. 그러나 유비쿼터스 컴퓨팅 기술이 현실적으로 두 공간의 연결을 촉진하고 있는 새로운현실을 따라잡기 위해서라도 도시연구와 미디어문화연구 간의 접속과 협력이 시급하다. 이 글에서는 카스텔스의 네트워크 사회에 관한 연구와 데이비드 하비의 공간 연구, 디지털 미디어의 새로운 언어와 논리에 관한 레프 마노비치의 연구, 그리고 촛불시위 사례 분석 등을 연결하여 제3공간이라는 새로운 지형의 문화ㆍ정치적 함의를 살펴보고자한다.",
-      "keywords": "유비쿼터스 컴퓨팅, 제3공간, 네트워크 사회, 세계화의 거시공간과 신체의 미시공간, 네비게이션, 문화ㆍ정치적 참여"
+      "keywords": ""
     }
   ]
 };

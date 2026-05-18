@@ -402,21 +402,38 @@
         <div class="author-bar-table" id="author-bar-table">
           <!-- JS로 채움 -->
         </div>
-        <div class="abt-legend">
-          <span class="abt-dot" style="background:#2563eb"></span><span>제1저자 / 단독</span>
-          <span class="abt-dot" style="background:#e2e8f0; margin-left:1rem"></span><span>공동저자</span>
-        </div>
+
 
       </div>
 
-      <!-- 오른쪽 플레이스홀더 (추후 패널 추가 예정) -->
-      <div class="detail-card detail-placeholder">
-        <div class="placeholder-inner">
-          <div class="placeholder-icon">⏳</div>
-          <div class="placeholder-label">추후 추가될 패널</div>
-          <div class="placeholder-sub">분석 내용을 준비 중입니다</div>
+      <!-- 우측 열 래퍼 -->
+      <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+        <!-- 신규 진입 vs 기존 연구자 -->
+      <div class="detail-card discourse-author-card">
+        <div class="detail-card-header">
+          <h3>👥 신규 진입 vs 기존 연구자 (연도별)</h3>
+          <p>매년 처음 등장한 연구자(신규)와 이전에도 발표한 연구자(기존)의 비율</p>
+        </div>
+        <div style="position: relative; width: 100%; height: 320px;">
+          <canvas id="chart-author-entry"></canvas>
         </div>
       </div>
+      
+      <!-- 클릭한 연구자의 논문 리스트 패널 -->
+      <div class="detail-card author-papers-card" id="author-papers-card" style="max-height: 400px; overflow-y: auto;">
+        <div class="detail-card-header" style="margin-bottom: 1rem;">
+          <h3 id="ap-author-title">📌 연구자 논문 목록</h3>
+          <p id="ap-author-desc">KCI 등재 논문 상세 목록</p>
+        </div>
+        <div class="ap-list" id="ap-list">
+          <div style="min-height: 100px; display: flex; align-items: center; justify-content: center; color: var(--text-muted);">
+            핵심 연구자를 클릭해 논문 목록을 확인하세요.
+          </div>
+        </div>
+      </div>
+
+        </div>
+      <!-- // 우측 열 래퍼 끝 -->
 
     </div><!-- /detail-body -->
   </div><!-- /detail-kpi -->
@@ -479,25 +496,46 @@
             </div>
             <div id="chart-stream" style="width:100%; height:380px;"></div>
           </div>
+          
+          <!-- 키워드 지배력 분석 패널 -->
+          <div id="keyword-monopoly-panel" style="display:none; width: 280px; flex-shrink: 0; padding: 1.5rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md);">
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
+              <h4 id="km-title" style="font-size: 1.1rem; color: var(--text-base); margin: 0; line-height: 1.3;"></h4>
+              <span id="km-total" style="font-size: 0.85rem; color: var(--text-muted); background: var(--bg-hover); padding: 0.3rem 0.6rem; border-radius: 6px; display: inline-block;"></span>
+            </div>
+            <div id="km-list" style="display: flex; flex-direction: column; gap: 0.8rem;">
+              <!-- JS로 채움 -->
+            </div>
+          </div>
+          
         </div>
       </div>
 
-      <!-- 차트 2: 신규 진입 vs 기존 연구자 -->
-      <div class="detail-card discourse-author-card">
-        <div class="detail-card-header">
-          <h3>👥 신규 진입 vs 기존 연구자 (연도별)</h3>
-          <p>매년 처음 등장한 연구자(신규)와 이전에도 발표한 연구자(기존)의 비율</p>
-        </div>
-        <div id="chart-author-entry" style="width:100%; height:320px;"></div>
-        <div class="author-entry-note">
-          💡 <strong>신규 진입자가 압도적으로 많은 해</strong>는 외부 유입(정책 사업 등)이 강했음을 시사합니다.
-          <strong>기존 연구자 비율이 높아지는 해</strong>는 분야의 자생적 성숙기를 나타냅니다.
-        </div>
-      </div>
+
 
     </div><!-- /discourse-body -->
   </div><!-- /detail-discourse -->
 
+  <!-- 논문 상세 모달 -->
+  <div id="paper-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+    <div style="background: #fff; width: 90%; max-width: 600px; border-radius: var(--radius-lg); box-shadow: var(--shadow-modal); padding: 2rem; position: relative; max-height: 80vh; overflow-y: auto;">
+      <button onclick="closePaperModal()" style="position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+      <div id="pm-year" style="font-size: 0.9rem; font-weight: 700; color: var(--accent); margin-bottom: 0.5rem;"></div>
+      <h3 id="pm-title" style="font-size: 1.2rem; font-weight: 700; color: var(--text-base); margin-bottom: 0.5rem; line-height: 1.4;"></h3>
+      <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
+        <span id="pm-journal" style="font-weight: 600;"></span> 
+        <span id="pm-author-type" style="margin-left: 0.5rem;"></span>
+      </div>
+      
+      <h4 style="font-size: 1rem; margin-bottom: 0.5rem; color: var(--text-base);">초록 (Abstract)</h4>
+      <div id="pm-abstract" style="font-size: 0.95rem; line-height: 1.6; color: var(--text-muted); margin-bottom: 1.5rem; white-space: pre-wrap;"></div>
+      
+      <h4 style="font-size: 1rem; margin-bottom: 0.5rem; color: var(--text-base);">키워드 (Keywords)</h4>
+      <div id="pm-keywords" style="font-size: 0.9rem; color: var(--accent); line-height: 1.5;"></div>
+    </div>
+  </div>
+
+  <script src="keyword_authors.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
