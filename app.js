@@ -653,30 +653,72 @@ function initGlobalPanel() {
 
 /* ── Init ── */
 function init() {
-  initKPI();
-  initTrendChart();
-  initDonutChart();
-  initStackedChart();
-  initMapChart();
-  initGlobalPanel();
-  initTop10Table();
-  initBarAnimations();
-  initCoreAuthorList();
+  const run = (name, fn) => {
+    try { fn(); }
+    catch(e) {
+      console.error('[init] ' + name + ' 실패:', e);
+      const el = document.getElementById('home-main');
+      if (el) el.insertAdjacentHTML('afterbegin',
+        `<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:8px;padding:1rem;margin:1rem;font-family:monospace;font-size:0.85rem;color:#991b1b;">
+          ⚠️ <strong>${name}</strong> 초기화 실패: ${e.message}
+        </div>`);
+    }
+  };
+
+  run('initKPI', initKPI);
+  run('initTrendChart', initTrendChart);
+  run('initTop10Table', initTop10Table);
+
+  const deferred = [
+    ['initDonutChart',   initDonutChart],
+    ['initStackedChart', initStackedChart],
+    ['initMapChart',     initMapChart],
+    ['initGlobalPanel',  initGlobalPanel],
+    ['initBarAnimations',initBarAnimations],
+    ['initCoreAuthorList',initCoreAuthorList],
+  ];
+
+  if ('requestIdleCallback' in window) {
+    const runNext = (tasks) => {
+      if (!tasks.length) return;
+      requestIdleCallback(() => {
+        run(tasks[0][0], tasks[0][1]);
+        runNext(tasks.slice(1));
+      }, { timeout: 2000 });
+    };
+    runNext(deferred);
+  } else {
+    deferred.forEach(([name, fn], i) => setTimeout(() => run(name, fn), 100 + i * 80));
+  }
 }
+
 
 /* ══════════════════════════════════════════
    화면 전환 (홈 ↔ 상세 뷰)
 ══════════════════════════════════════════ */
 function showDetailView(viewId) {
-  document.getElementById('home-header').style.display = 'none';
-  document.getElementById('home-layout').style.display = 'none';
+  try {
+    const detailEl = document.getElementById('detail-' + viewId);
+    if (!detailEl) {
+      alert('해당 뷰를 찾을 수 없습니다: ' + viewId);
+      return;
+    }
 
-  const detailEl = document.getElementById('detail-' + viewId);
-  if (detailEl) {
+    document.getElementById('home-header').style.display = 'none';
+    document.getElementById('home-layout').style.display = 'none';
+
+    document.querySelectorAll('.detail-view').forEach(el => el.classList.add('hidden'));
     detailEl.classList.remove('hidden');
+
     window.scrollTo({ top: 0, behavior: 'smooth' });
+
     if (viewId === 'kpi') { initEcosystemDonut(); initAuthorBarTable(); initAuthorEntryChart(); }
     if (viewId === 'discourse') { initStreamChart(); }
+    if (viewId === 'region') { initRegionView(); }
+  } catch(e) {
+    console.error('showDetailView 에러:', e);
+    alert('화면 전환 중 오류가 발생했습니다: ' + e.message);
+    hideDetailView();
   }
 }
 
@@ -930,26 +972,62 @@ function initStreamChart() {
       showKeywordMonopoly(params.seriesName);
     }
   });
+
+  window.addEventListener('resize', () => {
+    if (streamChart) streamChart.resize();
+  });
 }
 
 function showKeywordMonopoly(keyword) {
   const panel = document.getElementById('keyword-monopoly-panel');
+  const placeholder = document.getElementById('km-placeholder');
+  const content = document.getElementById('km-content');
   const title = document.getElementById('km-title');
   const total = document.getElementById('km-total');
   const list = document.getElementById('km-list');
   
-  if (!panel || typeof KEYWORD_AUTHOR_DATA === 'undefined') return;
-  
+  const tkPanel = document.getElementById('theme-keywords-panel');
+  const tkTotal = document.getElementById('tk-total');
+  const tkList = document.getElementById('tk-list');
+
+  if (!panel) return;
+
+  // ── THEME_KEYWORDS_MAP에 있는 테마인지 먼저 확인 ──
+  const isThemeCategory = tkPanel
+    && typeof THEME_KEYWORDS_MAP !== 'undefined'
+    && !!THEME_KEYWORDS_MAP[keyword];
+
+  if (isThemeCategory) {
+    // 분류 기준 테마: 독점 패널은 그대로 두고, 키워드 목록 패널만 추가 표시
+    tkPanel.style.display = 'flex';
+    const themeKws = THEME_KEYWORDS_MAP[keyword];
+    tkTotal.innerHTML = `분류 기준 키워드 <strong>${themeKws.length}개</strong> 포함`;
+    tkList.innerHTML = themeKws.map(kw =>
+      `<button class="tk-chip tk-chip-clickable" onclick="onThemeKeywordClick('${kw.replace(/'/g, "\\'")}')" title="${kw} 키워드만 차트에 표시">${kw}</button>`
+    ).join('');
+    return;
+  }
+
+  // 일반 키워드: monopoly 패널 표시, 키워드 목록 패널 숨김
+  panel.style.display = 'flex';
+  if (tkPanel) tkPanel.style.display = 'none';
+
+
+  // ── 저자 독점 분석 패널 ──
+  if (typeof KEYWORD_AUTHOR_DATA === 'undefined') return;
+
   const kwData = KEYWORD_AUTHOR_DATA[keyword];
   if (!kwData) {
-    panel.style.display = 'block';
+    if (placeholder) placeholder.style.display = 'none';
+    if (content) content.style.display = 'flex';
     title.innerHTML = `📌 <strong>${keyword}</strong> 담론의 독점 분석`;
     total.innerHTML = `검색된 논문 데이터가 부족합니다.`;
     list.innerHTML = ``;
     return;
   }
   
-  panel.style.display = 'block';
+  if (placeholder) placeholder.style.display = 'none';
+  if (content) content.style.display = 'flex';
   title.innerHTML = `📌 <strong>${keyword}</strong> 담론의 독점 분석`;
   total.innerHTML = `해당 키워드를 포함한 총 논문: <strong>${kwData.total}편</strong>`;
   
@@ -958,26 +1036,68 @@ function showKeywordMonopoly(keyword) {
     return;
   }
   
-  // 최대 값을 기준으로 막대그래프 비율 계산
-  const maxCount = kwData.authors[0][1];
+  // 전체 논문 수 대비 비율 계산
+  const totalPapers = kwData.total;
   
   list.innerHTML = kwData.authors.map((item, idx) => {
     const author = item[0];
     const count = item[1];
-    const percent = Math.max(5, Math.round((count / maxCount) * 100)); // 최소 5% 너비 보장
-    // 1위는 색상을 강조 (파란색 계열)
-    const barColor = idx === 0 ? 'var(--accent)' : 'var(--text-muted)';
+    const pctOfTotal = totalPapers > 0 ? ((count / totalPapers) * 100).toFixed(1) : '0.0';
+    const isTop = idx === 0;
     
     return `
-      <div style="display: flex; align-items: center; gap: 1rem;">
-        <div style="width: 20px; font-weight: 700; color: ${idx === 0 ? 'var(--accent)' : 'var(--text-muted)'};">${idx + 1}</div>
-        <div style="width: 70px; font-weight: 600; color: var(--text-base);">${author}</div>
-        <div style="flex: 1; background: var(--bg-hover); border-radius: 4px; height: 16px; overflow: hidden; position: relative;">
-          <div style="width: ${percent}%; height: 100%; background: ${barColor}; border-radius: 4px; transition: width 0.5s ease-out;"></div>
+      <div style="display: flex; align-items: center; gap: 0.6rem; padding: 0.35rem 0.5rem; border-radius: 6px; background: ${isTop ? 'rgba(37,99,235,0.05)' : 'transparent'};">
+        <div style="width: 18px; font-size: 0.8rem; font-weight: 700; color: ${isTop ? 'var(--accent)' : 'var(--text-muted)'}; flex-shrink: 0;">${idx + 1}</div>
+        <div style="width: 64px; font-size: 0.85rem; font-weight: ${isTop ? '700' : '600'}; color: var(--text-base); flex-shrink: 0;">${author}</div>
+        <div style="display: flex; align-items: baseline; gap: 3px; flex-shrink: 0;">
+          <span style="font-size: 0.9rem; font-weight: 700; color: ${isTop ? 'var(--accent)' : 'var(--text-base)'};">${count}</span>
+          <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500;">편</span>
         </div>
-        <div style="width: 40px; text-align: right; font-size: 0.9rem; font-weight: 600;">${count}편</div>
+        <div style="flex: 1; text-align: right;">
+          <span style="font-size: 0.78rem; font-weight: 600; color: ${isTop ? 'var(--accent)' : 'var(--text-muted)'}; background: ${isTop ? 'rgba(37,99,235,0.08)' : 'rgba(0,0,0,0.04)'}; padding: 2px 7px; border-radius: 100px;">${pctOfTotal}%</span>
+        </div>
       </div>
     `;
+  }).join('');
+}
+
+// 테마 포함 키워드 클릭 시 차트 전환
+function onThemeKeywordClick(kw) {
+  const kwSource = window.KW_DATA ? window.KW_DATA.keywords : (typeof DISCOURSE_DATA !== 'undefined' ? DISCOURSE_DATA.keywords : null);
+  if (!kwSource) return;
+  const data = kwSource[kw] || [];
+  const color = '#3b82f6'; // 기본 강조색
+  onTreeSelect('keyword', kw, color, data);
+}
+
+// 서브클러스터 클릭 시 → 해당 서브클러스터의 세부 키워드를 오른쪽 패널에 표시
+function showSubclusterKeywords(scName, scColor) {
+  const tkPanel = document.getElementById('theme-keywords-panel');
+  const tkTotal = document.getElementById('tk-total');
+  const tkList = document.getElementById('tk-list');
+  const kmPanel = document.getElementById('keyword-monopoly-panel');
+
+  if (!tkPanel || typeof window.SUBCLUSTER_KEYWORDS_MAP === 'undefined') return;
+
+  const kws = window.SUBCLUSTER_KEYWORDS_MAP[scName];
+  if (!kws || kws.length === 0) return; // 매핑이 없으면 패널 변경 없이 차트만 업데이트
+
+  // 독점 패널은 항상 유지, 키워드 패널만 추가 표시
+  tkPanel.style.display = 'flex';
+
+  const color = scColor || '#3b82f6';
+  tkTotal.innerHTML = `<span style="display:inline-flex;align-items:center;gap:6px;"><span style="width:8px;height:8px;border-radius:50%;background:${color};display:inline-block;"></span><strong>${scName}</strong> 관련 키워드 <strong>${kws.length}개</strong></span>`;
+
+  const kwSource = window.KW_DATA ? window.KW_DATA.keywords : (typeof DISCOURSE_DATA !== 'undefined' ? DISCOURSE_DATA.keywords : null);
+
+  tkList.innerHTML = kws.map(kw => {
+    const hasData = kwSource && (kwSource[kw] || []).some(v => v > 0);
+    return `<button
+      class="tk-chip tk-chip-clickable${hasData ? '' : ' tk-chip-dim'}"
+      onclick="onThemeKeywordClick('${kw.replace(/'/g, "\'")}')" 
+      title="${kw} 키워드만 차트에 표시"
+      style="--chip-color:${color};"
+    >${kw}</button>`;
   }).join('');
 }
 
@@ -1084,7 +1204,7 @@ function renderThemeTree() {
       return `<button class="stt-sub ${isScSel ? 'active' : ''}"
         data-label="${sc.name}" data-color="${sc.color}" data-type="cluster"
         draggable="true" ondragstart="onDragStart(event, 'cluster', '${sc.name}', '${sc.color}', '${JSON.stringify(sc.data)}')"
-        onclick="onTreeSelect('cluster','${sc.name}','${sc.color}',${JSON.stringify(sc.data)})"
+        onclick="onTreeSelect('cluster','${sc.name}','${sc.color}',${JSON.stringify(sc.data)}); showSubclusterKeywords('${sc.name}', '${sc.color}')"
         style="${isScSel ? `border-left-color:${sc.color};background:${sc.color}12;` : ''}">
         <span class="stt-sub-dot" style="background:${sc.color}"></span>
         <span class="stt-sub-name">${sc.name}</span>
@@ -1097,7 +1217,7 @@ function renderThemeTree() {
         data-id="${theme.id}"
         data-label="${theme.name}"
         ${!hasSub ? `draggable="true" ondragstart="onDragStart(event, 'theme', '${theme.name}', '${theme.color}', '${JSON.stringify(theme.data)}')"` : ''}
-        onclick="${hasSub ? `toggleThemeExpand('${theme.id}')` : `onTreeSelect('theme','${theme.name}','${theme.color}',${JSON.stringify(theme.data)})`}"
+        onclick="${hasSub ? `toggleThemeExpand('${theme.id}'); showKeywordMonopoly('${theme.name}')` : `onTreeSelect('theme','${theme.name}','${theme.color}',${JSON.stringify(theme.data)})`}"
         style="${isThemeSel ? `border-left-color:${theme.color};background:${theme.color}12;` : ''}">
         <span class="stt-name">${theme.name}</span>
         <span class="stt-count">${theme.total}</span>
@@ -1347,6 +1467,7 @@ function initAuthorEntryChart() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
 const CORE_AUTHOR_PAPERS = {
   "홍남희": [
     {
@@ -2304,4 +2425,1176 @@ const CORE_AUTHOR_PAPERS = {
       "keywords": "유비쿼터스 컴퓨팅, 제3공간, 네트워크 사회, 세계화의 거시공간과 신체의 미시공간, 네비게이션, 문화ㆍ정치적 참여"
     }
   ]
+};
+
+/* ══════════════════════════════════════════
+   지역별 기관 뷰
+══════════════════════════════════════════ */
+
+const REGION_META = {
+  seoul:   { label: '서울',      color: '#2563eb', icon: '🏙️', char: '이론+정책 복합 (초집중)' },
+  gyeongi: { label: '경기/인천',  color: '#0891b2', icon: '🌊', char: '현상학·텍스트 중심' },
+  daejeon: { label: '대전/충청',  color: '#7c3aed', icon: '🌿', char: '일상·사회 현상' },
+  busan:   { label: '부산/경남',  color: '#ea580c', icon: '⚓', char: '지역성·정책' },
+  gwangju: { label: '광주/전라',  color: '#16a34a', icon: '🌱', char: '정체성·공간 담론' },
+  gangwon: { label: '강원',      color: '#0d9488', icon: '🏔️', char: '공동체·전후 문학' },
+  daegu:   { label: '대구/경북',  color: '#b45309', icon: '🏯', char: '도시사·유산 보존' },
+  jeju:    { label: '제주',      color: '#9333ea', icon: '🌺', char: '이동·이주 테마' },
+  foreign: { label: '해외',      color: '#94a3b8', icon: '🌐', char: '해외 기관' },
+  unknown: { label: '기타',      color: '#64748b', icon: '🔹', char: '미분류' },
+};
+
+let regionChartInstance = null;
+let currentRegionFilter = 'all';
+
+function initRegionView() {
+  const body = document.querySelector('#detail-region .detail-body');
+
+  if (!window.INSTITUTION_DATA) {
+    if (body) body.insertAdjacentHTML('afterbegin',
+      `<div style="background:#fef9c3;border:1px solid #fcd34d;border-radius:8px;padding:1.2rem;margin-bottom:1rem;color:#78350f;font-size:0.9rem;">
+        ⚠️ <strong>institution_data.js</strong> 가 로드되지 않았습니다.<br>
+        파일 경로: <code>Dashboard_Urban Humanities/institution_data.js</code>
+      </div>`);
+    return;
+  }
+
+  try { renderRegionKPI(); } catch(e) { console.error('renderRegionKPI 실패:', e); }
+  try { renderRegionFilterTabs(); } catch(e) { console.error('renderRegionFilterTabs 실패:', e); }
+  try { renderRegionChart('all'); } catch(e) {
+    console.error('renderRegionChart 실패:', e);
+    const c = document.getElementById('chart-region-bar');
+    if (c) c.innerHTML = `<div style="padding:2rem;color:#64748b;text-align:center;">차트 로드 실패: ${e.message}</div>`;
+  }
+}
+
+
+function renderRegionKPI() {
+  const data = window.INSTITUTION_DATA;
+  const bar = document.getElementById('region-kpi-bar');
+  if (!bar) return;
+
+  const total = data.totalPapers;
+  const seoulCount = data.regionSummary['seoul']?.count || 0;
+  const seoulPct = ((seoulCount / total) * 100).toFixed(1);
+
+  // 최고 인용 권역 (foreign/unknown 제외)
+  let bestRegion = null, bestAvg = 0;
+  for (const [rid, s] of Object.entries(data.regionSummary)) {
+    if (rid === 'foreign' || rid === 'unknown' || !s.count) continue;
+    const avg = s.totalCit / s.count;
+    if (avg > bestAvg) { bestAvg = avg; bestRegion = rid; }
+  }
+
+  // 서울 외 최다 기관
+  const nonSeoulTop = data.institutions.find(i => i.region !== 'seoul' && i.region !== 'foreign' && i.region !== 'unknown');
+
+  const kpis = [
+    { label: '전체 논문', value: `${total}편`, sub: '447편 전수 분석', color: '#2563eb' },
+    { label: '서울 집중도', value: `${seoulPct}%`, sub: `서울 ${seoulCount}편 / 전국`, color: '#dc2626' },
+    { label: '서울 외 최다', value: nonSeoulTop ? nonSeoulTop.name : '—', sub: nonSeoulTop ? `${nonSeoulTop.count}편` : '', color: '#16a34a' },
+    { label: '인용 효율 최고', value: bestRegion ? REGION_META[bestRegion]?.label : '—', sub: bestRegion ? `평균 ${bestAvg.toFixed(1)}회` : '', color: '#d97706' },
+  ];
+
+  bar.innerHTML = kpis.map(k => `
+    <div class="rkpi-item">
+      <div class="rkpi-value" style="color:${k.color}">${k.value}</div>
+      <div class="rkpi-label">${k.label}</div>
+      <div class="rkpi-sub">${k.sub}</div>
+    </div>
+  `).join('<div class="rkpi-divider"></div>');
+}
+
+function renderRegionFilterTabs() {
+  const data = window.INSTITUTION_DATA;
+  const tabs = document.getElementById('region-filter-tabs');
+  if (!tabs) return;
+
+  const regions = ['all', ...Object.keys(REGION_META).filter(r =>
+    data.regionSummary[r] && data.regionSummary[r].count > 0
+  )];
+
+  tabs.innerHTML = regions.map(r => {
+    const meta = r === 'all' ? { label: '전체', color: '#475569', icon: '📊' } : REGION_META[r];
+    const count = r === 'all' ? data.totalPapers : (data.regionSummary[r]?.count || 0);
+    return `
+      <button class="rft-btn ${r === currentRegionFilter ? 'active' : ''}"
+        id="rft-${r}"
+        onclick="onRegionFilterClick('${r}')"
+        style="${r === currentRegionFilter ? `border-color:${meta?.color};background:${meta?.color}14;color:${meta?.color}` : ''}">
+        <span class="rft-icon">${meta?.icon || '🔹'}</span>
+        <span class="rft-label">${meta?.label}</span>
+        <span class="rft-count">${count}</span>
+      </button>`;
+  }).join('');
+}
+
+function onRegionFilterClick(regionId) {
+  currentRegionFilter = regionId;
+  renderRegionFilterTabs();
+  renderRegionChart(regionId);
+  if (regionId !== 'all') {
+    renderRegionSideCard(regionId);
+  } else {
+    document.getElementById('region-side-placeholder').style.display = 'flex';
+    document.getElementById('region-side-content').style.display = 'none';
+  }
+}
+
+function renderRegionChart(filterRegion) {
+  const data = window.INSTITUTION_DATA;
+  const container = document.getElementById('chart-region-bar');
+  if (!container || !data) return;
+
+  // 필터링
+  let institutions = filterRegion === 'all'
+    ? data.institutions.filter(i => i.region !== 'foreign' && i.region !== 'unknown')
+    : data.institutions.filter(i => i.region === filterRegion);
+
+  // Top 25 표시
+  institutions = institutions.slice(0, 25);
+
+  const title = document.getElementById('region-chart-title');
+  const sub = document.getElementById('region-chart-sub');
+  if (title) title.textContent = filterRegion === 'all'
+    ? `📊 기관별 논문 수 랭킹 (국내 Top ${institutions.length})`
+    : `📊 ${REGION_META[filterRegion]?.label} 권역 기관 랭킹`;
+  if (sub) sub.textContent = '논문 수 기준 내림차순 · 막대 오른쪽 숫자는 평균 인용 횟수';
+
+  const names = institutions.map(i => i.name);
+  const counts = institutions.map(i => i.count);
+  const avgCits = institutions.map(i => i.avgCit);
+  const colors = institutions.map(i => {
+    const c = REGION_META[i.region]?.color || '#64748b';
+    return c + 'cc';  // 투명도 추가
+  });
+
+  const option = {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' },
+      formatter: params => {
+        const idx = params[0].dataIndex;
+        const inst = institutions[idx];
+        const rm = REGION_META[inst.region];
+        return `<div style="font-size:0.85rem;">
+          <strong>${inst.name}</strong><br>
+          ${rm?.icon || ''} ${rm?.label || '기타'}<br>
+          논문 수: <strong>${inst.count}편</strong><br>
+          평균 인용: <strong>${inst.avgCit}회</strong><br>
+          총 인용: ${inst.totalCit}회
+        </div>`;
+      }
+    },
+    grid: { left: '2%', right: '12%', top: '2%', bottom: '3%', containLabel: true },
+    xAxis: {
+      type: 'value',
+      axisLabel: { fontSize: 11, color: '#94a3b8' },
+      splitLine: { lineStyle: { color: '#e2e8f0', type: 'dashed' } },
+    },
+    yAxis: {
+      type: 'category',
+      data: names.slice().reverse(),
+      axisLabel: {
+        fontSize: 11.5,
+        color: '#334155',
+        fontFamily: 'Pretendard, sans-serif',
+        width: 140,
+        overflow: 'truncate',
+      },
+      axisTick: { show: false },
+      axisLine: { lineStyle: { color: '#e2e8f0' } },
+    },
+    series: [
+      {
+        type: 'bar',
+        data: counts.slice().reverse().map((v, i) => ({
+          value: v,
+          itemStyle: { color: colors[counts.length - 1 - i], borderRadius: [0, 4, 4, 0] },
+        })),
+        barMaxWidth: 28,
+        label: {
+          show: true,
+          position: 'right',
+          formatter: params => {
+            const idx = counts.length - 1 - params.dataIndex;
+            return `${counts[idx]}편  ·  인용 ${avgCits[idx]}`;
+          },
+          fontSize: 10.5,
+          color: '#64748b',
+        },
+      }
+    ],
+  };
+
+  // 차트 높이를 데이터 수에 맞게 조정
+  const height = Math.max(360, institutions.length * 32 + 60);
+  container.style.height = height + 'px';
+
+  if (regionChartInstance) {
+    regionChartInstance.dispose();
+  }
+  regionChartInstance = echarts.init(container);
+  regionChartInstance.setOption(option);
+}
+
+function renderRegionSideCard(regionId) {
+  const data = window.INSTITUTION_DATA;
+  const placeholder = document.getElementById('region-side-placeholder');
+  const content = document.getElementById('region-side-content');
+  if (!placeholder || !content || !data) return;
+
+  const meta = REGION_META[regionId];
+  const summary = data.regionSummary[regionId];
+  if (!summary) return;
+
+  const avgCit = summary.count > 0 ? (summary.totalCit / summary.count).toFixed(1) : '0.0';
+  const insts = data.institutions.filter(i => i.region === regionId).slice(0, 8);
+
+  // 헤더
+  document.getElementById('rsc-header').innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;">
+      <span style="font-size:1.8rem;">${meta.icon}</span>
+      <div>
+        <div style="font-size:1.1rem;font-weight:700;color:var(--text-base);">${meta.label} 권역</div>
+        <div style="font-size:0.75rem;color:var(--text-muted);">${meta.char}</div>
+      </div>
+    </div>`;
+
+  // KPI
+  document.getElementById('rsc-kpi').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;margin-bottom:1.2rem;">
+      <div class="rsc-kpi-item" style="border-left-color:${meta.color}">
+        <div class="rsc-kpi-val">${summary.count}<span style="font-size:0.75rem;font-weight:400;">편</span></div>
+        <div class="rsc-kpi-lbl">논문 수</div>
+      </div>
+      <div class="rsc-kpi-item" style="border-left-color:${meta.color}">
+        <div class="rsc-kpi-val">${avgCit}<span style="font-size:0.75rem;font-weight:400;">회</span></div>
+        <div class="rsc-kpi-lbl">평균 인용</div>
+      </div>
+      <div class="rsc-kpi-item" style="border-left-color:${meta.color}">
+        <div class="rsc-kpi-val">${insts.length}<span style="font-size:0.75rem;font-weight:400;">곳</span></div>
+        <div class="rsc-kpi-lbl">참여 기관</div>
+      </div>
+      <div class="rsc-kpi-item" style="border-left-color:${meta.color}">
+        <div class="rsc-kpi-val">${summary.totalCit}<span style="font-size:0.75rem;font-weight:400;">회</span></div>
+        <div class="rsc-kpi-lbl">총 인용</div>
+      </div>
+    </div>`;
+
+  // 기관 목록
+  document.getElementById('rsc-institutions').innerHTML = `
+    <div style="font-size:0.78rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:0.7rem;">대표 기관</div>
+    ${insts.map((inst, i) => `
+      <div class="rsc-inst-row">
+        <span class="rsc-inst-rank" style="background:${i === 0 ? meta.color : '#e2e8f0'};color:${i === 0 ? '#fff' : '#64748b'}">${i + 1}</span>
+        <span class="rsc-inst-name">${inst.name}</span>
+        <span class="rsc-inst-count">${inst.count}편</span>
+      </div>
+    `).join('')}`;
+
+  placeholder.style.display = 'none';
+  content.style.display = 'block';
+}
+
+/* ── 기관 데이터 내장 ── */
+window.INSTITUTION_DATA = {
+  "totalPapers": 447,
+  "institutions": [
+    {
+      "name": "서울시립대학교",
+      "region": "seoul",
+      "count": 196,
+      "avgCit": 3.6,
+      "totalCit": 699
+    },
+    {
+      "name": "서울대학교",
+      "region": "seoul",
+      "count": 19,
+      "avgCit": 1.7,
+      "totalCit": 33
+    },
+    {
+      "name": "건국대학교",
+      "region": "seoul",
+      "count": 14,
+      "avgCit": 3.1,
+      "totalCit": 44
+    },
+    {
+      "name": "전남대학교",
+      "region": "gwangju",
+      "count": 9,
+      "avgCit": 1.7,
+      "totalCit": 15
+    },
+    {
+      "name": "인천대학교",
+      "region": "gyeongi",
+      "count": 8,
+      "avgCit": 3.0,
+      "totalCit": 24
+    },
+    {
+      "name": "경희대학교",
+      "region": "seoul",
+      "count": 8,
+      "avgCit": 3.4,
+      "totalCit": 27
+    },
+    {
+      "name": "연세대학교",
+      "region": "seoul",
+      "count": 7,
+      "avgCit": 4.7,
+      "totalCit": 33
+    },
+    {
+      "name": "충북대학교",
+      "region": "daejeon",
+      "count": 6,
+      "avgCit": 2.5,
+      "totalCit": 15
+    },
+    {
+      "name": "한국예술종합학교",
+      "region": "seoul",
+      "count": 5,
+      "avgCit": 4.0,
+      "totalCit": 20
+    },
+    {
+      "name": "부산대학교",
+      "region": "busan",
+      "count": 5,
+      "avgCit": 1.8,
+      "totalCit": 9
+    },
+    {
+      "name": "한양대학교",
+      "region": "seoul",
+      "count": 5,
+      "avgCit": 4.0,
+      "totalCit": 20
+    },
+    {
+      "name": "고려대학교",
+      "region": "seoul",
+      "count": 5,
+      "avgCit": 6.0,
+      "totalCit": 30
+    },
+    {
+      "name": "전북대학교",
+      "region": "gwangju",
+      "count": 4,
+      "avgCit": 3.8,
+      "totalCit": 15
+    },
+    {
+      "name": "제주대학교",
+      "region": "jeju",
+      "count": 4,
+      "avgCit": 0.8,
+      "totalCit": 3
+    },
+    {
+      "name": "강원대학교",
+      "region": "gangwon",
+      "count": 4,
+      "avgCit": 3.0,
+      "totalCit": 12
+    },
+    {
+      "name": "동국대학교",
+      "region": "seoul",
+      "count": 4,
+      "avgCit": 5.5,
+      "totalCit": 22
+    },
+    {
+      "name": "덕성여자대학교",
+      "region": "seoul",
+      "count": 4,
+      "avgCit": 4.8,
+      "totalCit": 19
+    },
+    {
+      "name": "충남대학교",
+      "region": "daejeon",
+      "count": 4,
+      "avgCit": 2.8,
+      "totalCit": 11
+    },
+    {
+      "name": "경상국립대학교",
+      "region": "busan",
+      "count": 3,
+      "avgCit": 0.3,
+      "totalCit": 1
+    },
+    {
+      "name": "성균관대학교",
+      "region": "seoul",
+      "count": 3,
+      "avgCit": 1.3,
+      "totalCit": 4
+    },
+    {
+      "name": "성신여자대학교",
+      "region": "seoul",
+      "count": 3,
+      "avgCit": 3.3,
+      "totalCit": 10
+    },
+    {
+      "name": "서울과학기술대학교",
+      "region": "seoul",
+      "count": 3,
+      "avgCit": 0.7,
+      "totalCit": 2
+    },
+    {
+      "name": "한림대학교",
+      "region": "gangwon",
+      "count": 3,
+      "avgCit": 2.7,
+      "totalCit": 8
+    },
+    {
+      "name": "광운대학교",
+      "region": "seoul",
+      "count": 3,
+      "avgCit": 7.7,
+      "totalCit": 23
+    },
+    {
+      "name": "한국근현대문화사상",
+      "region": "unknown",
+      "count": 3,
+      "avgCit": 26.3,
+      "totalCit": 79
+    },
+    {
+      "name": "Globalization Research Center and Department of Urban & Regional Planning University of Hawaii",
+      "region": "foreign",
+      "count": 3,
+      "avgCit": 2.7,
+      "totalCit": 8
+    },
+    {
+      "name": "중국 상해사회과학원 역사",
+      "region": "foreign",
+      "count": 3,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "부경대학교",
+      "region": "busan",
+      "count": 3,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "세명대학교",
+      "region": "daejeon",
+      "count": 2,
+      "avgCit": 5.0,
+      "totalCit": 10
+    },
+    {
+      "name": "한국학중앙",
+      "region": "unknown",
+      "count": 2,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "한국외국어대학교",
+      "region": "seoul",
+      "count": 2,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "동의대학교",
+      "region": "busan",
+      "count": 2,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "한국전통문화대학교",
+      "region": "daejeon",
+      "count": 2,
+      "avgCit": 4.0,
+      "totalCit": 8
+    },
+    {
+      "name": "대진대학교",
+      "region": "gyeongi",
+      "count": 2,
+      "avgCit": 5.0,
+      "totalCit": 10
+    },
+    {
+      "name": "인하대학교",
+      "region": "gyeongi",
+      "count": 2,
+      "avgCit": 5.5,
+      "totalCit": 11
+    },
+    {
+      "name": "영남대학교",
+      "region": "daegu",
+      "count": 2,
+      "avgCit": 7.0,
+      "totalCit": 14
+    },
+    {
+      "name": "원광대학교",
+      "region": "gwangju",
+      "count": 2,
+      "avgCit": 5.5,
+      "totalCit": 11
+    },
+    {
+      "name": "홍익대학교",
+      "region": "seoul",
+      "count": 2,
+      "avgCit": 4.5,
+      "totalCit": 9
+    },
+    {
+      "name": "일본 도시샤대학교",
+      "region": "foreign",
+      "count": 2,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "공주대학교",
+      "region": "daejeon",
+      "count": 2,
+      "avgCit": 3.0,
+      "totalCit": 6
+    },
+    {
+      "name": "중국 복단대학교 역",
+      "region": "foreign",
+      "count": 2,
+      "avgCit": 0.5,
+      "totalCit": 1
+    },
+    {
+      "name": "중앙대학교",
+      "region": "seoul",
+      "count": 2,
+      "avgCit": 2.5,
+      "totalCit": 5
+    },
+    {
+      "name": "이화여자대학교",
+      "region": "seoul",
+      "count": 2,
+      "avgCit": 10.5,
+      "totalCit": 21
+    },
+    {
+      "name": "강릉원주대학교",
+      "region": "gangwon",
+      "count": 2,
+      "avgCit": 3.5,
+      "totalCit": 7
+    },
+    {
+      "name": "신한대학교",
+      "region": "gyeongi",
+      "count": 2,
+      "avgCit": 2.5,
+      "totalCit": 5
+    },
+    {
+      "name": "영산대학교",
+      "region": "busan",
+      "count": 2,
+      "avgCit": 7.5,
+      "totalCit": 15
+    },
+    {
+      "name": "경북대학교",
+      "region": "daegu",
+      "count": 2,
+      "avgCit": 7.0,
+      "totalCit": 14
+    },
+    {
+      "name": "용인대학교",
+      "region": "unknown",
+      "count": 2,
+      "avgCit": 11.0,
+      "totalCit": 22
+    },
+    {
+      "name": "국민대학교 영상디자인 교수",
+      "region": "seoul",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "청주대학교",
+      "region": "daejeon",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "공군사관학교",
+      "region": "unknown",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "西安交通利物浦大學",
+      "region": "unknown",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "아주대학교",
+      "region": "gyeongi",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "국민대학교 중국인문사회",
+      "region": "seoul",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "웨스트민스트 고전기독학교",
+      "region": "unknown",
+      "count": 1,
+      "avgCit": 1.0,
+      "totalCit": 1
+    },
+    {
+      "name": "Louisiana State University",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 1.0,
+      "totalCit": 1
+    },
+    {
+      "name": "동경학예대학 연합",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "국립문환재",
+      "region": "unknown",
+      "count": 1,
+      "avgCit": 4.0,
+      "totalCit": 4
+    },
+    {
+      "name": "국민대학교",
+      "region": "seoul",
+      "count": 1,
+      "avgCit": 1.0,
+      "totalCit": 1
+    },
+    {
+      "name": "New School for Social Research",
+      "region": "unknown",
+      "count": 1,
+      "avgCit": 4.0,
+      "totalCit": 4
+    },
+    {
+      "name": "통일",
+      "region": "unknown",
+      "count": 1,
+      "avgCit": 2.0,
+      "totalCit": 2
+    },
+    {
+      "name": "City University of Hong Kong",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 1.0,
+      "totalCit": 1
+    },
+    {
+      "name": "㈜씨엔케이",
+      "region": "unknown",
+      "count": 1,
+      "avgCit": 1.0,
+      "totalCit": 1
+    },
+    {
+      "name": "서울사회복지대학교",
+      "region": "seoul",
+      "count": 1,
+      "avgCit": 14.0,
+      "totalCit": 14
+    },
+    {
+      "name": "나고야대학교",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 2.0,
+      "totalCit": 2
+    },
+    {
+      "name": "University of Bamberg",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "The University of Melbourne",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "상하이",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "상하이사범대 도시문화연구",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "서울시정개발",
+      "region": "seoul",
+      "count": 1,
+      "avgCit": 14.0,
+      "totalCit": 14
+    },
+    {
+      "name": "일본 동경대학교 동양문화",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 2.0,
+      "totalCit": 2
+    },
+    {
+      "name": "독일 막스플랑크 사회인류학",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "루뱅대학교 경제사회윤리",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 3.0,
+      "totalCit": 3
+    },
+    {
+      "name": "영국 맨체스터 대학교",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "중국무한대학",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "경상대학교",
+      "region": "busan",
+      "count": 1,
+      "avgCit": 2.0,
+      "totalCit": 2
+    },
+    {
+      "name": "서강대학교",
+      "region": "seoul",
+      "count": 1,
+      "avgCit": 1.0,
+      "totalCit": 1
+    },
+    {
+      "name": "한신대학교",
+      "region": "gyeongi",
+      "count": 1,
+      "avgCit": 12.0,
+      "totalCit": 12
+    },
+    {
+      "name": "Ritsumeikan University",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 1.0,
+      "totalCit": 1
+    },
+    {
+      "name": "Yeshiva University",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "창원대학교",
+      "region": "busan",
+      "count": 1,
+      "avgCit": 4.0,
+      "totalCit": 4
+    },
+    {
+      "name": "서울",
+      "region": "seoul",
+      "count": 1,
+      "avgCit": 8.0,
+      "totalCit": 8
+    },
+    {
+      "name": "Cambridge University",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 1.0,
+      "totalCit": 1
+    },
+    {
+      "name": "글로벌 정치경제",
+      "region": "unknown",
+      "count": 1,
+      "avgCit": 3.0,
+      "totalCit": 3
+    },
+    {
+      "name": "토지+자유",
+      "region": "unknown",
+      "count": 1,
+      "avgCit": 2.0,
+      "totalCit": 2
+    },
+    {
+      "name": "싱가포르국립대학교",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 1.0,
+      "totalCit": 1
+    },
+    {
+      "name": "일본 가나가와대학교",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "일본 오사카시립대학 도시연구플라자 글로벌COE 프로그램",
+      "region": "unknown",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "미국 뉴욕대 로스쿨",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "독일 다름슈타트대학교",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "일본 동경학예대학교",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 1.0,
+      "totalCit": 1
+    },
+    {
+      "name": "안양대학교",
+      "region": "gyeongi",
+      "count": 1,
+      "avgCit": 2.0,
+      "totalCit": 2
+    },
+    {
+      "name": "목원대학교",
+      "region": "daejeon",
+      "count": 1,
+      "avgCit": 3.0,
+      "totalCit": 3
+    },
+    {
+      "name": "경북",
+      "region": "unknown",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "성산효대학교",
+      "region": "unknown",
+      "count": 1,
+      "avgCit": 9.0,
+      "totalCit": 9
+    },
+    {
+      "name": "立命館大学",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "단국대학교과",
+      "region": "daejeon",
+      "count": 1,
+      "avgCit": 1.0,
+      "totalCit": 1
+    },
+    {
+      "name": "한국연구재단",
+      "region": "unknown",
+      "count": 1,
+      "avgCit": 3.0,
+      "totalCit": 3
+    },
+    {
+      "name": "숙명여자대학교",
+      "region": "seoul",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "레스파스",
+      "region": "unknown",
+      "count": 1,
+      "avgCit": 1.0,
+      "totalCit": 1
+    },
+    {
+      "name": "한국체육대학교",
+      "region": "seoul",
+      "count": 1,
+      "avgCit": 2.0,
+      "totalCit": 2
+    },
+    {
+      "name": "한국해양대학교",
+      "region": "busan",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "목포대학교",
+      "region": "gwangju",
+      "count": 1,
+      "avgCit": 4.0,
+      "totalCit": 4
+    },
+    {
+      "name": "숭실대학교",
+      "region": "seoul",
+      "count": 1,
+      "avgCit": 4.0,
+      "totalCit": 4
+    },
+    {
+      "name": "충주대학교",
+      "region": "daejeon",
+      "count": 1,
+      "avgCit": 4.0,
+      "totalCit": 4
+    },
+    {
+      "name": "서울신학대학교",
+      "region": "gyeongi",
+      "count": 1,
+      "avgCit": 3.0,
+      "totalCit": 3
+    },
+    {
+      "name": "신구대학교",
+      "region": "gyeongi",
+      "count": 1,
+      "avgCit": 2.0,
+      "totalCit": 2
+    },
+    {
+      "name": "선문대학교",
+      "region": "daejeon",
+      "count": 1,
+      "avgCit": 2.0,
+      "totalCit": 2
+    },
+    {
+      "name": "대구한의대학교",
+      "region": "daegu",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "웨스트민스터신학대학교",
+      "region": "seoul",
+      "count": 1,
+      "avgCit": 4.0,
+      "totalCit": 4
+    },
+    {
+      "name": "프랑스 파리8대학",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "호치민국립대학교 인문 한국",
+      "region": "foreign",
+      "count": 1,
+      "avgCit": 0.0,
+      "totalCit": 0
+    },
+    {
+      "name": "원예과학특작원",
+      "region": "unknown",
+      "count": 1,
+      "avgCit": 1.0,
+      "totalCit": 1
+    }
+  ],
+  "regionSummary": {
+    "seoul": {
+      "count": 298,
+      "totalCit": 1069,
+      "topInstitutions": [
+        "서울시립대학교",
+        "서울대학교",
+        "건국대학교",
+        "경희대학교",
+        "연세대학교"
+      ]
+    },
+    "gwangju": {
+      "count": 16,
+      "totalCit": 45,
+      "topInstitutions": [
+        "전남대학교",
+        "전북대학교",
+        "원광대학교",
+        "목포대학교"
+      ]
+    },
+    "gyeongi": {
+      "count": 19,
+      "totalCit": 69,
+      "topInstitutions": [
+        "인천대학교",
+        "대진대학교",
+        "인하대학교",
+        "신한대학교",
+        "아주대학교"
+      ]
+    },
+    "daejeon": {
+      "count": 21,
+      "totalCit": 60,
+      "topInstitutions": [
+        "충북대학교",
+        "충남대학교",
+        "세명대학교",
+        "한국전통문화대학교",
+        "공주대학교"
+      ]
+    },
+    "busan": {
+      "count": 18,
+      "totalCit": 31,
+      "topInstitutions": [
+        "부산대학교",
+        "경상국립대학교",
+        "부경대학교",
+        "동의대학교",
+        "영산대학교"
+      ]
+    },
+    "jeju": {
+      "count": 4,
+      "totalCit": 3,
+      "topInstitutions": [
+        "제주대학교"
+      ]
+    },
+    "gangwon": {
+      "count": 9,
+      "totalCit": 27,
+      "topInstitutions": [
+        "강원대학교",
+        "한림대학교",
+        "강릉원주대학교"
+      ]
+    },
+    "unknown": {
+      "count": 22,
+      "totalCit": 132,
+      "topInstitutions": [
+        "한국근현대문화사상",
+        "한국학중앙",
+        "용인대학교",
+        "공군사관학교",
+        "西安交通利物浦大學"
+      ]
+    },
+    "foreign": {
+      "count": 34,
+      "totalCit": 22,
+      "topInstitutions": [
+        "Globalization Research Center and Department of Urban & Regional Planning University of Hawaii",
+        "중국 상해사회과학원 역사",
+        "일본 도시샤대학교",
+        "중국 복단대학교 역",
+        "Louisiana State University"
+      ]
+    },
+    "daegu": {
+      "count": 5,
+      "totalCit": 28,
+      "topInstitutions": [
+        "영남대학교",
+        "경북대학교",
+        "대구한의대학교"
+      ]
+    }
+  }
 };

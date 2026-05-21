@@ -8,12 +8,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3/dist/chartjs-plugin-annotation.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
-  <script src="korea.js"></script>
-  <script src="keyword_data.js"></script>
-  <script src="theme_data.js"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -37,7 +31,7 @@
       <div class="detail-nav-header">개관에서 심층으로</div>
       <div class="detail-nav-items">
 
-        <button class="detail-nav-btn" onclick="showDetailView('kpi')" aria-label="연구자 생태계 페이지로 ">
+        <button type="button" class="detail-nav-btn" onclick="showDetailView('kpi')" aria-label="연구자 생태계 페이지로 ">
           <span class="dnb-icon">👥</span>
           <div class="dnb-text">
             <div class="dnb-name">연구자 생태계</div>
@@ -47,7 +41,7 @@
         </button>
 
         <!-- 추후 페이지 토글 (coming soon) -->
-        <button class="detail-nav-btn" onclick="showDetailView('discourse')" aria-label="담론의 진화 페이지로">
+        <button type="button" class="detail-nav-btn" onclick="showDetailView('discourse')" aria-label="담론의 진화 페이지로">
           <span class="dnb-icon">📈</span>
           <div class="dnb-text">
             <div class="dnb-name">담론의 진화</div>
@@ -56,14 +50,14 @@
           <span class="dnb-arrow">›</span>
         </button>
 
-        <div class="detail-nav-btn detail-nav-btn-soon">
+        <button type="button" class="detail-nav-btn" onclick="showDetailView('region')" aria-label="지역별 기관 페이지로">
           <span class="dnb-icon">🗺️</span>
           <div class="dnb-text">
             <div class="dnb-name">지역별 기관</div>
             <div class="dnb-sub">서울 바깥의 연구는?</div>
           </div>
-          <span class="dnb-soon">soon</span>
-        </div>
+          <span class="dnb-arrow">›</span>
+        </button>
 
         <div class="detail-nav-btn detail-nav-btn-soon">
           <span class="dnb-icon">🔭</span>
@@ -328,13 +322,15 @@
   ══════════════════════════════════════════ -->
   <div id="detail-kpi" class="detail-view hidden">
     <div class="detail-header">
-      <button class="back-btn" onclick="hideDetailView()">
-        <span class="back-arrow">←</span> 대시보드 홈으로
-      </button>
-      <div class="detail-header-title">
-        <span class="detail-badge">DEEP DIVE</span>
-        <h2>연구 생태계는 누가 유지하는가?</h2>
-        <p>KCI 논문 447편 · 저자 300명의 참여 패턴 분석</p>
+      <div class="detail-header-inner">
+        <button class="back-btn" onclick="hideDetailView()">
+          <span class="back-arrow">←</span> 대시보드 홈으로
+        </button>
+        <div class="detail-header-title">
+          <span class="detail-badge">DEEP DIVE</span>
+          <h2>연구 생태계는 누가 유지하는가?</h2>
+          <p>KCI 논문 447편 · 저자 300명의 참여 패턴 분석</p>
+        </div>
       </div>
     </div>
 
@@ -443,13 +439,15 @@
   ══════════════════════════════════════════ -->
   <div id="detail-discourse" class="detail-view hidden">
     <div class="detail-header">
-      <button class="back-btn" onclick="hideDetailView()">
-        <span class="back-arrow">←</span> 대시보드 홈으로
-      </button>
-      <div class="detail-header-title">
-        <span class="detail-badge">DEEP DIVE</span>
-        <h2>담론의 진화 — 키워드는 어떻게 변했는가?</h2>
-        <p>KCI 논문 447편의 저자 키워드 데이터를 기반으로 도시인문학 담론의 생애주기를 추적합니다</p>
+      <div class="detail-header-inner">
+        <button class="back-btn" onclick="hideDetailView()">
+          <span class="back-arrow">←</span> 대시보드 홈으로
+        </button>
+        <div class="detail-header-title">
+          <span class="detail-badge">DEEP DIVE</span>
+          <h2>담론의 진화 — 키워드는 어떻게 변했는가?</h2>
+          <p>KCI 논문 447편의 저자 키워드 데이터를 기반으로 도시인문학 담론의 생애주기를 추적합니다</p>
+        </div>
       </div>
     </div>
 
@@ -497,24 +495,106 @@
             <div id="chart-stream" style="width:100%; height:380px;"></div>
           </div>
           
-          <!-- 키워드 지배력 분석 패널 -->
-          <div id="keyword-monopoly-panel" style="display:none; width: 280px; flex-shrink: 0; padding: 1.5rem; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md);">
-            <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
-              <h4 id="km-title" style="font-size: 1.1rem; color: var(--text-base); margin: 0; line-height: 1.3;"></h4>
-              <span id="km-total" style="font-size: 0.85rem; color: var(--text-muted); background: var(--bg-hover); padding: 0.3rem 0.6rem; border-radius: 6px; display: inline-block;"></span>
+          <!-- 우측 영역 컨테이너 -->
+          <div class="stream-right-panel" style="display: flex; flex-direction: column; gap: 1.2rem; width: 280px; flex-shrink: 0; max-height: 600px; overflow-y: auto; overflow-x: hidden; padding-right: 0.3rem;">
+            
+            <!-- 키워드 지배력 분석 패널 -->
+            <div id="keyword-monopoly-panel" style="width: 100%; padding: 1.5rem; box-sizing: border-box; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); display: flex; flex-direction: column;">
+            
+            <!-- 초기 안내 메시지 (키워드 미선택 시) -->
+            <div id="km-placeholder" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: var(--text-muted); padding: 2rem 0;">
+              <div style="font-size: 2rem; margin-bottom: 0.8rem; opacity: 0.5;">👆</div>
+              <div style="font-size: 0.95rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--text-primary);">키워드를 클릭하세요</div>
+              <div style="font-size: 0.75rem; line-height: 1.5;">차트의 데이터 포인트를 클릭하면<br>해당 키워드의 저자 분석이 제공됩니다.</div>
             </div>
-            <div id="km-list" style="display: flex; flex-direction: column; gap: 0.8rem;">
+            
+            <!-- 실제 데이터 영역 (초기엔 숨김) -->
+            <div id="km-content" style="display: none; flex-direction: column;">
+              <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
+                <h4 id="km-title" style="font-size: 0.95rem; color: var(--text-base); margin: 0; line-height: 1.3;"></h4>
+                <span id="km-total" style="font-size: 0.75rem; color: var(--text-muted); background: var(--bg-hover); padding: 0.3rem 0.6rem; border-radius: 6px; display: inline-block;"></span>
+              </div>
+              <div id="km-list" style="display: flex; flex-direction: column; gap: 0.8rem;">
+                <!-- JS로 채움 -->
+              </div>
+            </div>
+          </div>
+          
+          <!-- 테마별 포함 키워드 패널 -->
+          <div id="theme-keywords-panel" style="display: none; width: 100%; padding: 1.5rem; box-sizing: border-box; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-md); flex-direction: column;">
+            <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
+              <h4 style="font-size: 0.95rem; color: var(--text-base); margin: 0; line-height: 1.3;">📌 테마 포함 키워드</h4>
+              <span id="tk-total" style="font-size: 0.75rem; color: var(--text-muted); background: var(--bg-hover); padding: 0.3rem 0.6rem; border-radius: 6px; display: inline-block;"></span>
+            </div>
+            <div id="tk-list" style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
               <!-- JS로 채움 -->
             </div>
           </div>
           
+        </div><!-- /stream-right-panel -->
+      </div><!-- /stream-panel -->
+    </div><!-- /detail-card -->
+
+  </div><!-- /discourse-body -->
+</div><!-- /detail-discourse -->
+
+  <!-- ══════════════════════════════════════════
+       상세 뷰 | 지역별 기관
+  ══════════════════════════════════════════ -->
+  <div id="detail-region" class="detail-view hidden">
+    <div class="detail-header">
+      <div class="detail-header-inner">
+        <button class="back-btn" onclick="hideDetailView()"><span class="back-arrow">←</span> 대시보드 홈으로</button>
+        <div class="detail-header-title">
+          <span class="detail-badge">DEEP DIVE</span>
+          <h2>지역별 기관 — 서울 바깥의 연구는?</h2>
+          <p>KCI 논문 447편의 주저자 소속기관을 기반으로 한국 도시인문학의 지리적 분포를 분석합니다</p>
         </div>
       </div>
+    </div>
 
+    <div class="detail-body region-body">
 
+      <!-- KPI 바 -->
+      <div class="region-kpi-bar" id="region-kpi-bar">
+        <!-- JS로 채움 -->
+      </div>
 
-    </div><!-- /discourse-body -->
-  </div><!-- /detail-discourse -->
+      <!-- 지역 필터 탭 -->
+      <div class="region-filter-tabs" id="region-filter-tabs">
+        <!-- JS로 채움 -->
+      </div>
+
+      <!-- 메인 콘텐츠: 차트 + 사이드 카드 -->
+      <div class="region-main-layout">
+
+        <!-- 기관 랭킹 차트 -->
+        <div class="detail-card region-chart-card">
+          <div class="detail-card-header">
+            <h3 id="region-chart-title">📊 기관별 논문 수 랭킹</h3>
+            <p id="region-chart-sub">논문 수 기준 내림차순 · 막대 오른쪽 숫자는 평균 인용 횟수</p>
+          </div>
+          <div id="chart-region-bar" style="width:100%; height:480px;"></div>
+        </div>
+
+        <!-- 사이드 상세 카드 -->
+        <div class="detail-card region-side-card" id="region-side-card">
+          <div class="region-side-placeholder" id="region-side-placeholder">
+            <div class="rsp-icon">🗺️</div>
+            <div class="rsp-title">지역 탭을 클릭하세요</div>
+            <div class="rsp-desc">해당 권역의 기관 분포와<br>연구 특성이 표시됩니다.</div>
+          </div>
+          <div class="region-side-content" id="region-side-content" style="display:none;">
+            <div class="rsc-header" id="rsc-header"></div>
+            <div class="rsc-kpi" id="rsc-kpi"></div>
+            <div class="rsc-institutions" id="rsc-institutions"></div>
+          </div>
+        </div>
+
+      </div><!-- /region-main-layout -->
+    </div><!-- /detail-body -->
+  </div><!-- /detail-region -->
+
 
   <!-- 논문 상세 모달 -->
   <div id="paper-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
@@ -535,6 +615,12 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3/dist/chartjs-plugin-annotation.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+  <script src="korea.js"></script>
+  <script src="keyword_data.js"></script>
+  <script src="theme_data.js"></script>
   <script src="keyword_authors.js"></script>
   <script src="app.js"></script>
 </body>
