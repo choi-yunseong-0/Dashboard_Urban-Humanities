@@ -59,14 +59,14 @@
           <span class="dnb-arrow">›</span>
         </button>
 
-        <div class="detail-nav-btn detail-nav-btn-soon">
+        <button type="button" class="detail-nav-btn" onclick="showDetailView('perspective')" aria-label="인문학의 편중 페이지로">
           <span class="dnb-icon">🔭</span>
           <div class="dnb-text">
             <div class="dnb-name">인문학의 편중</div>
             <div class="dnb-sub">어느 관점에 치중하는가?</div>
           </div>
-          <span class="dnb-soon">soon</span>
-        </div>
+          <span class="dnb-arrow">›</span>
+        </button>
 
         <div class="detail-nav-btn detail-nav-btn-soon">
           <span class="dnb-icon">🏆</span>
@@ -580,20 +580,142 @@
         <!-- 사이드 상세 카드 -->
         <div class="detail-card region-side-card" id="region-side-card">
           <div class="region-side-placeholder" id="region-side-placeholder">
-            <div class="rsp-icon">🗺️</div>
-            <div class="rsp-title">지역 탭을 클릭하세요</div>
-            <div class="rsp-desc">해당 권역의 기관 분포와<br>연구 특성이 표시됩니다.</div>
+            <div class="rsp-icon">🏢</div>
+            <div class="rsp-title">기관을 클릭하세요</div>
+            <div class="rsp-desc">차트에서 기관을 선택하면<br>해당 기관의 주요 연구 동향이 표시됩니다.</div>
           </div>
+          
+          <!-- 권역별 요약 뷰 (기존 유지, 필요 시 사용) -->
           <div class="region-side-content" id="region-side-content" style="display:none;">
             <div class="rsc-header" id="rsc-header"></div>
             <div class="rsc-kpi" id="rsc-kpi"></div>
             <div class="rsc-institutions" id="rsc-institutions"></div>
+            
+            <div id="region-temporal-sec" style="margin-top: 1.5rem;">
+              <h4 style="font-size:0.95rem; margin-bottom:0.5rem; color:var(--text-base);">⏳ 지역별 연구 관심사 이동</h4>
+              <div style="display:flex; flex-direction:column; gap:0.6rem; background:var(--bg-hover); padding:1rem; border-radius:var(--radius-md);">
+                <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                  <div style="font-size:0.75rem; font-weight:600; color:#8b5cf6;">[1기] 2003~2015 탐색기</div>
+                  <div id="region-temp-past" style="display:flex; flex-wrap:wrap; gap:0.3rem;"></div>
+                </div>
+                <div style="border-top:1px dashed var(--border); margin:0.2rem 0;"></div>
+                <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                  <div style="font-size:0.75rem; font-weight:600; color:#3b82f6;">[2기] 2016~2018 대폭발기</div>
+                  <div id="region-temp-boom" style="display:flex; flex-wrap:wrap; gap:0.3rem;"></div>
+                </div>
+                <div style="border-top:1px dashed var(--border); margin:0.2rem 0;"></div>
+                <div style="display:flex; flex-direction:column; gap:0.3rem;">
+                  <div style="font-size:0.75rem; font-weight:600; color:#10b981;">[3기] 2019~2025 전환기</div>
+                  <div id="region-temp-recent" style="display:flex; flex-wrap:wrap; gap:0.3rem;"></div>
+                </div>
+              </div>
+            </div>
+          </div> <!-- /region-side-content -->
+
+          <!-- 기관별 세부 동향 뷰 (신규 추가) -->
+          <div class="inst-side-content" id="inst-side-content" style="display:none; flex-direction:column; gap:1.5rem; max-height:800px; overflow-y:auto; padding-right:0.5rem;">
+            <!-- 1. 헤더: 기관명 및 논문수 -->
+            <div id="inst-header" style="border-bottom: 1px solid var(--border); padding-bottom: 1rem;">
+              <div style="font-size:0.8rem; font-weight:600; color:var(--accent); margin-bottom:0.3rem;" id="inst-region-badge"></div>
+              <h3 id="inst-name" style="font-size:1.4rem; color:var(--text-base); margin-bottom:0.6rem; word-break:keep-all;"></h3>
+              <div style="display:flex; gap:1rem; font-size:0.85rem; color:var(--text-muted);">
+                <span>논문 <strong id="inst-count" style="color:var(--text-base);"></strong>편</span>
+                <span>총 피인용 <strong id="inst-cit" style="color:var(--text-base);"></strong>회</span>
+              </div>
+            </div>
+
+            <!-- 2. 특화 키워드 영역 (TF-IDF) -->
+            <div id="inst-tfidf-sec">
+              <div id="inst-tfidf-title" style="font-size:0.75rem; font-weight:600; color:#ef4444; margin-bottom:0.3rem;">✨ 전국 평균 대비 특화도 높음</div>
+              <div id="inst-tfidf-list" style="display:flex; flex-wrap:wrap; gap:0.4rem;"></div>
+            </div>
+
+            <!-- 3. 관점 성향 영역 -->
+            <div id="inst-persp-sec">
+              <h4 style="font-size:0.95rem; margin-bottom:0.5rem; color:var(--text-base);">🧭 도시를 바라보는 관점 비중</h4>
+              <div id="inst-persp-bar" style="display:flex; width:100%; height:12px; border-radius:6px; overflow:hidden; margin-bottom:0.5rem; background:var(--bg-hover);"></div>
+              <div id="inst-persp-legend" style="display:flex; flex-wrap:wrap; gap:0.5rem; font-size:0.75rem;"></div>
+            </div>
+
+            <!-- 4. 대표 연구자 영역 -->
+            <div id="inst-authors-sec">
+              <h4 style="font-size:0.95rem; margin-bottom:0.5rem; color:var(--text-base);">👥 이 기관의 대표 연구자</h4>
+              <div id="inst-authors-list" style="display:flex; flex-direction:column; gap:0.4rem;"></div>
+            </div>
+
+
+
+            <!-- 6. 대표 논문 영역 -->
+            <div id="inst-papers-sec">
+              <h4 style="font-size:0.95rem; margin-bottom:0.6rem; color:var(--text-base);">📄 피인용 상위 논문</h4>
+              <div id="inst-papers-list" style="display:flex; flex-direction:column; gap:0.8rem;"></div>
+            </div>
           </div>
         </div>
 
       </div><!-- /region-main-layout -->
     </div><!-- /detail-body -->
   </div><!-- /detail-region -->
+
+  <!-- 인문학의 편중 뷰 -->
+  <div id="detail-perspective" class="detail-view hidden">
+    <div class="detail-header">
+      <div class="detail-header-inner">
+        <button class="back-btn" onclick="hideDetailView()"><span class="back-arrow">←</span> 대시보드 홈으로</button>
+        <div class="detail-header-title">
+          <span class="detail-badge">DEEP DIVE</span>
+          <h2>인문학의 편중 — 어느 관점에 치중하는가?</h2>
+          <p>도시인문학 447편의 논문을 5대 관점(Perspective)으로 분류하여, 학계의 지적 편중 현상과 인용의 특징을 분석합니다.</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="detail-body" style="display:grid; grid-template-columns: 400px 1fr; gap:2rem; align-items:start;">
+      
+      <!-- 좌측: 메인 도넛 차트 및 탭 -->
+      <div style="display:flex; flex-direction:column; gap:1.5rem; position:sticky; top:2rem;">
+        <div class="detail-card" style="display:flex; flex-direction:column; align-items:center; padding-bottom:1.5rem;">
+          <div class="detail-card-header" style="text-align:center; width:100%; padding-bottom:0; border-bottom:none;">
+            <h3 style="margin-bottom:0; font-size:1.1rem;">5가지 관점 비중</h3>
+          </div>
+          <div id="perspective-chart" style="width:100%; height:320px;"></div>
+          
+          <!-- 탭 내비게이션 (범례 대체) -->
+          <div style="display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; padding: 0 1rem;" id="perspective-tabs">
+            <!-- 탭 버튼들은 JS에서 렌더링 -->
+          </div>
+        </div>
+      </div>
+      
+      <!-- 우측: 관점별 심층 분석 패널 -->
+      <div class="detail-card" id="perspective-detail-panel" style="display:none; flex-direction:column; gap: 2rem; padding: 2rem;">
+        
+        <!-- 왼쪽: 키워드 & 시기별 동향 -->
+        <div style="display:flex; flex-direction:column; gap:1.5rem;">
+          <div>
+            <h4 style="font-size:1.05rem; margin-bottom:0.8rem; color:var(--text-base); display:flex; align-items:center; gap:0.5rem;"><span style="font-size:1.2rem;">🔑</span> 핵심 키워드</h4>
+            <div id="persp-keywords" style="display:flex; flex-wrap:wrap; gap:0.5rem;"></div>
+          </div>
+          
+          <div>
+            <h4 style="font-size:1.05rem; margin-bottom:0.8rem; color:var(--text-base); display:flex; align-items:center; gap:0.5rem;"><span style="font-size:1.2rem;">📈</span> 시기별 논문 발생량</h4>
+            <div style="display:flex; flex-direction:column; gap:0.8rem;" id="persp-temporal">
+              <!-- JS에서 채움 -->
+            </div>
+          </div>
+        </div>
+        
+        <!-- 오른쪽: 피인용 상위 논문 -->
+        <div style="display:flex; flex-direction:column; gap:1rem;">
+          <h4 style="font-size:1.05rem; margin-bottom:0.2rem; color:var(--text-base); display:flex; align-items:center; gap:0.5rem;"><span style="font-size:1.2rem;">📄</span> 피인용 상위 논문</h4>
+          <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.5rem;">이 관점의 기초를 형성하는 핵심 문헌들입니다.</div>
+          <div id="persp-papers" style="display:flex; flex-direction:column; gap:1rem;"></div>
+        </div>
+        
+      </div>
+      
+    </div>
+  </div>
 
 
   <!-- 논문 상세 모달 -->
@@ -611,7 +733,13 @@
       <div id="pm-abstract" style="font-size: 0.95rem; line-height: 1.6; color: var(--text-muted); margin-bottom: 1.5rem; white-space: pre-wrap;"></div>
       
       <h4 style="font-size: 1rem; margin-bottom: 0.5rem; color: var(--text-base);">키워드 (Keywords)</h4>
-      <div id="pm-keywords" style="font-size: 0.9rem; color: var(--accent); line-height: 1.5;"></div>
+      <div id="pm-keywords" style="font-size: 0.9rem; color: var(--accent); line-height: 1.5; margin-bottom: 1.5rem;"></div>
+      
+      <div style="text-align: right;">
+        <a id="pm-link-btn" href="#" target="_blank" style="display: none; background-color: var(--accent); color: #fff; padding: 0.6rem 1.2rem; border-radius: var(--radius-md); text-decoration: none; font-size: 0.9rem; font-weight: 600; box-shadow: var(--shadow-sm); transition: background-color 0.2s;">
+          <span class="icon">🔗</span> 원문 보기
+        </a>
+      </div>
     </div>
   </div>
 
@@ -619,6 +747,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3/dist/chartjs-plugin-annotation.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
   <script src="korea.js"></script>
+  <script src="perspective_data.js"></script>
   <script src="keyword_data.js"></script>
   <script src="theme_data.js"></script>
   <script src="keyword_authors.js"></script>
