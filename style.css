@@ -1589,7 +1589,7 @@ body {
 
 .abt-row {
   display: grid;
-  grid-template-columns: 24px 60px 40px 1fr 44px 120px;
+  grid-template-columns: 24px 180px 40px 1fr 44px 120px;
   align-items: center;
   gap: 0.7rem;
   padding: 0.5rem 0.6rem;

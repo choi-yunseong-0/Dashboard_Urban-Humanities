@@ -734,16 +734,16 @@ function hideDetailView() {
    KPI 상세 | 연구 생태계 도넛 차트
 ══════════════════════════════════════════ */
 const CORE_AUTHORS = [
-  { name: '홍남희',  count: 18, firstAuthor: 15 },
-  { name: '유인혁',  count: 16, firstAuthor: 16 },
-  { name: '홍용진',  count: 15, firstAuthor: 15 },
-  { name: '김은주',  count: 14, firstAuthor: 13 },
-  { name: '곽노완',  count: 14, firstAuthor: 14 },
-  { name: '김태연',  count: 11, firstAuthor: 10 },
-  { name: '정희원',  count: 11, firstAuthor: 11 },
-  { name: '오창룡',  count:  7, firstAuthor:  7 },
-  { name: '노영희',  count:  6, firstAuthor:  5 },
-  { name: '심광현',  count:  5, firstAuthor:  5 },
+  { name: '홍남희',  count: 18, firstAuthor: 15, affiliation: '서울시립대', field: '신문방송학' },
+  { name: '유인혁',  count: 16, firstAuthor: 16, affiliation: '서울시립대', field: '국어국문학' },
+  { name: '홍용진',  count: 15, firstAuthor: 15, affiliation: '서울시립대', field: '역사학' },
+  { name: '김은주',  count: 14, firstAuthor: 13, affiliation: '서울시립대', field: '인문학' },
+  { name: '곽노완',  count: 14, firstAuthor: 14, affiliation: '서울시립대', field: '인문학' },
+  { name: '김태연',  count: 11, firstAuthor: 10, affiliation: '서울대', field: '인문학' },
+  { name: '정희원',  count: 11, firstAuthor: 11, affiliation: '서울시립대', field: '영문학' },
+  { name: '오창룡',  count:  7, firstAuthor:  7, affiliation: '서울시립대', field: '사회과학' },
+  { name: '노영희',  count:  6, firstAuthor:  5, affiliation: '건국대', field: '문헌정보학' },
+  { name: '심광현',  count:  5, firstAuthor:  5, affiliation: '한국예술종합학교', field: '인문학' },
 ];
 
 let ecosystemDonutChart = null;
@@ -768,7 +768,10 @@ function initAuthorBarTable() {
     return `
       <div class="abt-row" onclick="showAuthorPapers(event, '${a.name}')" style="cursor:pointer; transition: background 0.2s;">
         <div class="abt-rank">${i + 1}</div>
-        <div class="abt-name">${a.name}</div>
+        <div class="abt-name" style="display:flex; align-items:center; gap:0.5rem; white-space:nowrap;">
+          <span>${a.name}</span>
+          <span style="font-size:0.75rem; color:var(--text-muted); font-weight:normal; letter-spacing:-0.02em;">${a.affiliation} · ${a.field}</span>
+        </div>
         <div class="abt-total">${a.count}편</div>
         <div class="abt-bar-wrap">
           <div class="abt-bar-track">
@@ -11415,3 +11418,280 @@ window.INSTITUTION_DATA = {
     }
   }
 };
+
+/* ══════════════════════════════════════════
+   이론적 토대 상세 (Theory Detail View) 렌더링
+══════════════════════════════════════════ */
+let theoryRatioChartInstance = null;
+let theoryNetworkChartInstance = null;
+
+function showTheoryDetail() {
+  const data = window.THEORY_DATA;
+  if (!data) {
+    alert("이론적 토대 데이터를 불러오지 못했습니다.");
+    return;
+  }
+  
+  document.getElementById('theory-detail-view').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  
+  // 1. 도넛 차트 (순수 이론 vs 차용)
+  const ratioContainer = document.getElementById('theory-ratio-chart');
+  if (theoryRatioChartInstance) theoryRatioChartInstance.dispose();
+  theoryRatioChartInstance = echarts.init(ratioContainer);
+  
+  const summary = data.summary;
+  const ratioOption = {
+    tooltip: { trigger: 'item', formatter: '{b}: {c}편 ({d}%)' },
+    legend: { bottom: '0', left: 'center' },
+    color: ['#8b5cf6', '#3b82f6'],
+    series: [
+      {
+        type: 'pie',
+        radius: ['40%', '70%'],
+        avoidLabelOverlap: false,
+        itemStyle: { borderRadius: 8, borderColor: '#fff', borderWidth: 2 },
+        label: { show: false },
+        data: [
+          { value: summary.pure_theory_count, name: '순수 철학·이론 목적으로 쓰임' },
+          { value: summary.applied_theory_count, name: '타 관점의 방법론적 도구로 차용됨' }
+        ]
+      }
+    ]
+  };
+  theoryRatioChartInstance.setOption(ratioOption);
+  
+  // 2. 주요 이론가 목록 렌더링
+  const listContainer = document.getElementById('theorist-list');
+  listContainer.innerHTML = data.theorists.map((t, idx) => `
+    <div onclick="renderTheoryNetwork('${t.name}')" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center; padding:0.8rem; background:var(--bg-hover); border-radius:8px; transition:background 0.2s;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--bg-hover)'">
+      <div style="display:flex; align-items:center; gap:0.6rem;">
+        <div style="background:#8b5cf6; color:#fff; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:bold;">${idx+1}</div>
+        <span style="font-weight:600; color:var(--text-base);">${t.name}</span>
+      </div>
+      <div style="font-size:0.85rem; color:var(--text-muted);">총 <span style="font-weight:700; color:var(--accent);">${t.total_mentions}</span>건 등장</div>
+    </div>
+  `).join('');
+  
+  // 첫 번째 이론가 네트워크 렌더링
+  if (data.theorists.length > 0) {
+    renderTheoryNetwork(data.theorists[0].name);
+  }
+}
+
+function hideTheoryDetail() {
+  document.getElementById('theory-detail-view').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+function renderTheoryNetwork(theoristName) {
+  const data = window.THEORY_DATA;
+  const tData = data.theorists.find(t => t.name === theoristName);
+  if (!tData) return;
+  
+  // 타이틀 업데이트
+  document.getElementById('theory-net-title').innerHTML = `<span style="font-size:1.2rem;">🕸️</span> [${tData.name}] 파생 키워드 네트워크`;
+  
+  // 네트워크 노드 및 링크 구성
+  const nodes = [];
+  const links = [];
+  
+  nodes.push({
+    id: tData.name,
+    name: tData.name,
+    symbolSize: 60,
+    itemStyle: { color: '#8b5cf6', borderColor: '#fff', borderWidth: 2 },
+    label: { show: true, position: 'inside', color: '#fff', fontWeight: 'bold', fontSize: 14 }
+  });
+  
+  const maxKwCount = tData.co_keywords.length > 0 ? Math.max(...tData.co_keywords.map(k => k.count)) : 1;
+  
+  tData.co_keywords.forEach((kw) => {
+    const size = Math.max(20, (kw.count / maxKwCount) * 45);
+    nodes.push({
+      id: kw.keyword,
+      name: kw.keyword,
+      value: kw.count,
+      symbolSize: size,
+      itemStyle: { color: '#3b82f6', opacity: 0.8 },
+      label: { show: true, position: 'top', color: 'var(--text-base)', fontSize: 11 }
+    });
+    
+    links.push({
+      source: tData.name,
+      target: kw.keyword,
+      value: kw.count,
+      lineStyle: { width: Math.max(1, (kw.count / maxKwCount) * 5), opacity: 0.4, color: '#94a3b8' }
+    });
+  });
+  
+  const netContainer = document.getElementById('theory-network-chart');
+  if (theoryNetworkChartInstance) theoryNetworkChartInstance.dispose();
+  theoryNetworkChartInstance = echarts.init(netContainer);
+  
+  const option = {
+    tooltip: {
+      formatter: function(params) {
+        if (params.dataType === 'node') {
+          return params.data.id === tData.name 
+            ? `${params.data.name}` 
+            : `${params.data.name} (동시 출현: ${params.value}회)`;
+        }
+      }
+    },
+    series: [
+      {
+        type: 'graph',
+        layout: 'force',
+        force: {
+          repulsion: 800,
+          edgeLength: [50, 150]
+        },
+        roam: true,
+        label: { show: true },
+        data: nodes,
+        links: links,
+        lineStyle: {
+          color: 'source',
+          curveness: 0.1
+        },
+        emphasis: {
+          focus: 'adjacency',
+          lineStyle: { width: 5 }
+        }
+      }
+    ]
+  };
+  
+  theoryNetworkChartInstance.setOption(option);
+  
+  // 최상위 논문 렌더링
+  const paperContainer = document.getElementById('theory-papers');
+  if (tData.top_papers.length > 0) {
+    paperContainer.innerHTML = tData.top_papers.map((p, idx) => {
+      const badgeHtml = p.badge ? `<span style="background:var(--accent); color:#fff; font-size:0.7rem; padding:0.2rem 0.5rem; border-radius:12px; margin-left:0.5rem; vertical-align:middle; font-weight:600;">${p.badge}</span>` : '';
+      return `<div onclick="showTheoryPaperModal('${tData.name}', ${idx})" style="cursor:pointer; display:flex; gap:0.6rem; align-items:flex-start; background:var(--bg-hover); padding:0.8rem; border-radius:6px; transition:background 0.2s;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--bg-hover)'">
+        <div style="background:#8b5cf6; color:#fff; font-size:0.75rem; font-weight:bold; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">${idx+1}</div>
+        <div style="font-size:0.85rem; line-height:1.4;">
+          <div style="font-weight:600; color:var(--text-base); margin-bottom:0.3rem;">${p.title}${badgeHtml}</div>
+          <div style="color:var(--text-muted); font-size:0.75rem; margin-bottom:0.3rem;">
+            ${p.author} · ${p.year}년 · 인용 ${p.cit}회
+          </div>
+        </div>
+      </div>`
+    }).join('');
+  } else {
+    paperContainer.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem;">관련 논문 없음</div>';
+  }
+}
+
+function showTheoryPaperModal(theoristName, idx) {
+  const data = window.THEORY_DATA;
+  const tData = data.theorists.find(t => t.name === theoristName);
+  if (!tData) return;
+  const paper = tData.top_papers[idx];
+  if (!paper) return;
+
+  document.getElementById('pm-year').innerText = paper.year + '년';
+  document.getElementById('pm-title').innerText = paper.title;
+  document.getElementById('pm-journal').innerText = paper.journal || '';
+  document.getElementById('pm-author-type').innerHTML = `<span style="color: var(--text-muted);">[${paper.author}]</span>`;
+    
+  document.getElementById('pm-abstract').innerText = (paper.abstract && String(paper.abstract).toLowerCase() !== 'nan' && String(paper.abstract).trim() !== '') 
+    ? paper.abstract 
+    : '제공된 초록 데이터가 없습니다.';
+    
+  document.getElementById('pm-keywords').innerText = (paper.keywords && String(paper.keywords).toLowerCase() !== 'nan' && String(paper.keywords).trim() !== '')
+    ? paper.keywords.replace(/;/g, ', ')
+    : '제공된 키워드 데이터가 없습니다.';
+    
+  const linkBtn = document.getElementById('pm-link-btn');
+  if (linkBtn) {
+    let url = paper.url && String(paper.url).toLowerCase() !== 'nan' && String(paper.url).trim() !== '' ? paper.url : null;
+    let doi = paper.doi && String(paper.doi).toLowerCase() !== 'nan' && String(paper.doi).trim() !== '' ? paper.doi : null;
+    if (url) {
+      linkBtn.href = url;
+      linkBtn.innerHTML = '<span class="icon">🔗</span> KCI 원문 보기';
+      linkBtn.style.display = 'inline-block';
+    } else if (doi) {
+      linkBtn.href = doi.startsWith('http') ? doi : `https://doi.org/${doi}`;
+      linkBtn.innerHTML = '<span class="icon">🔗</span> DOI 논문 보기';
+      linkBtn.style.display = 'inline-block';
+    } else {
+      linkBtn.style.display = 'none';
+    }
+  }
+
+  const dnaContainer = document.getElementById('pm-dna-container');
+  if (dnaContainer) {
+    const dnaBar = document.getElementById('pm-dna-bar');
+    const dnaLegend = document.getElementById('pm-dna-legend');
+    
+    if (paper.dna && Object.keys(paper.dna).length > 0) {
+      const perspectivesMap = {
+        "사회·공동체": "#d97706",
+        "공간·역사·장소": "#059669",
+        "문학·예술·문화": "#2563eb",
+        "철학·이론": "#e11d48",
+        "융복합/기타": "#94a3b8"
+      };
+      
+      let barHtml = '';
+      let legendHtml = '';
+      const sortedDna = Object.entries(paper.dna).sort((a, b) => b[1] - a[1]);
+      for (const [pName, pct] of sortedDna) {
+        if (pct === 0) continue;
+        const color = perspectivesMap[pName] || '#94a3b8';
+        barHtml += `<div style="height: 100%; width: ${pct}%; background-color: ${color};" title="${pName} ${pct}%"></div>`;
+        legendHtml += `
+          <div style="display:flex; align-items:center; gap:0.2rem;">
+            <div style="width:8px; height:8px; border-radius:50%; background-color:${color};"></div>
+            <span style="color:var(--text-base);">${pName} <span style="font-weight:700; color:${color};">${pct}%</span></span>
+          </div>
+        `;
+      }
+      dnaBar.innerHTML = barHtml;
+      dnaLegend.innerHTML = legendHtml;
+      dnaContainer.style.display = 'block';
+    } else {
+      dnaContainer.style.display = 'none';
+    }
+  }
+
+  const modal = document.getElementById('paper-modal');
+  modal.style.display = 'flex';
+}
+
+/* ══════════════════════════════════════════
+   로컬 연구 논문 6편 모달 제어
+══════════════════════════════════════════ */
+const LOCAL_PAPERS = [
+  { region: "통영", title: "세계시민의식 함양을 위한 교양교과목 설계와 성찰", author: "이효숙;전병국", affiliation: "건국대학교" },
+  { region: "제주", title: "제주 지역 관련 교육 연구의 동향분석 및 연구방향 탐색 : 내용분석 및 의미연결망 분석을 활용하여", author: "연준모", affiliation: "성신여자대학교" },
+  { region: "제주", title: "조에의 계보학으로서 ‘이별의 공동체’와 정동 : 제인 진 카이젠의 <이별의 공동체(2019)>에 관하여", author: "김은주", affiliation: "서울시립대학교 도시인문학연구소" },
+  { region: "여수", title: "여수시 인문지리콘텐츠 연구", author: "이문성;안남일", affiliation: "고려대학교" },
+  { region: "강원", title: "연세대학교 원주박물관의 인문도시 사업 운영과 지역 협력", author: "이상순", affiliation: "연세대학교" },
+  { region: "대전", title: "진보적 지방정치의 역사적 경험들 - 시기별 특징과 그 함의", author: "장석준", affiliation: "글로벌 정치경제연구소" }
+];
+
+function showLocalPapersModal() {
+  const container = document.getElementById('local-papers-list');
+  if (container) {
+    container.innerHTML = LOCAL_PAPERS.map((p, idx) => `
+      <div style="background: var(--bg-hover); padding: 1rem; border-radius: var(--radius-sm); border-left: 4px solid var(--accent);">
+        <div style="font-size: 0.75rem; font-weight: 700; color: var(--accent); margin-bottom: 0.3rem;">[${p.region}] 대상 연구</div>
+        <div style="font-size: 0.95rem; font-weight: 600; color: var(--text-base); line-height: 1.4; margin-bottom: 0.4rem;">${p.title}</div>
+        <div style="font-size: 0.8rem; color: var(--text-muted);">
+          ${p.author} <span style="color:#cbd5e1; margin:0 0.2rem;">|</span> ${p.affiliation}
+        </div>
+      </div>
+    `).join('');
+  }
+  document.getElementById('local-papers-modal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function hideLocalPapersModal() {
+  document.getElementById('local-papers-modal').style.display = 'none';
+  document.body.style.overflow = '';
+}
