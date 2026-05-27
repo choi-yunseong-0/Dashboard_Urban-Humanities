@@ -684,6 +684,16 @@
           <div style="display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap; padding: 0 1rem;" id="perspective-tabs">
             <!-- 탭 버튼들은 JS에서 렌더링 -->
           </div>
+          
+          <hr style="width:100%; border:none; border-top:1px solid var(--border); margin:1.5rem 0 1rem;">
+          
+          <!-- 시기별 트렌드 차트 -->
+          <div style="width:100%; padding: 0 1.5rem;">
+            <div style="font-size:0.85rem; font-weight:600; margin-bottom:0.8rem; color:var(--text-muted); text-align:center;">시기별 관점 비중 변화 (%)</div>
+            <div style="position:relative; width:100%; height:160px;">
+              <canvas id="perspective-trend-chart"></canvas>
+            </div>
+          </div>
         </div>
       </div>
       
@@ -717,7 +727,29 @@
     </div>
   </div>
 
-
+  <!-- 키워드 관점 비율 팝업 모달 -->
+  <div id="keyword-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
+    <div style="background: #fff; width: 90%; max-width: 500px; border-radius: var(--radius-lg); box-shadow: var(--shadow-modal); padding: 2rem; position: relative; max-height: 80vh; overflow-y: auto;">
+      <button onclick="hideKeywordModal()" style="position: absolute; top: 1.5rem; right: 1.5rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+      <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.3rem;">키워드 전체 관점 분포</div>
+      <h3 id="km-title" style="font-size: 1.4rem; font-weight: 700; color: var(--text-base); margin-bottom: 1.5rem; line-height: 1.3;"></h3>
+      
+      <div id="km-bar-chart" style="display: flex; flex-direction: column; gap: 0.8rem;">
+        <!-- JS로 관점별 막대그래프 동적 생성 -->
+      </div>
+      
+      <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border);">
+        <h4 style="font-size: 0.95rem; font-weight: 600; color: var(--text-base); margin-bottom: 1rem;">시기별 관점 비중 변화 (편수)</h4>
+        <div style="width: 100%; height: 200px; position: relative;">
+          <canvas id="km-trend-chart"></canvas>
+        </div>
+      </div>
+      
+      <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed var(--border); text-align: center; font-size: 0.85rem; color: var(--text-muted);">
+        이 테마 키워드가 등장한 총 논문 수: <span id="km-total-count" style="font-weight: 600; color: var(--text-base);"></span>편
+      </div>
+    </div>
+  </div>
   <!-- 논문 상세 모달 -->
   <div id="paper-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center;">
     <div style="background: #fff; width: 90%; max-width: 600px; border-radius: var(--radius-lg); box-shadow: var(--shadow-modal); padding: 2rem; position: relative; max-height: 80vh; overflow-y: auto;">
@@ -727,6 +759,14 @@
       <div style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
         <span id="pm-journal" style="font-weight: 600;"></span> 
         <span id="pm-author-type" style="margin-left: 0.5rem;"></span>
+      </div>
+      
+      <div id="pm-dna-container" style="display: none; margin-bottom: 1.5rem; padding: 1rem; background: var(--bg-hover); border-radius: var(--radius-md);">
+        <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-base); margin-bottom: 0.5rem; display:flex; align-items:center; gap:0.4rem;">
+          <span style="font-size:1rem;">🧬</span> 관점 DNA (키워드 혼합률)
+        </div>
+        <div id="pm-dna-bar" style="display: flex; width: 100%; height: 12px; border-radius: 6px; overflow: hidden;"></div>
+        <div id="pm-dna-legend" style="display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.6rem; font-size: 0.75rem;"></div>
       </div>
       
       <h4 style="font-size: 1rem; margin-bottom: 0.5rem; color: var(--text-base);">초록 (Abstract)</h4>

@@ -908,6 +908,89 @@ function showInstitutionPaperModal(instName, idx) {
     }
   }
 
+  // (기존 paper-modal에서 dna-container는 showPerspectivePaperModal 이외에는 숨김 처리)
+  const dnaContainer = document.getElementById('pm-dna-container');
+  if (dnaContainer) dnaContainer.style.display = 'none';
+
+  const modal = document.getElementById('paper-modal');
+  modal.style.display = 'flex';
+}
+
+function showPerspectivePaperModal(perspId, idx) {
+  const data = window.PERSPECTIVE_DATA;
+  if (!data || !data[perspId]) return;
+  const paper = data[perspId].topPapers[idx];
+  if (!paper) return;
+
+  document.getElementById('pm-year').innerText = paper.year + '년';
+  document.getElementById('pm-title').innerText = paper.title;
+  document.getElementById('pm-journal').innerText = paper.journal || '';
+  document.getElementById('pm-author-type').innerHTML = `<span style="color: var(--text-muted);">[${paper.author}]</span>`;
+    
+  document.getElementById('pm-abstract').innerText = (paper.abstract && String(paper.abstract).toLowerCase() !== 'nan' && String(paper.abstract).trim() !== '') 
+    ? paper.abstract 
+    : '제공된 초록 데이터가 없습니다.';
+    
+  document.getElementById('pm-keywords').innerText = (paper.keywords && String(paper.keywords).toLowerCase() !== 'nan' && String(paper.keywords).trim() !== '')
+    ? paper.keywords.replace(/;/g, ', ')
+    : '제공된 키워드 데이터가 없습니다.';
+    
+  const linkBtn = document.getElementById('pm-link-btn');
+  if (linkBtn) {
+    let url = paper.url && String(paper.url).toLowerCase() !== 'nan' && String(paper.url).trim() !== '' ? paper.url : null;
+    let doi = paper.doi && String(paper.doi).toLowerCase() !== 'nan' && String(paper.doi).trim() !== '' ? paper.doi : null;
+    
+    if (url) {
+      linkBtn.href = url;
+      linkBtn.innerHTML = '<span class="icon">🔗</span> KCI 원문 보기';
+      linkBtn.style.display = 'inline-block';
+    } else if (doi) {
+      linkBtn.href = doi.startsWith('http') ? doi : `https://doi.org/${doi}`;
+      linkBtn.innerHTML = '<span class="icon">🔗</span> DOI 논문 보기';
+      linkBtn.style.display = 'inline-block';
+    } else {
+      linkBtn.style.display = 'none';
+    }
+  }
+
+  const dnaContainer = document.getElementById('pm-dna-container');
+  if (dnaContainer) {
+    const dnaBar = document.getElementById('pm-dna-bar');
+    const dnaLegend = document.getElementById('pm-dna-legend');
+    
+    if (paper.dna && Object.keys(paper.dna).length > 0) {
+      const perspectivesMap = {
+        "사회·공동체": "#d97706",
+        "공간·역사·장소": "#059669",
+        "문학·예술·문화": "#2563eb",
+        "철학·이론": "#e11d48",
+        "융복합/기타": "#94a3b8"
+      };
+      
+      let barHtml = '';
+      let legendHtml = '';
+      const sortedDna = Object.entries(paper.dna).sort((a, b) => b[1] - a[1]);
+      
+      for (const [pName, pct] of sortedDna) {
+        if (pct === 0) continue;
+        const color = perspectivesMap[pName] || '#94a3b8';
+        barHtml += `<div style="height: 100%; width: ${pct}%; background-color: ${color};" title="${pName} ${pct}%"></div>`;
+        legendHtml += `
+          <div style="display:flex; align-items:center; gap:0.2rem;">
+            <div style="width:8px; height:8px; border-radius:50%; background-color:${color};"></div>
+            <span style="color:var(--text-base);">${pName} <span style="font-weight:700; color:${color};">${pct}%</span></span>
+          </div>
+        `;
+      }
+      
+      dnaBar.innerHTML = barHtml;
+      dnaLegend.innerHTML = legendHtml;
+      dnaContainer.style.display = 'block';
+    } else {
+      dnaContainer.style.display = 'none';
+    }
+  }
+
   const modal = document.getElementById('paper-modal');
   modal.style.display = 'flex';
 }
@@ -915,6 +998,141 @@ function showInstitutionPaperModal(instName, idx) {
 function closePaperModal() {
   document.getElementById('paper-modal').style.display = 'none';
 }
+
+let kmTrendChartInstance = null;
+
+function showKeywordModal(keyword) {
+  const bd = window.PERSPECTIVE_DATA._themeBreakdown;
+  if (!bd || !bd[keyword]) return;
+
+  const totalData = bd[keyword].total || bd[keyword]; // 하위 호환성
+  const tempData = bd[keyword].temporal;
+  
+  const perspectivesMap = {
+    "사회·공동체": "#d97706",
+    "공간·역사·장소": "#059669",
+    "문학·예술·문화": "#2563eb",
+    "철학·이론": "#e11d48",
+    "융복합/기타": "#94a3b8"
+  };
+
+  document.getElementById('km-title').innerText = '#' + keyword;
+  
+  const chartContainer = document.getElementById('km-bar-chart');
+  
+  let total = 0;
+  for (const p in totalData) {
+    total += totalData[p];
+  }
+  document.getElementById('km-total-count').innerText = total;
+
+  let html = '';
+  const sorted = Object.entries(totalData).sort((a,b) => b[1] - a[1]);
+  
+  for (const [pName, count] of sorted) {
+    if (count === 0) continue;
+    const pct = Math.round((count / total) * 100);
+    const color = perspectivesMap[pName] || '#94a3b8';
+    
+    html += `
+      <div style="display:flex; flex-direction:column; gap:0.3rem;">
+        <div style="display:flex; justify-content:space-between; font-size:0.85rem; font-weight:600; color:var(--text-base);">
+          <span style="display:flex; align-items:center; gap:0.4rem;">
+            <span style="display:inline-block; width:10px; height:10px; border-radius:50%; background:${color};"></span>
+            ${pName}
+          </span>
+          <span style="color:var(--text-muted); font-size:0.8rem;">${count}편 <span style="font-weight:700; color:${color}; margin-left:0.3rem;">${pct}%</span></span>
+        </div>
+        <div style="width:100%; height:8px; background:var(--border); border-radius:4px; overflow:hidden;">
+          <div style="width:${pct}%; height:100%; background:${color}; border-radius:4px;"></div>
+        </div>
+      </div>
+    `;
+  }
+  
+  chartContainer.innerHTML = html;
+
+  if (kmTrendChartInstance) {
+    kmTrendChartInstance.destroy();
+  }
+  
+  if (tempData) {
+    const canvas = document.getElementById('km-trend-chart');
+    const ctx = canvas.getContext('2d');
+    
+    const periods = ['past', 'boom', 'recent'];
+    const pLabels = ['1기 (탐색기)', '2기 (대폭발기)', '3기 (전환기)'];
+    
+    const datasets = [];
+    const pNames = Object.keys(perspectivesMap);
+    
+    pNames.forEach(pName => {
+      const dataPoints = periods.map(period => tempData[period][pName] || 0);
+      const totalCount = dataPoints.reduce((a,b)=>a+b, 0);
+      if (totalCount > 0) {
+        datasets.push({
+          label: pName,
+          data: dataPoints,
+          borderColor: perspectivesMap[pName],
+          backgroundColor: perspectivesMap[pName],
+          tension: 0.3,
+          borderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 6
+        });
+      }
+    });
+
+    kmTrendChartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: pLabels,
+        datasets: datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { boxWidth: 10, font: { size: 10 }, padding: 15 }
+          },
+          tooltip: {
+            mode: 'index',
+            intersect: false
+          }
+        },
+        scales: {
+          x: {
+            grid: { display: false }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1,
+              precision: 0
+            }
+          }
+        }
+      }
+    });
+  }
+  
+  const modal = document.getElementById('keyword-modal');
+  modal.style.display = 'flex';
+}
+
+function hideKeywordModal() {
+  document.getElementById('keyword-modal').style.display = 'none';
+}
+
+window.addEventListener('click', function(e) {
+  const kModal = document.getElementById('keyword-modal');
+  if (e.target === kModal) hideKeywordModal();
+  
+  const pModal = document.getElementById('paper-modal');
+  if (e.target === pModal) closePaperModal();
+});
 
 function initEcosystemDonut() {
   const canvas = document.getElementById('chart-ecosystem-donut');
@@ -2924,9 +3142,9 @@ function initPerspectiveView() {
   if (!data) return;
 
   const perspectives = [
-    { id: "사회·공동체", color: "#2563eb" },
+    { id: "사회·공동체", color: "#d97706" },
     { id: "공간·역사·장소", color: "#059669" },
-    { id: "문학·예술·문화", color: "#d97706" },
+    { id: "문학·예술·문화", color: "#2563eb" },
     { id: "철학·이론", color: "#e11d48" },
     { id: "융복합/기타", color: "#94a3b8" }
   ];
@@ -2981,6 +3199,80 @@ function initPerspectiveView() {
 
   // 3. 초기 선택
   renderPerspectiveDetail('사회·공동체');
+  
+  // 4. 시기별 트렌드 차트 렌더링
+  initPerspectiveTrendChart();
+}
+
+let perspectiveTrendChartInstance = null;
+
+function initPerspectiveTrendChart() {
+  const ctx = document.getElementById('perspective-trend-chart').getContext('2d');
+  
+  if (perspectiveTrendChartInstance) {
+    perspectiveTrendChartInstance.destroy();
+  }
+
+  // DATA.perspectiveTrend는 app.js 상단에 정의되어 있음
+  const periods = DATA.perspectiveTrend.map(d => d.period);
+  const perspNames = ["철학·이론", "문학·예술·문화", "공간·역사·장소", "사회·공동체"];
+  const colors = ["#e11d48", "#2563eb", "#059669", "#d97706"];
+  const styles = ['circle', 'rectRounded', 'rectRot', 'triangle'];
+
+  const datasets = perspNames.map((name, i) => ({
+    label: name,
+    data: DATA.perspectiveTrend.map(d => d[name]),
+    backgroundColor: colors[i] + '22',
+    borderColor: colors[i],
+    borderWidth: 2,
+    fill: true,
+    tension: 0.4,
+    pointRadius: 4,
+    pointHoverRadius: 6,
+    pointStyle: styles[i],
+    pointBackgroundColor: colors[i],
+    pointBorderColor: '#ffffff',
+    pointBorderWidth: 2,
+  }));
+
+  perspectiveTrendChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: { labels: periods, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          mode: 'index',
+          intersect: false,
+          backgroundColor: '#ffffff',
+          borderColor: 'rgba(37,99,235,0.2)',
+          borderWidth: 1,
+          titleColor: '#0f172a',
+          bodyColor: '#334155',
+          padding: 8,
+          callbacks: {
+            label: item => ` ${item.dataset.label}: ${item.parsed.y}%`
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(100,116,139,0.1)', drawTicks: false },
+          ticks: { color: '#64748b', font: { size: 9 }, padding: 4 },
+          border: { display: false }
+        },
+        y: {
+          grid: { color: 'rgba(100,116,139,0.1)', drawTicks: false },
+          ticks: { color: '#64748b', font: { size: 9 }, stepSize: 20, padding: 4, callback: v => v + '%' },
+          border: { display: false },
+          min: 0, max: 60
+        }
+      },
+      animation: { duration: 1000, easing: 'easeOutQuart' }
+    }
+  });
 }
 
 function renderPerspectiveDetail(perspId) {
@@ -3014,6 +3306,15 @@ function renderPerspectiveDetail(perspId) {
     kwContainer.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem;">키워드 데이터 없음</div>';
   }
 
+  const perspectivesMap = {
+    "사회·공동체": "#d97706",
+    "공간·역사·장소": "#059669",
+    "문학·예술·문화": "#2563eb",
+    "철학·이론": "#e11d48",
+    "융복합/기타": "#94a3b8"
+  };
+  const perspColor = perspectivesMap[perspId] || '#94a3b8';
+
   // 시기별 동향
   const tempContainer = document.getElementById('persp-temporal');
   const tempLabels = [
@@ -3025,25 +3326,26 @@ function renderPerspectiveDetail(perspId) {
   tempContainer.innerHTML = tempLabels.map(t => {
     const kws = data.temporal[t.key];
     const kwHtml = kws && kws.length > 0 
-      ? kws.map(k => `<span style="font-size:0.8rem; background:#f1f5f9; padding:0.2rem 0.4rem; border-radius:3px;">${k.keyword} <span style="opacity:0.5;font-size:0.7rem;">${k.count}</span></span>`).join(' ')
+      ? kws.map(k => `<span onclick="showKeywordModal('${k.keyword.replace(/'/g, "\\'")}')" style="cursor:pointer; font-size:0.8rem; background:${perspColor}15; color:${perspColor}; border:1px solid ${perspColor}33; padding:0.2rem 0.4rem; border-radius:4px; font-weight:600; transition:all 0.2s;">${k.keyword} <span style="opacity:0.7;font-size:0.7rem;">${k.count}</span></span>`).join(' ')
       : '<span style="font-size:0.8rem; color:var(--text-muted);">데이터 없음</span>';
     
     return `
-      <div style="display:flex; flex-direction:column; gap:0.3rem; border-left:3px solid ${t.color}; padding-left:0.6rem;">
+      <div style="display:flex; flex-direction:column; gap:0.4rem; border-left:3px solid ${t.color}; padding-left:0.6rem;">
         <div style="font-size:0.75rem; font-weight:600; color:${t.color};">${t.label}</div>
-        <div style="display:flex; flex-wrap:wrap; gap:0.3rem;">${kwHtml}</div>
+        <div style="display:flex; flex-wrap:wrap; gap:0.4rem;">${kwHtml}</div>
       </div>
     `;
-  }).join('<div style="border-top:1px dashed var(--border); margin:0.3rem 0;"></div>');
+  }).join('<div style="border-top:1px dashed var(--border); margin:0.4rem 0;"></div>');
 
   // 상위 논문
   const paperContainer = document.getElementById('persp-papers');
   if (data.topPapers.length > 0) {
-    paperContainer.innerHTML = data.topPapers.map((p, idx) => 
-      `<div style="display:flex; gap:0.6rem; align-items:flex-start; background:var(--bg-hover); padding:0.8rem; border-radius:6px;">
+    paperContainer.innerHTML = data.topPapers.map((p, idx) => {
+      const badgeHtml = p.badge ? `<span style="background:var(--accent); color:#fff; font-size:0.7rem; padding:0.2rem 0.5rem; border-radius:12px; margin-left:0.5rem; vertical-align:middle; font-weight:600;">${p.badge}</span>` : '';
+      return `<div onclick="showPerspectivePaperModal('${perspId}', ${idx})" style="cursor:pointer; display:flex; gap:0.6rem; align-items:flex-start; background:var(--bg-hover); padding:0.8rem; border-radius:6px; transition:background 0.2s;" onmouseover="this.style.background='var(--border)'" onmouseout="this.style.background='var(--bg-hover)'">
         <div style="background:var(--accent); color:#fff; font-size:0.75rem; font-weight:bold; border-radius:50%; width:20px; height:20px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">${idx+1}</div>
         <div style="font-size:0.85rem; line-height:1.4;">
-          <div style="font-weight:600; color:var(--text-base); margin-bottom:0.3rem;">${p.title}</div>
+          <div style="font-weight:600; color:var(--text-base); margin-bottom:0.3rem;">${p.title}${badgeHtml}</div>
           <div style="color:var(--text-muted); font-size:0.75rem; margin-bottom:0.3rem;">
             ${p.author} · ${p.year}년 · 인용 ${p.cit}회
           </div>
@@ -3052,7 +3354,7 @@ function renderPerspectiveDetail(perspId) {
           </div>
         </div>
       </div>`
-    ).join('');
+    }).join('');
   } else {
     paperContainer.innerHTML = '<div style="color:var(--text-muted); font-size:0.85rem;">주요 논문 데이터 없음</div>';
   }

@@ -60,11 +60,11 @@ window.PERSPECTIVE_DATA = {
       ],
       "boom": [
         {
-          "keyword": "공유·커먼즈",
+          "keyword": "기본소득·분배",
           "count": 8
         },
         {
-          "keyword": "기본소득·분배",
+          "keyword": "공유·커먼즈",
           "count": 8
         },
         {
@@ -97,7 +97,13 @@ window.PERSPECTIVE_DATA = {
         "keywords": "SF, 페미니즘 SF, 듀나, 김보영, 잠재성, 동시대성",
         "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART002586790",
         "doi": "10.15686/fkl.2020..49.36",
-        "journal": "여성문학연구"
+        "journal": "여성문학연구",
+        "badge": "핵심 문헌",
+        "dna": {
+          "사회·공동체": 43,
+          "문학·예술·문화": 43,
+          "철학·이론": 14
+        }
       },
       {
         "title": "빅데이터가 던지는 도전적인 철학적 문제들에 대한 고찰",
@@ -108,7 +114,14 @@ window.PERSPECTIVE_DATA = {
         "keywords": "지능정보사회, 빅데이터, 지향적 속성, 상관관계, 정보 존재론, 구조 실재론, 정보 인식론, 과학지식의 상의 변화, 프라이버시, 투명성, 동의, 정체성, 자율성, 소유권, 책임, 책무, 분산된 도덕성, 분산된 책임성, 다중 행위자, 빅데이터 윤리학, 빅데이터 거버넌스, 담화윤리",
         "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART002217268",
         "doi": "10.21458/siuh.2017.9.1.007",
-        "journal": "도시인문학연구"
+        "journal": "도시인문학연구",
+        "badge": "방법론적 렌즈 제공",
+        "dna": {
+          "사회·공동체": 33,
+          "공간·역사·장소": 17,
+          "문학·예술·문화": 17,
+          "철학·이론": 33
+        }
       },
       {
         "title": "혐오발언, 혐오감, 타자로서 이웃",
@@ -119,7 +132,12 @@ window.PERSPECTIVE_DATA = {
         "keywords": "혐오발언, 주권적 주체, 혐오감, 주이상스, 타자로서 이웃",
         "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART002157605",
         "doi": "10.21458/siuh.2016.8.2.004",
-        "journal": "도시인문학연구"
+        "journal": "도시인문학연구",
+        "badge": "방법론적 렌즈 제공",
+        "dna": {
+          "사회·공동체": 50,
+          "철학·이론": 50
+        }
       },
       {
         "title": "도시민의 문화자본과 문화적 취향분화 - 관람형 여가소비를 중심으로 -",
@@ -130,7 +148,12 @@ window.PERSPECTIVE_DATA = {
         "keywords": "문화자본, 부르디외(Bourdieu), 여가활동, 문화적 취향, 취향분화",
         "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART001950089",
         "doi": "",
-        "journal": "도시인문학연구"
+        "journal": "도시인문학연구",
+        "badge": "초기 담론 형성",
+        "dna": {
+          "사회·공동체": 50,
+          "철학·이론": 50
+        }
       },
       {
         "title": "공유사회의 기본소득과 롤스의 정의의 두 원칙",
@@ -141,23 +164,28 @@ window.PERSPECTIVE_DATA = {
         "keywords": "롤스, 기본소득, 공유지, 공유사회",
         "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART002186507",
         "doi": "",
-        "journal": "시대와 철학"
+        "journal": "시대와 철학",
+        "badge": "방법론적 렌즈 제공",
+        "dna": {
+          "사회·공동체": 80,
+          "철학·이론": 20
+        }
       }
     ]
   },
   "공간·역사·장소": {
-    "count": 61,
+    "count": 77,
     "topKeywords": [
       {
         "keyword": "도시인문학",
         "count": 6
       },
       {
-        "keyword": "도시재생",
-        "count": 5
+        "keyword": "인문학",
+        "count": 6
       },
       {
-        "keyword": "인문학",
+        "keyword": "도시재생",
         "count": 5
       },
       {
@@ -166,10 +194,6 @@ window.PERSPECTIVE_DATA = {
       },
       {
         "keyword": "도시계획",
-        "count": 3
-      },
-      {
-        "keyword": "도시",
         "count": 3
       },
       {
@@ -186,6 +210,10 @@ window.PERSPECTIVE_DATA = {
       },
       {
         "keyword": "도시공간",
+        "count": 2
+      },
+      {
+        "keyword": "도시경관",
         "count": 2
       }
     ],
@@ -221,15 +249,15 @@ window.PERSPECTIVE_DATA = {
       "recent": [
         {
           "keyword": "도시 공간과 장소",
-          "count": 6
+          "count": 5
         },
         {
           "keyword": "도시 정책과 재생",
           "count": 3
         },
         {
-          "keyword": "라투르",
-          "count": 1
+          "keyword": "해러웨이",
+          "count": 2
         }
       ]
     },
@@ -243,7 +271,14 @@ window.PERSPECTIVE_DATA = {
         "keywords": "도시재생, 산업유산, 산책자, 체험, 흔적",
         "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART001871551",
         "doi": "",
-        "journal": "문화역사지리"
+        "journal": "문화역사지리",
+        "badge": "초기 담론 형성",
+        "dna": {
+          "사회·공동체": 10,
+          "공간·역사·장소": 50,
+          "문학·예술·문화": 30,
+          "철학·이론": 10
+        }
       },
       {
         "title": "서울시 중구 지역의 역사문화자원과 도시 레트로(Retro)의 연계",
@@ -254,7 +289,13 @@ window.PERSPECTIVE_DATA = {
         "keywords": "서울시 중구, 레트로(Retro), 도시 레트로(Urban Retro), 역사문화자원, 유형문화재, 미래문화유산, 도시재생사업, 지역문화콘텐츠, 인문학, 도시 인문학",
         "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART002598743",
         "doi": "10.33639/ptc.2020..33.006",
-        "journal": "철학∙사상∙문화"
+        "journal": "철학∙사상∙문화",
+        "badge": "방법론적 렌즈 제공",
+        "dna": {
+          "공간·역사·장소": 50,
+          "문학·예술·문화": 33,
+          "철학·이론": 17
+        }
       },
       {
         "title": "광통교, 조선 후기 한양의 핫 플레이스- 강이천의 「한경사」를 중심으로",
@@ -265,7 +306,12 @@ window.PERSPECTIVE_DATA = {
         "keywords": "광통교(廣通橋), 핫 플레이스, 복합 문화 공간, 강이천(姜彛天), 한경사(漢京詞)",
         "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART002401265",
         "doi": "10.21458/siuh.2018.10.2.002",
-        "journal": "도시인문학연구"
+        "journal": "도시인문학연구",
+        "badge": "지역 실증 연구",
+        "dna": {
+          "공간·역사·장소": 50,
+          "문학·예술·문화": 50
+        }
       },
       {
         "title": "서울학 연구의 현재적 의미와 한계",
@@ -276,34 +322,45 @@ window.PERSPECTIVE_DATA = {
         "keywords": "서울, 서울학, 로컬, 로컬리티, 전통도시",
         "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART001955244",
         "doi": "",
-        "journal": "도시인문학연구"
+        "journal": "도시인문학연구",
+        "badge": "초기 담론 형성",
+        "dna": {
+          "사회·공동체": 20,
+          "공간·역사·장소": 80
+        }
       },
       {
-        "title": "산업혁명 이후 서양도시계획에 대한 인문학적 성찰",
-        "year": 2009,
-        "author": "민유기",
+        "title": "포스트 휴먼 신체와 공생의 거주하기 - 우리는 어떻게 포스트 휴먼이 되었는가? -",
+        "year": 2021,
+        "author": "김은주",
         "cit": 10,
-        "abstract": "이 글은 산업혁명 이후 서양의 도시계획에 대한 인문학적 성찰을 통해 현대도시의 각종 병폐를 치유하는 보다 인간적인 미래도시를 전망하기 위한 것이다. 산업혁명이 낳은 산업도시의 환경은 매우 열악했다. 19세기 전반기 유토피안 사회주의자들은 산업도시의 대안으로 생산, 주거, 여가활동이 결합된 소규모 이상적 공동체를 실험했다. 이들이 제시한 공동주거와 생활설비 모델은이후 도시계획에 큰 영향을 미쳤지만 인간적인 공동체 건설과 자본주의 사회에 대한 대안의 모색은 근대 도시계획에 별다른 영향을 주지 못했다. 19세기 중반 파리의 오스만화는 대로 건설, 상하수도망 정비, 녹지 공간 확충, 역사적 기념물 정비를 통해 도시를 근대적으로 변모시켰다. 하지만 동시에 도시공간의 사회적 분리, 부동산 소유주의 이익 증대, 스펙터클한 도시경관을 통한 권력의 통치력 강화를 가져왔다. 1920-30년대 르코르뷔지에와 바우하우스 건축가들의 주도로 등장한 국제적 근대건축 양식은 건축과 도시공간의 기능성을 강조했다. 이들은 기능주의적인 근대 도시계획을 전 세계에 확산시켰지만. 지역의 역사문화 전통과 유산을 최소화하였다. 20세기 중반 이래포스트모던 도시계획은 이 같은 기능주의를 비판하였다. 20세기 말 신자유주의적 세계화 흐름 속에서 진행된 도시재생 사업은 근대도시의 기능주의를 극복하고 있으나, 자본의 영향력이 증대되고 있다. 인간적인 미래도시는 사회적 불평등의 완화, 공공서비스와 문화공간의 확대,친환경적 성격과 지속성장 가능성의 적용, 시민의 참여 보장, 역사문화유산의보존과 활용 등을 통해 가능할 것이다. 이를 위해 도시인문학의 학문적 사회적 실천이 적극 요구된다.",
-        "keywords": "근대도시, 도시계획, 기능주의, 도시재생, 미래도시, 도시인문학",
-        "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART001952789",
+        "abstract": "본 연구의 목적은 인본주의의 가정을 해체하면서 신체에서 포스트 휴먼적 전회가 일어난다는 사실에 주목하면서 포스트 휴먼의 신체를 설명하는 것이다. 들뢰즈의 신체 개념을 통해 포스트 휴먼의 신체를 결합과 변이의 정동을 담아내고 지속하면서 변이하는 정동체(affect-capacité/affectcapacity)로 칭하고 설명한다. 정동체 개념은 포스트 휴먼의 신체를 경계설정을 거듭하며 변이하는 신체이자 매체로 작동하고 존재함을 제시한다. 정동체로서 포스트 휴먼 신체는 다른 신체들과 구분되는 본질적 구별을 지닌 것이 아니라, 세계와 신체의 상호적인 겹침을 이루는 강도들이 이행하는바를 표시하는 경계면이자 인터페이스이다. 또한 이러한 신체는 자연 문화이분법을 넘어 환경과 결합하고 적응하며 환경 그 자체가 되는 생명체이다. 본고는 정동체로서 포스트 휴먼 신체를 이해하면서, 포스트 휴먼 신체에서 공생(symbiosis/poiesis)의 거주하기를 사유해보려는 것이다.",
+        "keywords": "공생, 매체, 신체, 정동체, 포스트 휴먼",
+        "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART002702971",
         "doi": "",
-        "journal": "도시인문학연구"
+        "journal": "시대와 철학",
+        "badge": "방법론적 렌즈 제공",
+        "dna": {
+          "공간·역사·장소": 33,
+          "문학·예술·문화": 33,
+          "철학·이론": 33
+        }
       }
     ]
   },
   "문학·예술·문화": {
-    "count": 84,
+    "count": 93,
     "topKeywords": [
       {
         "keyword": "박완서",
         "count": 7
       },
       {
-        "keyword": "인문학",
-        "count": 5
+        "keyword": "도시",
+        "count": 4
       },
       {
-        "keyword": "도시",
+        "keyword": "인문학",
         "count": 4
       },
       {
@@ -353,7 +410,7 @@ window.PERSPECTIVE_DATA = {
       "boom": [
         {
           "keyword": "도시 정책과 재생",
-          "count": 3
+          "count": 4
         },
         {
           "keyword": "도시 공간과 장소",
@@ -389,7 +446,13 @@ window.PERSPECTIVE_DATA = {
         "keywords": "한국 웹소설 판타지, 장르소설, 클리셰, 책빙의물, 메타소설, 메타 장르, 장르비틀기, 장르 교차",
         "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART002559064",
         "doi": "10.18856/jpn.2020.26.1.003",
-        "journal": "대중서사연구"
+        "journal": "대중서사연구",
+        "badge": "핵심 문헌",
+        "dna": {
+          "사회·공동체": 29,
+          "공간·역사·장소": 14,
+          "문학·예술·문화": 57
+        }
       },
       {
         "title": "창조도시 논의의 비판적 성찰과 과제",
@@ -400,7 +463,14 @@ window.PERSPECTIVE_DATA = {
         "keywords": "창조도시론 비판, 도시정책, 도시경제성장, 포스트포디스트 도시, 창조성, 리처드 플로리다",
         "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART001952258",
         "doi": "",
-        "journal": "도시인문학연구"
+        "journal": "도시인문학연구",
+        "badge": "초기 담론 형성",
+        "dna": {
+          "사회·공동체": 20,
+          "공간·역사·장소": 20,
+          "문학·예술·문화": 40,
+          "철학·이론": 20
+        }
       },
       {
         "title": "발터 벤야민과 도시경험-벤야민의 도시인문학 방법론에 대한 고찰",
@@ -411,7 +481,12 @@ window.PERSPECTIVE_DATA = {
         "keywords": "벤야민, 정신분석, 라깡, 아우라, 도시, 도시경험, 시선, 촉각적 경험, 상실, 충격",
         "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART001474474",
         "doi": "",
-        "journal": "현대정신분석"
+        "journal": "현대정신분석",
+        "badge": "초기 담론 형성",
+        "dna": {
+          "문학·예술·문화": 50,
+          "철학·이론": 50
+        }
       },
       {
         "title": "서울의 공간적 의미 작용에 대한 기호학적 시론",
@@ -422,7 +497,12 @@ window.PERSPECTIVE_DATA = {
         "keywords": "도시의 의미 생산 구조, 의미론적 사각형, 도시 서사, 도시 인문학",
         "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART001014059",
         "doi": "",
-        "journal": "기호학 연구"
+        "journal": "기호학 연구",
+        "badge": "초기 담론 형성",
+        "dna": {
+          "공간·역사·장소": 33,
+          "문학·예술·문화": 67
+        }
       },
       {
         "title": "언택트 시대 넷플릭스와 영화:퀄리티 콘텐츠로서의 영화와 극장의 의미 변화",
@@ -433,16 +513,21 @@ window.PERSPECTIVE_DATA = {
         "keywords": "넷플릭스 오리지널, 영화, 팬데믹, 언택트, 퀄리티 TV",
         "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART002671276",
         "doi": "10.21299/jovc.2020.37.7",
-        "journal": "영상문화"
+        "journal": "영상문화",
+        "badge": "핵심 문헌",
+        "dna": {
+          "공간·역사·장소": 14,
+          "문학·예술·문화": 86
+        }
       }
     ]
   },
   "철학·이론": {
-    "count": 60,
+    "count": 59,
     "topKeywords": [
       {
         "keyword": "도시",
-        "count": 4
+        "count": 5
       },
       {
         "keyword": "발터 벤야민",
@@ -455,6 +540,10 @@ window.PERSPECTIVE_DATA = {
       {
         "keyword": "라투르",
         "count": 4
+      },
+      {
+        "keyword": "기억",
+        "count": 3
       },
       {
         "keyword": "초현실주의",
@@ -474,10 +563,6 @@ window.PERSPECTIVE_DATA = {
       },
       {
         "keyword": "생활세계",
-        "count": 2
-      },
-      {
-        "keyword": "탈산업주의",
         "count": 2
       }
     ],
@@ -504,19 +589,15 @@ window.PERSPECTIVE_DATA = {
         {
           "keyword": "마르크스",
           "count": 1
-        },
-        {
-          "keyword": "정체성·주체·감정",
-          "count": 1
         }
       ],
       "recent": [
         {
-          "keyword": "라투르",
+          "keyword": "정체성·주체·감정",
           "count": 5
         },
         {
-          "keyword": "정체성·주체·감정",
+          "keyword": "라투르",
           "count": 4
         },
         {
@@ -535,7 +616,13 @@ window.PERSPECTIVE_DATA = {
         "keywords": "헤테로토피아, 공간, 지리학, 문화, 칸트, 하비",
         "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART001955587",
         "doi": "",
-        "journal": "도시인문학연구"
+        "journal": "도시인문학연구",
+        "badge": "초기 담론 형성",
+        "dna": {
+          "사회·공동체": 17,
+          "공간·역사·장소": 17,
+          "철학·이론": 67
+        }
       },
       {
         "title": "르페브르의 변증법적 공간 이론과 공간정치― 「공간의 생산」을 중심으로",
@@ -546,7 +633,13 @@ window.PERSPECTIVE_DATA = {
         "keywords": "르페브르, 공간의 생산, 변증법, 공간정치, 몸, 도시사회",
         "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART001952284",
         "doi": "",
-        "journal": "도시인문학연구"
+        "journal": "도시인문학연구",
+        "badge": "초기 담론 형성",
+        "dna": {
+          "사회·공동체": 33,
+          "공간·역사·장소": 17,
+          "철학·이론": 50
+        }
       },
       {
         "title": "포스트휴머니즘 시대의 과학담론과 문학적 상상력",
@@ -557,7 +650,14 @@ window.PERSPECTIVE_DATA = {
         "keywords": "행위자네트워크이론, 테크노사이언스, 사이보그, 포스트휴먼, 윤이형, 대니, 굿바이",
         "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART002464664",
         "doi": "10.21458/siuh.2019.11.1.004",
-        "journal": "도시인문학연구"
+        "journal": "도시인문학연구",
+        "badge": "핵심 문헌",
+        "dna": {
+          "사회·공동체": 25,
+          "공간·역사·장소": 12,
+          "문학·예술·문화": 25,
+          "철학·이론": 38
+        }
       },
       {
         "title": "세계의 몰락과 영웅적 멜랑콜리: 독일 바로크 비극, 보들레르, 그리고 발터 벤야민",
@@ -568,7 +668,11 @@ window.PERSPECTIVE_DATA = {
         "keywords": "발터 벤야민, 독일 바로크 비극, 샤를르 보들레르, 세계의 몰락, 영웅적 멜랑콜리, 멜랑콜리적 천재, 광기, 변증법",
         "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART001955194",
         "doi": "",
-        "journal": "도시인문학연구"
+        "journal": "도시인문학연구",
+        "badge": "초기 담론 형성",
+        "dna": {
+          "철학·이론": 100
+        }
       },
       {
         "title": "상품과 알레고리 - 맑스와 벤야민의 환등상 개념",
@@ -579,41 +683,19 @@ window.PERSPECTIVE_DATA = {
         "keywords": "상품물신주의, 맑스, 벤야민, 환등상, 보들레르, 초현실주의",
         "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART002157608",
         "doi": "10.21458/siuh.2016.8.2.005",
-        "journal": "도시인문학연구"
+        "journal": "도시인문학연구",
+        "badge": "핵심 문헌",
+        "dna": {
+          "사회·공동체": 17,
+          "문학·예술·문화": 17,
+          "철학·이론": 67
+        }
       }
     ]
   },
   "융복합/기타": {
-    "count": 37,
+    "count": 13,
     "topKeywords": [
-      {
-        "keyword": ".",
-        "count": 3
-      },
-      {
-        "keyword": "Adventures of Huckleberry Finn",
-        "count": 1
-      },
-      {
-        "keyword": "Green Book",
-        "count": 1
-      },
-      {
-        "keyword": "Deep South",
-        "count": 1
-      },
-      {
-        "keyword": "urban humanities",
-        "count": 1
-      },
-      {
-        "keyword": "racialized space",
-        "count": 1
-      },
-      {
-        "keyword": "road movie",
-        "count": 1
-      },
       {
         "keyword": "권위주의 국가 최고지도자",
         "count": 1
@@ -625,6 +707,34 @@ window.PERSPECTIVE_DATA = {
       {
         "keyword": "최고지도자의 권력",
         "count": 1
+      },
+      {
+        "keyword": "최고지도자의 대외위기 대응 성향",
+        "count": 1
+      },
+      {
+        "keyword": "국내외정세 위험수준",
+        "count": 1
+      },
+      {
+        "keyword": "중국 AI 발전 전략",
+        "count": 1
+      },
+      {
+        "keyword": "중국의 학교 AI 교육",
+        "count": 1
+      },
+      {
+        "keyword": "AI 교과서",
+        "count": 1
+      },
+      {
+        "keyword": "페이샹싱추",
+        "count": 1
+      },
+      {
+        "keyword": "커다쉰페이",
+        "count": 1
       }
     ],
     "temporal": {
@@ -635,10 +745,6 @@ window.PERSPECTIVE_DATA = {
         },
         {
           "keyword": "근대성·문명론",
-          "count": 1
-        },
-        {
-          "keyword": "하비",
           "count": 1
         }
       ],
@@ -664,29 +770,11 @@ window.PERSPECTIVE_DATA = {
         "keywords": "",
         "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART002646335",
         "doi": "10.46645/inoutsesk.49.14",
-        "journal": "안과밖:영미문학연구"
-      },
-      {
-        "title": "도시, 유성기, 댄스홀 ― 1920~30년대 상하이 대중음악의 탄생과 그 물질적 조건",
-        "year": 2017,
-        "author": "김태연",
-        "cit": 5,
-        "abstract": "This article aim to study the birth of Chinese popular music from the perspective of urban cultural environment in the early 20’s Shanghai. To make this point clear, I chose gramophone industry and dance hall as the key elements new urban musical environment. A phonograph and dance halls are both introduced from the west, and lead an unprecedented modern pop culture industry in Shanghai. Shanghai dance hall and music industry, the results of these factors, played a big role to changing musical tastes of Chinese people, including the citizens of Shanghai. The initial form of Chinese pop music is a new urban cultural content that reflects the trend of the time and industry in the early 20th century. So formal features of Chinese initial pop music meet the features and demands of pop culture industry that formed through these media. It is helpful in explaining how the Chinese pop music ― first appeared in the late 20's ― quickly accepted by the public and developed, and continued to sustain its vitality.",
-        "keywords": "Chinese popular music, gramophone, dance hall, Shanghai, music industry, Shidaiqu(時代曲)",
-        "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART002195832",
-        "doi": "",
-        "journal": "중국현대문학"
-      },
-      {
-        "title": "Globopolis or Cosmopolis? -Alternative Futures of City Life in East Asia",
-        "year": 2009,
-        "author": "마이크 더글라스",
-        "cit": 3,
-        "abstract": "From the late 1980s urbanization in East Asia has been proceedingunder historically new dynamics that are rapidly transforming urbanspaces and city life. One of the key drivers is the emergence of anaffluent middle class that is simultaneously pushing for political reformwhile also encouraging a shift in land-uses toward global consumption. The challenge to the strong ‘developmental state’ has also come fromglobalization in the form of intensifying inter-city competition forglobal investment and accompanying neoliberal policy regimes aimed atprivatizing urban space and substantially reducing the role of the publicsector in all aspects of the economy. Privatization is furthered by theadvent of a new era of mega-projects in the form of gigantic newtowns, gated communities, mega-malls, the world’s tallest buildings,and global business hubs. As all of these dynamics interplay, a contestover the future of the city is emerging between the idea of the city asan inclusive cosmopolis of diversity and accommodation of differenceversus the city as a globopolis of networked non-public spaces forelites to engage in global consumption, business, and daily lifeprotected from the ‘chaos’ of the city of the less wealthy and thepoor. While democratization and devolution of power to local scales ofgovernance provides openings for more cosmopolitan outcomes,privatization of the city through mega-projects is transforminggovernance into corporate management and the city into zones ofexclusion. The future of city life hangs in the balance.",
-        "keywords": ".",
-        "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART001952716",
-        "doi": "",
-        "journal": "도시인문학연구"
+        "journal": "안과밖:영미문학연구",
+        "badge": "핵심 문헌",
+        "dna": {
+          "융복합/기타": 100
+        }
       },
       {
         "title": "시티팝과 아시아적 도시감성의 탄생-일본, 홍콩, 타이완, 한국을 중심으로",
@@ -697,7 +785,11 @@ window.PERSPECTIVE_DATA = {
         "keywords": "시티팝, 도시감성, 취향, 동아시아, 아시아, 신흥 중산층",
         "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART002773749",
         "doi": "10.21458/siuh.2021.13.2.001",
-        "journal": "도시인문학연구"
+        "journal": "도시인문학연구",
+        "badge": "",
+        "dna": {
+          "융복합/기타": 100
+        }
       },
       {
         "title": "496년(?) 12월 25일, 클로비스의 세례와 개종",
@@ -708,8 +800,972 @@ window.PERSPECTIVE_DATA = {
         "keywords": "클로비스, 가톨릭, 도유식, 프랑크족, 메로베우스 왕조, 프랑스 정체성",
         "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART002137024",
         "doi": "",
-        "journal": "프랑스사 연구"
+        "journal": "프랑스사 연구",
+        "badge": "",
+        "dna": {
+          "융복합/기타": 100
+        }
+      },
+      {
+        "title": "중국 학교의 AI 교육 도입 - 정부, 기업, 학교의 역할과 현황",
+        "year": 2024,
+        "author": "jiangxuejin",
+        "cit": 1,
+        "abstract": "본고는 중국의 AI 발전 전략과 교육 분야의 도입 현황을 고찰했다. 중국의 정부와 학교, 기업 3자는 손발을 맞춰가며 빠른 속도로 AI 교육을 학교 교과에 도입하고 있다. 지금까지 살펴본 결과 중국의 AI 교육 도입 현황은 다음과 같은 특징을 보인다. 첫째, AI 발전과 보급에 대한 중국 정부의 강력한 의지와 추진이다. 국무원이 2017년에 『차세대 인공 지능 발전계획 』을 발표하자, 실무부서인 공업정보화부와 교육부가 연이어 『계획』을 구체화하는 정책을 발표했다. 이와 동시에 큰 규모의 재정적 지원이 이어졌다. 둘째, 중국은 빨리 그리고 과감하게 각급 학교에 AI 교육과 AI를 활용한 수업을 도입했다. 『계획 』이 발표된 다음 해에 출판계는 바로 초 중 고 학생을 위한 인공 지능 교과서를 발행했다. 지금은 심지어 유치원에서 대학까지 아우르는 교과서 시리즈가 출간되어 보급되고 있다. 셋째, 에듀테크 기업들이 학교 현장에서의 교사 학생의 커뮤니티와 AI 활용을 돕는 다양한 서비스를 제공하며 새로운 시장과 AI 교육산업 생태계를 형성하고 있다. 중국의 ‘교육 + AI’ 사업은 빠르게 성장하고 있다. 중국 교육과학연구원의 글로벌 디지털 교육 발전 지수에 따르면, 중국은 3년 만에 24위에서 9위로 순위가 크게 올랐다. 중국이 AI 교육을 학교 교육에 도입하면서 해결할 문제도 나타나고 있다. 첫째, 지역별 AI 교육 수혜의 편차 문제다. 둘째, AI 교육의 적정 학령과 효과에 관한 문제가 제기된다. 셋째, 국제 표준의 문제이다.",
+        "keywords": "중국 AI 발전 전략, 중국의 학교 AI 교육, AI 교과서, 페이샹싱추, 커다쉰페이, 샤오화스",
+        "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART003135599",
+        "doi": "10.21458/siuh.2024.16.2.006",
+        "journal": "도시인문학연구",
+        "badge": "",
+        "dna": {
+          "융복합/기타": 100
+        }
+      },
+      {
+        "title": "박인환 시에 나타난 도시적 서정성 연구",
+        "year": 2011,
+        "author": "노승욱",
+        "cit": 1,
+        "abstract": "박인환은 1950년대 모더니즘 신시운동의 중심에 위치하는 시인이다. 그는 한국전쟁 이후의 암울한 시대적 상황을 실험적이고 전위적인 시 창작을 통해 승화시키면서 새로운 차원의 도시적 서정성을 확립하였다. 그의 시에서 나타나는 도시적 서정성은 청록파 등의 전통적 서정성과는 다른 면모를 보이는데 이는 그가 도시문명과 전쟁체험에서 포착한 모더니티를 미적 자의식을 통해 표현하고자 했기 때문이다. 황무지적 반동의식 가운데 재래적인 서정성과는 불연속성을 나타내는 박인환의 시는 1930년대 김광균의 도시적 서정성과는 모더니티의 추구라는 공통된 인식 가운데 연속성을 나타내고 있다. 김광균의 도시적 서정성이 파시즘의 억압 속에서 발현되었다면 박인환의 도시적 서정성은 전쟁체험의 충격 속에서 생성되었다고 할 수 있다. 박인환의 시들은 미증유의 민족동란을 겪으면서 지적인 각성이 강조된 미적 자의식을 보여주는데 이러한 그의 시적 특성을 ‘상실과 부재’의 미학으로 정의할 수 있다.",
+        "keywords": "도시적 서정성, 모더니티, 전쟁체험, 미적 자의식, ‘상실과 부재’의 미학",
+        "url": "https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=ART001955545",
+        "doi": "",
+        "journal": "도시인문학연구",
+        "badge": "",
+        "dna": {
+          "융복합/기타": 100
+        }
       }
     ]
+  },
+  "_themeBreakdown": {
+    "도시 정책과 재생": {
+      "total": {
+        "사회·공동체": 22,
+        "공간·역사·장소": 13,
+        "문학·예술·문화": 13,
+        "철학·이론": 0,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 7,
+          "공간·역사·장소": 8,
+          "문학·예술·문화": 3,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 3,
+          "공간·역사·장소": 2,
+          "문학·예술·문화": 4,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 12,
+          "공간·역사·장소": 3,
+          "문학·예술·문화": 6,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "도시 공간과 장소": {
+      "total": {
+        "사회·공동체": 24,
+        "공간·역사·장소": 17,
+        "문학·예술·문화": 17,
+        "철학·이론": 10,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 6,
+          "공간·역사·장소": 11,
+          "문학·예술·문화": 9,
+          "철학·이론": 8,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 5,
+          "공간·역사·장소": 1,
+          "문학·예술·문화": 3,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 13,
+          "공간·역사·장소": 5,
+          "문학·예술·문화": 5,
+          "철학·이론": 2,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "근대성·문명론": {
+      "total": {
+        "사회·공동체": 5,
+        "공간·역사·장소": 2,
+        "문학·예술·문화": 1,
+        "철학·이론": 6,
+        "융복합/기타": 1
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 4,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 6,
+          "융복합/기타": 1
+        },
+        "boom": {
+          "사회·공동체": 1,
+          "공간·역사·장소": 2,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 1,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "정체성·주체·감정": {
+      "total": {
+        "사회·공동체": 22,
+        "공간·역사·장소": 3,
+        "문학·예술·문화": 16,
+        "철학·이론": 10,
+        "융복합/기타": 1
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 8,
+          "공간·역사·장소": 2,
+          "문학·예술·문화": 2,
+          "철학·이론": 5,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 5,
+          "공간·역사·장소": 1,
+          "문학·예술·문화": 1,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 9,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 13,
+          "철학·이론": 5,
+          "융복합/기타": 1
+        }
+      }
+    },
+    "공동체·돌봄": {
+      "total": {
+        "사회·공동체": 19,
+        "공간·역사·장소": 1,
+        "문학·예술·문화": 1,
+        "철학·이론": 2,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 5,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 3,
+          "공간·역사·장소": 1,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 11,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 1,
+          "철학·이론": 2,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "라깡": {
+      "total": {
+        "사회·공동체": 3,
+        "공간·역사·장소": 0,
+        "문학·예술·문화": 3,
+        "철학·이론": 2,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 1,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 3,
+          "철학·이론": 2,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 1,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 1,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "르페브르": {
+      "total": {
+        "사회·공동체": 5,
+        "공간·역사·장소": 3,
+        "문학·예술·문화": 2,
+        "철학·이론": 1,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 2,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 1,
+          "철학·이론": 1,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 1,
+          "공간·역사·장소": 2,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 2,
+          "공간·역사·장소": 1,
+          "문학·예술·문화": 1,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "벤야민": {
+      "total": {
+        "사회·공동체": 2,
+        "공간·역사·장소": 3,
+        "문학·예술·문화": 5,
+        "철학·이론": 8,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 1,
+          "공간·역사·장소": 2,
+          "문학·예술·문화": 3,
+          "철학·이론": 5,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 1,
+          "철학·이론": 1,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 1,
+          "공간·역사·장소": 1,
+          "문학·예술·문화": 1,
+          "철학·이론": 2,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "가상·메타버스": {
+      "total": {
+        "사회·공동체": 1,
+        "공간·역사·장소": 1,
+        "문학·예술·문화": 4,
+        "철학·이론": 1,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 1,
+          "공간·역사·장소": 1,
+          "문학·예술·문화": 4,
+          "철학·이론": 1,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "국가·정치": {
+      "total": {
+        "사회·공동체": 8,
+        "공간·역사·장소": 1,
+        "문학·예술·문화": 2,
+        "철학·이론": 2,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 3,
+          "공간·역사·장소": 1,
+          "문학·예술·문화": 0,
+          "철학·이론": 2,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 3,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 2,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 2,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "기술·디지털·포스트휴먼": {
+      "total": {
+        "사회·공동체": 4,
+        "공간·역사·장소": 0,
+        "문학·예술·문화": 2,
+        "철학·이론": 1,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 4,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 2,
+          "철학·이론": 1,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "AI·자동화": {
+      "total": {
+        "사회·공동체": 3,
+        "공간·역사·장소": 0,
+        "문학·예술·문화": 1,
+        "철학·이론": 0,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 1,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 3,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "라투르": {
+      "total": {
+        "사회·공동체": 3,
+        "공간·역사·장소": 1,
+        "문학·예술·문화": 2,
+        "철학·이론": 4,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 2,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 1,
+          "공간·역사·장소": 1,
+          "문학·예술·문화": 2,
+          "철학·이론": 4,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "공유·커먼즈": {
+      "total": {
+        "사회·공동체": 12,
+        "공간·역사·장소": 0,
+        "문학·예술·문화": 1,
+        "철학·이론": 2,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 3,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 1,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 8,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 1,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 2,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "공동체와 사회 정의": {
+      "total": {
+        "사회·공동체": 2,
+        "공간·역사·장소": 0,
+        "문학·예술·문화": 0,
+        "철학·이론": 1,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 2,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 1,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "해러웨이": {
+      "total": {
+        "사회·공동체": 2,
+        "공간·역사·장소": 2,
+        "문학·예술·문화": 3,
+        "철학·이론": 3,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 1,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 1,
+          "공간·역사·장소": 2,
+          "문학·예술·문화": 3,
+          "철학·이론": 3,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "아리스토텔레스": {
+      "total": {
+        "사회·공동체": 3,
+        "공간·역사·장소": 0,
+        "문학·예술·문화": 0,
+        "철학·이론": 1,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 1,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 1,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 1,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 1,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "마르크스": {
+      "total": {
+        "사회·공동체": 7,
+        "공간·역사·장소": 0,
+        "문학·예술·문화": 1,
+        "철학·이론": 3,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 3,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 1,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 2,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 1,
+          "철학·이론": 1,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 2,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 1,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "유럽 중세사": {
+      "total": {
+        "사회·공동체": 9,
+        "공간·역사·장소": 0,
+        "문학·예술·문화": 0,
+        "철학·이론": 1,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 2,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 7,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 1,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "동아시아": {
+      "total": {
+        "사회·공동체": 12,
+        "공간·역사·장소": 4,
+        "문학·예술·문화": 3,
+        "철학·이론": 0,
+        "융복합/기타": 2
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 6,
+          "공간·역사·장소": 1,
+          "문학·예술·문화": 1,
+          "철학·이론": 0,
+          "융복합/기타": 1
+        },
+        "boom": {
+          "사회·공동체": 1,
+          "공간·역사·장소": 2,
+          "문학·예술·문화": 1,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 5,
+          "공간·역사·장소": 1,
+          "문학·예술·문화": 1,
+          "철학·이론": 0,
+          "융복합/기타": 1
+        }
+      }
+    },
+    "글로벌·역사·문명": {
+      "total": {
+        "사회·공동체": 4,
+        "공간·역사·장소": 3,
+        "문학·예술·문화": 2,
+        "철학·이론": 2,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 3,
+          "공간·역사·장소": 1,
+          "문학·예술·문화": 0,
+          "철학·이론": 2,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 1,
+          "공간·역사·장소": 2,
+          "문학·예술·문화": 1,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 1,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "들뢰즈": {
+      "total": {
+        "사회·공동체": 4,
+        "공간·역사·장소": 3,
+        "문학·예술·문화": 1,
+        "철학·이론": 3,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 2,
+          "문학·예술·문화": 1,
+          "철학·이론": 3,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 1,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 3,
+          "공간·역사·장소": 1,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "기본소득·분배": {
+      "total": {
+        "사회·공동체": 14,
+        "공간·역사·장소": 0,
+        "문학·예술·문화": 0,
+        "철학·이론": 0,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 6,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 8,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "하비": {
+      "total": {
+        "사회·공동체": 2,
+        "공간·역사·장소": 0,
+        "문학·예술·문화": 3,
+        "철학·이론": 2,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 1,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 1,
+          "철학·이론": 2,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 1,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 1,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 1,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "헤겔": {
+      "total": {
+        "사회·공동체": 0,
+        "공간·역사·장소": 0,
+        "문학·예술·문화": 0,
+        "철학·이론": 5,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 4,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 1,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "디지털 문화": {
+      "total": {
+        "사회·공동체": 11,
+        "공간·역사·장소": 0,
+        "문학·예술·문화": 3,
+        "철학·이론": 2,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 2,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 1,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 8,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 3,
+          "철학·이론": 2,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "칸트": {
+      "total": {
+        "사회·공동체": 2,
+        "공간·역사·장소": 0,
+        "문학·예술·문화": 1,
+        "철학·이론": 1,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 1,
+          "철학·이론": 1,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 2,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "버틀러": {
+      "total": {
+        "사회·공동체": 7,
+        "공간·역사·장소": 1,
+        "문학·예술·문화": 1,
+        "철학·이론": 0,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 2,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 1,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 2,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 3,
+          "공간·역사·장소": 1,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        }
+      }
+    },
+    "포스트휴먼·사이보그": {
+      "total": {
+        "사회·공동체": 0,
+        "공간·역사·장소": 0,
+        "문학·예술·문화": 1,
+        "철학·이론": 1,
+        "융복합/기타": 0
+      },
+      "temporal": {
+        "past": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "boom": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 0,
+          "철학·이론": 0,
+          "융복합/기타": 0
+        },
+        "recent": {
+          "사회·공동체": 0,
+          "공간·역사·장소": 0,
+          "문학·예술·문화": 1,
+          "철학·이론": 1,
+          "융복합/기타": 0
+        }
+      }
+    }
   }
 };

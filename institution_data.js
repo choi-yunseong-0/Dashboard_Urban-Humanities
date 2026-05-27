@@ -8,11 +8,11 @@ window.INSTITUTION_DATA = {
       "avgCit": 3.6,
       "totalCit": 699,
       "perspectives": {
-        "사회·공동체": 84,
-        "공간·역사·장소": 25,
+        "사회·공동체": 82,
+        "공간·역사·장소": 30,
         "문학·예술·문화": 30,
         "철학·이론": 20,
-        "융복합/기타": 37
+        "융복합/기타": 34
       },
       "topAuthors": [
         {
@@ -1393,8 +1393,8 @@ window.INSTITUTION_DATA = {
       "totalCit": 22,
       "perspectives": {
         "사회·공동체": 2,
-        "공간·역사·장소": 0,
-        "문학·예술·문화": 2,
+        "공간·역사·장소": 1,
+        "문학·예술·문화": 1,
         "철학·이론": 0,
         "융복합/기타": 0
       },
@@ -1666,10 +1666,10 @@ window.INSTITUTION_DATA = {
       "totalCit": 1,
       "perspectives": {
         "사회·공동체": 2,
-        "공간·역사·장소": 0,
+        "공간·역사·장소": 1,
         "문학·예술·문화": 0,
         "철학·이론": 0,
-        "융복합/기타": 1
+        "융복합/기타": 0
       },
       "topAuthors": [
         {
@@ -1740,8 +1740,8 @@ window.INSTITUTION_DATA = {
       "totalCit": 4,
       "perspectives": {
         "사회·공동체": 1,
-        "공간·역사·장소": 0,
-        "문학·예술·문화": 1,
+        "공간·역사·장소": 1,
+        "문학·예술·문화": 0,
         "철학·이론": 0,
         "융복합/기타": 1
       },
@@ -2323,10 +2323,10 @@ window.INSTITUTION_DATA = {
       "totalCit": 8,
       "perspectives": {
         "사회·공동체": 2,
-        "공간·역사·장소": 0,
+        "공간·역사·장소": 1,
         "문학·예술·문화": 0,
         "철학·이론": 0,
-        "융복합/기타": 1
+        "융복합/기타": 0
       },
       "topAuthors": [
         {
@@ -3614,9 +3614,9 @@ window.INSTITUTION_DATA = {
       "perspectives": {
         "사회·공동체": 0,
         "공간·역사·장소": 1,
-        "문학·예술·문화": 0,
+        "문학·예술·문화": 1,
         "철학·이론": 0,
-        "융복합/기타": 1
+        "융복합/기타": 0
       },
       "topAuthors": [
         {
@@ -3763,11 +3763,11 @@ window.INSTITUTION_DATA = {
       "avgCit": 2.5,
       "totalCit": 5,
       "perspectives": {
-        "사회·공동체": 1,
+        "사회·공동체": 2,
         "공간·역사·장소": 0,
         "문학·예술·문화": 0,
         "철학·이론": 0,
-        "융복합/기타": 1
+        "융복합/기타": 0
       },
       "topAuthors": [
         {
@@ -4192,10 +4192,10 @@ window.INSTITUTION_DATA = {
       "totalCit": 0,
       "perspectives": {
         "사회·공동체": 0,
-        "공간·역사·장소": 0,
+        "공간·역사·장소": 1,
         "문학·예술·문화": 0,
         "철학·이론": 0,
-        "융복합/기타": 1
+        "융복합/기타": 0
       },
       "topAuthors": [
         {
@@ -4653,10 +4653,10 @@ window.INSTITUTION_DATA = {
       "totalCit": 1,
       "perspectives": {
         "사회·공동체": 0,
-        "공간·역사·장소": 0,
+        "공간·역사·장소": 1,
         "문학·예술·문화": 0,
         "철학·이론": 0,
-        "융복합/기타": 1
+        "융복합/기타": 0
       },
       "topAuthors": [
         {
@@ -4917,10 +4917,10 @@ window.INSTITUTION_DATA = {
       "totalCit": 0,
       "perspectives": {
         "사회·공동체": 0,
-        "공간·역사·장소": 0,
+        "공간·역사·장소": 1,
         "문학·예술·문화": 0,
         "철학·이론": 0,
-        "융복합/기타": 1
+        "융복합/기타": 0
       },
       "topAuthors": [
         {
@@ -4971,10 +4971,10 @@ window.INSTITUTION_DATA = {
       "totalCit": 0,
       "perspectives": {
         "사회·공동체": 0,
-        "공간·역사·장소": 0,
+        "공간·역사·장소": 1,
         "문학·예술·문화": 0,
         "철학·이론": 0,
-        "융복합/기타": 1
+        "융복합/기타": 0
       },
       "topAuthors": [
         {
@@ -5295,10 +5295,10 @@ window.INSTITUTION_DATA = {
       "totalCit": 0,
       "perspectives": {
         "사회·공동체": 0,
-        "공간·역사·장소": 0,
+        "공간·역사·장소": 1,
         "문학·예술·문화": 0,
         "철학·이론": 0,
-        "융복합/기타": 1
+        "융복합/기타": 0
       },
       "topAuthors": [
         {
@@ -5637,10 +5637,10 @@ window.INSTITUTION_DATA = {
       "totalCit": 0,
       "perspectives": {
         "사회·공동체": 0,
-        "공간·역사·장소": 0,
+        "공간·역사·장소": 1,
         "문학·예술·문화": 0,
         "철학·이론": 0,
-        "융복합/기타": 1
+        "융복합/기타": 0
       },
       "topAuthors": [
         {
@@ -5758,9 +5758,9 @@ window.INSTITUTION_DATA = {
       "perspectives": {
         "사회·공동체": 0,
         "공간·역사·장소": 0,
-        "문학·예술·문화": 0,
+        "문학·예술·문화": 1,
         "철학·이론": 0,
-        "융복합/기타": 1
+        "융복합/기타": 0
       },
       "topAuthors": [
         {
@@ -6179,10 +6179,10 @@ window.INSTITUTION_DATA = {
       "totalCit": 0,
       "perspectives": {
         "사회·공동체": 0,
-        "공간·역사·장소": 0,
+        "공간·역사·장소": 1,
         "문학·예술·문화": 0,
         "철학·이론": 0,
-        "융복합/기타": 1
+        "융복합/기타": 0
       },
       "topAuthors": [
         {
@@ -6880,10 +6880,10 @@ window.INSTITUTION_DATA = {
       "totalCit": 0,
       "perspectives": {
         "사회·공동체": 0,
-        "공간·역사·장소": 0,
+        "공간·역사·장소": 1,
         "문학·예술·문화": 0,
         "철학·이론": 0,
-        "융복합/기타": 1
+        "융복합/기타": 0
       },
       "topAuthors": [
         {
@@ -7450,10 +7450,10 @@ window.INSTITUTION_DATA = {
       "totalCit": 0,
       "perspectives": {
         "사회·공동체": 0,
-        "공간·역사·장소": 0,
+        "공간·역사·장소": 1,
         "문학·예술·문화": 0,
         "철학·이론": 0,
-        "융복합/기타": 1
+        "융복합/기타": 0
       },
       "topAuthors": [
         {
@@ -7557,11 +7557,11 @@ window.INSTITUTION_DATA = {
       "avgCit": 1.0,
       "totalCit": 1,
       "perspectives": {
-        "사회·공동체": 0,
+        "사회·공동체": 1,
         "공간·역사·장소": 0,
         "문학·예술·문화": 0,
         "철학·이론": 0,
-        "융복합/기타": 1
+        "융복합/기타": 0
       },
       "topAuthors": [
         {
@@ -7645,11 +7645,11 @@ window.INSTITUTION_DATA = {
         ],
         "boom": [
           {
-            "keyword": "공유·커먼즈",
+            "keyword": "기본소득·분배",
             "count": 8
           },
           {
-            "keyword": "기본소득·분배",
+            "keyword": "공유·커먼즈",
             "count": 8
           },
           {
@@ -7824,7 +7824,7 @@ window.INSTITUTION_DATA = {
             "count": 1
           },
           {
-            "keyword": "칸트",
+            "keyword": "공동체·돌봄",
             "count": 1
           }
         ]
@@ -7875,7 +7875,7 @@ window.INSTITUTION_DATA = {
             "count": 1
           },
           {
-            "keyword": "유럽 중세사",
+            "keyword": "벤야민",
             "count": 1
           }
         ]
@@ -7918,11 +7918,11 @@ window.INSTITUTION_DATA = {
       "temporal": {
         "past": [
           {
-            "keyword": "도시 공간과 장소",
+            "keyword": "글로벌·역사·문명",
             "count": 1
           },
           {
-            "keyword": "글로벌·역사·문명",
+            "keyword": "도시 공간과 장소",
             "count": 1
           }
         ],
@@ -7997,11 +7997,11 @@ window.INSTITUTION_DATA = {
       "temporal": {
         "past": [
           {
-            "keyword": "도시 공간과 장소",
+            "keyword": "도시 정책과 재생",
             "count": 1
           },
           {
-            "keyword": "도시 정책과 재생",
+            "keyword": "도시 공간과 장소",
             "count": 1
           }
         ],
@@ -8040,11 +8040,11 @@ window.INSTITUTION_DATA = {
         ],
         "recent": [
           {
-            "keyword": "도시 공간과 장소",
+            "keyword": "도시 정책과 재생",
             "count": 1
           },
           {
-            "keyword": "도시 정책과 재생",
+            "keyword": "도시 공간과 장소",
             "count": 1
           }
         ]
