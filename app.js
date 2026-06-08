@@ -369,32 +369,92 @@ function initStackedChart() {
 /* ── 4계층: Top 10 테이블 ── */
 function initTop10Table() {
   const tbody = document.getElementById('top10-body');
-  const maxCit = DATA.top10[0].citations;
+  
+  // 전처리된 데이터가 있으면 이를 사용해 동적 렌더링
+  const papersData = window.TOP_PAPERS_DATA ? window.TOP_PAPERS_DATA.anatomyData.slice(0, 10) : DATA.top10;
+  const isDynamic = !!window.TOP_PAPERS_DATA;
+  const maxCit = isDynamic ? papersData[0].cit : papersData[0].citations;
 
-  DATA.top10.forEach(paper => {
-    const rankClass = paper.rank <= 3 ? `rank-${paper.rank}` : 'rank-other';
-    const barWidth = Math.round(paper.citations / maxCit * 100);
+  const pColors = {
+    '사회·공동체': '#f43f5e',
+    '공간·역사·장소': '#10b981',
+    '문학·예술·문화': '#f59e0b',
+    '철학·이론': '#8b5cf6',
+    '융복합/기타': '#64748b'
+  };
 
+  papersData.forEach((p, idx) => {
+    const rank = isDynamic ? (idx + 1) : p.rank;
+    const year = p.year;
+    const title = p.title;
+    const author = p.author;
+    const citations = isDynamic ? p.cit : p.citations;
+    
+    const perspName = isDynamic ? p.perspective : (p.perspective ? p.perspective.name : '');
+    const perspColor = pColors[perspName] || '#8b5cf6';
+    
     // 관점 배지 HTML
-    const badge = paper.perspective
-      ? `<span class="persp-badge" style="background:${paper.perspective.color}18; color:${paper.perspective.color}; border:1px solid ${paper.perspective.color}44;">${paper.perspective.name}</span>`
+    const badge = perspName
+      ? `<span class="persp-badge" style="background:${perspColor}18; color:${perspColor}; border:1px solid ${perspColor}44;">${perspName}</span>`
       : '';
 
-    // 키워드 태그 HTML
-    const tags = paper.tags
-      ? paper.tags.map(t => `<span class="paper-tag">#${t}</span>`).join('')
-      : '';
+    // 키워드 태그 HTML (세미콜론 또는 쉼표로 분리 후 최대 3개 표시)
+    let tagsHtml = '';
+    if (isDynamic && p.keywords) {
+      const kws = p.keywords.split(/[,;]/).map(k => k.trim()).filter(k => k);
+      tagsHtml = kws.slice(0, 3).map(t => `<span class="paper-tag">#${t}</span>`).join('');
+    } else if (!isDynamic && p.tags) {
+      tagsHtml = p.tags.map(t => `<span class="paper-tag">#${t}</span>`).join('');
+    }
+
+    const rankClass = rank <= 3 ? `rank-${rank}` : 'rank-other';
+    const barWidth = Math.round(citations / maxCit * 100);
 
     const tr = document.createElement('tr');
+    tr.style.cursor = 'pointer';
+    tr.style.transition = 'background-color 0.2s';
+    tr.onmouseenter = () => tr.style.backgroundColor = 'rgba(0,0,0,0.02)';
+    tr.onmouseleave = () => tr.style.backgroundColor = 'transparent';
+    
+    tr.onclick = () => {
+      // 1. 디테일 뷰(슈퍼 페이퍼 해부학) 열기
+      showDetailView('top-papers');
+      
+      // 2. 해당 인덱스 논문 상세정보 렌더링 호출
+      if (window.renderAnatomyDetail) {
+        window.renderAnatomyDetail(idx);
+      }
+      
+      // 3. 약간의 딜레이 후(뷰 전환 애니메이션 대기) 좌측 리스트에서 해당 항목으로 세로 스크롤 이동
+      setTimeout(() => {
+        const anatomyList = document.getElementById('anatomy-list');
+        if (anatomyList) {
+          const listItems = anatomyList.querySelectorAll('.anatomy-list-item');
+          if (listItems[idx]) {
+            // 부드럽게 세로 스크롤
+            listItems[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+            
+            // 깜빡이는 하이라이트 효과 (시각적 피드백)
+            listItems[idx].style.transition = 'all 0.3s ease';
+            listItems[idx].style.boxShadow = '0 0 0 3px rgba(139, 92, 246, 0.4)';
+            
+            setTimeout(() => {
+              listItems[idx].style.boxShadow = 'var(--shadow-sm)';
+            }, 1000);
+          }
+        }
+      }, 350);
+    };
+
     tr.innerHTML = `
-      <td><span class="rank-badge ${rankClass}">${paper.rank}</span></td>
-      <td class="year-cell">${paper.year}</td>
+      <td><span class="rank-badge ${rankClass}">${rank}</span></td>
+      <td class="year-cell">${year}</td>
       <td class="title-cell">
-        <div class="title-main">${paper.title}</div>
-        <div class="title-meta">${badge}${tags}</div>
+        <div class="title-main">${title}</div>
+        <div class="title-meta">${badge}${tagsHtml}</div>
       </td>
-      <td class="author-cell">${paper.author}</td>
-      <td class="cit-cell">${paper.citations}</td>
+      <td class="author-cell">${author}</td>
+      <td class="cit-cell">${citations}</td>
       <td>
         <div class="cit-bar-wrap">
           <div class="cit-bar" style="width:0%" data-width="${barWidth}%"></div>
@@ -716,6 +776,7 @@ function showDetailView(viewId) {
     if (viewId === 'discourse') { initStreamChart(); }
     if (viewId === 'region') { initRegionView(); }
     if (viewId === 'perspective') { initPerspectiveView(); }
+    if (viewId === 'top-papers') { initTopPapersDetail(); }
   } catch(e) {
     console.error('showDetailView 에러:', e);
     alert('화면 전환 중 오류가 발생했습니다: ' + e.message);
@@ -734,16 +795,16 @@ function hideDetailView() {
    KPI 상세 | 연구 생태계 도넛 차트
 ══════════════════════════════════════════ */
 const CORE_AUTHORS = [
-  { name: '홍남희',  count: 18, firstAuthor: 15, affiliation: '서울시립대', field: '신문방송학' },
-  { name: '유인혁',  count: 16, firstAuthor: 16, affiliation: '서울시립대', field: '국어국문학' },
+  { name: '홍남희',  count: 14, firstAuthor: 14, affiliation: '서울시립대', field: '신문방송학' },
+  { name: '유인혁',  count: 15, firstAuthor: 15, affiliation: '서울시립대', field: '국어국문학' },
   { name: '홍용진',  count: 15, firstAuthor: 15, affiliation: '서울시립대', field: '역사학' },
-  { name: '김은주',  count: 14, firstAuthor: 13, affiliation: '서울시립대', field: '인문학' },
-  { name: '곽노완',  count: 14, firstAuthor: 14, affiliation: '서울시립대', field: '인문학' },
-  { name: '김태연',  count: 11, firstAuthor: 10, affiliation: '서울대', field: '인문학' },
-  { name: '정희원',  count: 11, firstAuthor: 11, affiliation: '서울시립대', field: '영문학' },
-  { name: '오창룡',  count:  7, firstAuthor:  7, affiliation: '서울시립대', field: '사회과학' },
-  { name: '노영희',  count:  6, firstAuthor:  5, affiliation: '건국대', field: '문헌정보학' },
-  { name: '심광현',  count:  5, firstAuthor:  5, affiliation: '한국예술종합학교', field: '인문학' },
+  { name: '김은주',  count: 13, firstAuthor: 13, affiliation: '서울시립대', field: '인문학' },
+  { name: '곽노완',  count: 14, firstAuthor: 14, affiliation: '서울시립대', field: '경제학' },
+  { name: '정희원',  count: 11, firstAuthor: 11, affiliation: '서울시립대', field: '국어국문학' },
+  { name: '김태연',  count: 10, firstAuthor: 10, affiliation: '서울대', field: '독어독문학' },
+  { name: '오창룡',  count: 6,  firstAuthor: 6,  affiliation: '고려대', field: '정치학' },
+  { name: '이양숙',  count: 5,  firstAuthor: 5,  affiliation: '서울시립대', field: '영어영문학' },
+  { name: '심광현',  count: 5,  firstAuthor: 5,  affiliation: '한국예술종합학교', field: '미학' }
 ];
 
 let ecosystemDonutChart = null;
@@ -11694,4 +11755,331 @@ function showLocalPapersModal() {
 function hideLocalPapersModal() {
   document.getElementById('local-papers-modal').style.display = 'none';
   document.body.style.overflow = '';
+}
+
+/* ══════════════════════════════════════════
+   피인용 상위 논문 상세 (영향력 지형도 & 해부학)
+══════════════════════════════════════════ */
+let topPapersScatterChart = null;
+
+function initTopPapersDetail() {
+  const data = window.TOP_PAPERS_DATA;
+  if (!data) {
+    console.warn("TOP_PAPERS_DATA not found.");
+    return;
+  }
+  
+  // 1. 산점도 렌더링
+  const scatterEl = document.getElementById('top-papers-scatter');
+  if (scatterEl) {
+    if (topPapersScatterChart) topPapersScatterChart.dispose();
+    topPapersScatterChart = echarts.init(scatterEl);
+    
+    const colors = {
+      '사회·공동체': '#f43f5e',
+      '공간·역사·장소': '#10b981',
+      '문학·예술·문화': '#f59e0b',
+      '철학·이론': '#8b5cf6',
+      '융복합/기타': '#64748b'
+    };
+    
+    const cdColors = {
+      '문학/어문학': '#f59e0b',
+      '예술/무용/영화': '#ec4899',
+      '사회/지리/공간': '#10b981',
+      '교육학': '#3b82f6',
+      '철학/이론': '#8b5cf6',
+      '기타': '#94a3b8'
+    };
+    
+    const seriesData = data.scatterData.map((p, idx) => {
+      // 버블 크기: 참고문헌 수에 비례 (기본 15, 최대 60)
+      const symbolSize = Math.min(60, Math.max(15, p.ref_count * 0.8));
+      
+      // 후속 연구 학문 분야 계산 (가장 비중이 높은 분야 추출)
+      let domCitingDiscipline = '데이터 없음';
+      let domCitingColor = '#cbd5e1';
+      let citingTotal = p.citing_total || 0;
+      
+      if (p.citing_disciplines && citingTotal > 0) {
+        let maxVal = -1;
+        for (const [k, v] of Object.entries(p.citing_disciplines)) {
+          if (v > maxVal) {
+            maxVal = v;
+            domCitingDiscipline = k;
+          }
+        }
+        domCitingColor = cdColors[domCitingDiscipline] || '#94a3b8';
+      }
+
+      return {
+        name: p.title,
+        value: [p.year, p.cit, p.ref_count, p.perspective, p.author, domCitingDiscipline, citingTotal, domCitingColor],
+        symbolSize: symbolSize,
+        itemStyle: {
+          color: colors[p.perspective] || '#64748b',
+          opacity: 0.8,
+          borderColor: domCitingColor,
+          borderWidth: citingTotal > 0 ? 4 : 1
+        }
+      };
+    });
+    
+    const option = {
+      tooltip: {
+        trigger: 'item',
+        backgroundColor: 'rgba(255,255,255,0.95)',
+        borderColor: '#e2e8f0',
+        textStyle: { color: '#1e293b' },
+        formatter: function (params) {
+          const v = params.value;
+          
+          let citingHtml = '';
+          if (v[6] > 0) {
+            citingHtml = `<div style="margin-top:0.5rem; padding-top:0.5rem; border-top:1px dashed #cbd5e1; font-size:0.8rem; color:#475569;">
+                            <span style="font-weight:700;">주요 인용 학문:</span> <span style="color:${v[7]}; font-weight:800;">${v[5]}</span> (${v[6]}건 분석)
+                          </div>`;
+          }
+          
+          return `
+            <div style="font-size:0.8rem; font-weight:700; color:${params.color}; margin-bottom:0.2rem;">(본문) ${v[3]}</div>
+            <div style="font-size:0.95rem; font-weight:700; color:#0f172a; margin-bottom:0.4rem; max-width:300px; white-space:normal; line-height:1.4;">${params.name}</div>
+            <div style="font-size:0.8rem; color:#64748b;">
+              저자: <span style="color:#334155;">${v[4]}</span><br>
+              발행: <span style="color:#334155;">${v[0]}년</span><br>
+              인용: <span style="color:#334155; font-weight:700;">${v[1]}회</span><br>
+              참고문헌: <span style="color:#334155;">${v[2]}건</span>
+            </div>
+            ${citingHtml}
+          `;
+        }
+      },
+      grid: { left: '5%', right: '8%', bottom: '10%', top: '10%', containLabel: true },
+      xAxis: {
+        type: 'value',
+        name: '발행 연도',
+        nameLocation: 'middle',
+        nameGap: 30,
+        min: 2002,
+        max: 2026,
+        splitLine: { show: false },
+        axisLabel: { formatter: '{value}' }
+      },
+      yAxis: {
+        type: 'value',
+        name: '인용 횟수',
+        splitLine: { lineStyle: { type: 'dashed', color: '#e2e8f0' } }
+      },
+      series: [
+        {
+          type: 'scatter',
+          data: seriesData,
+          emphasis: {
+            focus: 'self',
+            itemStyle: { borderColor: '#333', borderWidth: 2 }
+          }
+        }
+      ]
+    };
+    
+    topPapersScatterChart.setOption(option);
+    
+    window.addEventListener('resize', () => {
+      if (topPapersScatterChart) topPapersScatterChart.resize();
+    });
+  }
+  
+  // 2. 해부학 카드 렌더링 (마스터-디테일 레이아웃)
+  const anatomyListEl = document.getElementById('anatomy-list');
+  const anatomyDetailEl = document.getElementById('anatomy-detail-content');
+  
+  if (anatomyListEl && anatomyDetailEl) {
+    const pColors = {
+      '사회·공동체': '#f43f5e',
+      '공간·역사·장소': '#10b981',
+      '문학·예술·문화': '#f59e0b',
+      '철학·이론': '#8b5cf6',
+      '융복합/기타': '#64748b'
+    };
+    
+    let listHtml = '';
+    
+    // 마스터 리스트 렌더링
+    data.anatomyData.forEach((p, idx) => {
+      const badgeHtml = p.badge ? `<span style="background:var(--bg-hover); color:var(--text-base); font-size:0.65rem; padding:0.15rem 0.4rem; border-radius:4px; font-weight:600; border:1px solid var(--border);">${p.badge}</span>` : '';
+      
+      listHtml += `
+        <div class="anatomy-list-item" data-idx="${idx}" style="cursor: pointer; padding: 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm); transition: all 0.2s; background: #fff;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.4rem;">
+            <div style="font-size: 0.75rem; font-weight: 800; color: #8b5cf6;">🏆 TOP ${idx+1}</div>
+            <div style="font-size: 0.75rem; font-weight: 600; color: var(--text-muted);">${p.cit}회 인용</div>
+          </div>
+          <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--text-base); line-height: 1.3; margin-bottom: 0.3rem; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${p.title}</h4>
+          <div style="font-size: 0.75rem; color: var(--text-muted); display:flex; justify-content:space-between;">
+            <span>${p.author}</span>
+            ${badgeHtml}
+          </div>
+        </div>
+      `;
+    });
+    
+    anatomyListEl.innerHTML = listHtml;
+    
+    // 디테일 렌더링 함수
+    let citingChartInstance = null;
+    
+    window.renderAnatomyDetail = function(idx) {
+      const p = data.anatomyData[idx];
+      if (!p) return;
+      
+      // 리스트 선택 상태 업데이트
+      document.querySelectorAll('.anatomy-list-item').forEach(el => {
+        if (parseInt(el.dataset.idx) === idx) {
+          el.style.borderColor = '#8b5cf6';
+          el.style.backgroundColor = '#f5f3ff';
+          el.style.boxShadow = 'var(--shadow-sm)';
+        } else {
+          el.style.borderColor = 'var(--border)';
+          el.style.backgroundColor = '#fff';
+          el.style.boxShadow = 'none';
+        }
+      });
+      
+      // DNA Bar
+      const totalKeys = Object.values(p.dna).reduce((a,b)=>a+b, 0);
+      let dnaBars = '';
+      if (totalKeys > 0) {
+        Object.keys(p.dna).forEach(key => {
+          const ratio = (p.dna[key] / totalKeys) * 100;
+          if (ratio > 0) {
+            dnaBars += `<div style="height:100%; width:${ratio}%; background-color:${pColors[key]||'#ccc'};" title="${key} ${ratio.toFixed(1)}%"></div>`;
+          }
+        });
+      } else {
+        dnaBars = `<div style="height:100%; width:100%; background-color:#e2e8f0;"></div>`;
+      }
+      
+      // 상세 패널 상단 (기본 정보 + DNA)
+      const badgeHtml = p.badge ? `<span style="background:var(--bg-hover); color:var(--text-base); font-size:0.75rem; padding:0.2rem 0.5rem; border-radius:4px; font-weight:600; border:1px solid var(--border);">${p.badge}</span>` : '';
+      
+      let detailHtml = `
+        <div style="margin-bottom: 0.5rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
+            <div style="font-size: 0.85rem; font-weight: 800; color: #8b5cf6; display:flex; align-items:center; gap:0.5rem;"><span style="font-size:1.2rem;">🏆</span> TOP ${idx+1} 슈퍼 페이퍼</div>
+            ${badgeHtml}
+          </div>
+          <h2 style="font-size: 1.4rem; font-weight: 800; color: var(--text-base); line-height: 1.4; margin-bottom: 0.8rem;">${p.title}</h2>
+          <div style="font-size: 0.9rem; color: var(--text-muted); display:flex; gap:1rem;">
+            <span><strong>저자:</strong> ${p.author}</span>
+            <span><strong>발행년도:</strong> ${p.year}년</span>
+            <span><strong>피인용 횟수:</strong> ${p.cit}회</span>
+          </div>
+        </div>
+        
+        <div style="background: #f8fafc; padding: 1.2rem; border-radius: var(--radius-md); border: 1px solid var(--border); margin-bottom: 0.5rem;">
+          <div style="font-size: 0.85rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 0.6rem;">관점 DNA 혼합률</div>
+          <div style="width:100%; height:12px; border-radius:6px; overflow:hidden; display:flex; margin-bottom:0.8rem;">
+            ${dnaBars}
+          </div>
+          <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">
+            <span style="font-weight:700; color:var(--text-secondary);">주요 키워드:</span> ${p.keywords}
+          </div>
+        </div>
+        
+        <!-- 인용 학문 분야 대형 차트 -->
+        <div style="flex:1; display:flex; flex-direction:column; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 1.5rem; background: #fff;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
+            <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--text-base); display:flex; align-items:center; gap:0.5rem;"><span style="font-size:1.2rem;">🔭</span> 인용 학문 분야 (Methodological Lens)</h4>
+            <div style="font-size: 0.8rem; color: var(--text-muted); background:var(--bg-hover); padding:0.2rem 0.6rem; border-radius:4px;">${p.citing_total > 0 ? p.citing_total + '건 분석됨' : '수집 대기 중'}</div>
+          </div>
+          <div id="citing-disciplines-chart" style="width: 100%; flex:1; min-height: 300px;"></div>
+        </div>
+      `;
+      
+      anatomyDetailEl.innerHTML = detailHtml;
+      
+      // ECharts 렌더링
+      if (citingChartInstance) {
+        citingChartInstance.dispose();
+      }
+      
+      const chartDom = document.getElementById('citing-disciplines-chart');
+      if (chartDom && p.citing_total > 0 && p.citing_disciplines) {
+        citingChartInstance = echarts.init(chartDom);
+        
+        const cdColors = {
+          '문학/어문학': '#f59e0b',
+          '예술/무용/영화': '#ec4899',
+          '사회/지리/공간': '#10b981',
+          '교육학': '#3b82f6',
+          '철학/이론': '#8b5cf6',
+          '기타': '#94a3b8'
+        };
+        
+        const chartData = Object.keys(p.citing_disciplines)
+          .filter(k => p.citing_disciplines[k] > 0)
+          .map(k => ({
+            name: k,
+            value: p.citing_disciplines[k],
+            itemStyle: { color: cdColors[k] }
+          }))
+          .sort((a, b) => b.value - a.value); // 크기순 정렬
+          
+        const option = {
+          tooltip: {
+            trigger: 'item',
+            formatter: '{b}: {c}건 ({d}%)'
+          },
+          legend: {
+            orient: 'vertical',
+            right: 10,
+            top: 'center',
+            textStyle: { color: '#64748b', fontSize: 12 }
+          },
+          series: [
+            {
+              name: '인용 학문 분야',
+              type: 'pie',
+              radius: ['45%', '80%'], // 도넛 형태
+              center: ['40%', '50%'],
+              avoidLabelOverlap: false,
+              itemStyle: {
+                borderRadius: 6,
+                borderColor: '#fff',
+                borderWidth: 2
+              },
+              label: {
+                show: true,
+                position: 'outside',
+                formatter: '{b}\n{d}%',
+                color: '#64748b',
+                fontSize: 11
+              },
+              labelLine: {
+                show: true,
+                smooth: 0.2,
+                length: 10,
+                length2: 15
+              },
+              data: chartData
+            }
+          ]
+        };
+        citingChartInstance.setOption(option);
+      } else if (chartDom) {
+        chartDom.innerHTML = `<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:0.9rem;">아직 피인용 텍스트 데이터가 수집되지 않았습니다.</div>`;
+      }
+    };
+    
+    // 리스트 클릭 이벤트 바인딩
+    document.querySelectorAll('.anatomy-list-item').forEach(el => {
+      el.addEventListener('click', (e) => {
+        const idx = parseInt(e.currentTarget.dataset.idx);
+        renderAnatomyDetail(idx);
+      });
+    });
+    
+    // 초기 렌더링 (1위 논문)
+    renderAnatomyDetail(0);
+  }
 }

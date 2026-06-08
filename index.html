@@ -103,13 +103,13 @@
           </div>
           <div class="kpi-divider"></div>
           <div class="kpi-item" id="kpi-citations">
-            <span class="kpi-item-value" data-target="1669">0</span>
+            <span class="kpi-item-value" data-target="1491">0</span>
             <span class="kpi-item-unit">회</span>
             <span class="kpi-item-label">총 인용 횟수</span>
           </div>
           <div class="kpi-divider"></div>
           <div class="kpi-item" id="kpi-institutions">
-            <span class="kpi-item-value" data-target="97">0</span>
+            <span class="kpi-item-value" data-target="137">0</span>
             <span class="kpi-item-unit">곳</span>
             <span class="kpi-item-label">참여 기관</span>
           </div>
@@ -288,12 +288,17 @@
          4계층 | 피인용 횟수 Top 10
     ══════════════════════════════════════════ -->
     <section class="section top10-section" aria-label="피인용 횟수 Top 10 논문">
-      <div class="section-header">
-        <h2 class="section-title">
-          <span class="section-num">03</span>
-          피인용 횟수 Top 10 논문
-        </h2>
-        <p class="section-desc">도시인문학 연구 분야에서 가장 많이 인용된 논문</p>
+      <div class="section-header" style="display: flex; justify-content: space-between; align-items: flex-end;">
+        <div>
+          <h2 class="section-title">
+            <span class="section-num">03</span>
+            피인용 횟수 Top 10 논문
+          </h2>
+          <p class="section-desc">도시인문학 연구 분야에서 가장 많이 인용된 논문</p>
+        </div>
+        <button class="detail-btn" onclick="showDetailView('top-papers')">
+          DEEP DIVE <span class="detail-btn-arrow">›</span>
+        </button>
       </div>
       <div class="top10-table-wrap">
         <table class="top10-table" id="top10-table">
@@ -747,6 +752,56 @@
     </div>
   </div>
 
+  <!-- ══════════════════════════════════════════
+       상세 뷰 | 영향력 지형도 및 해부학 (Top Papers)
+  ══════════════════════════════════════════ -->
+  <div id="detail-top-papers" class="detail-view hidden">
+    <div class="detail-header">
+      <div class="detail-header-inner">
+        <button class="back-btn" onclick="hideDetailView()"><span class="back-arrow">←</span> 대시보드 홈으로</button>
+        <div class="detail-header-title">
+          <span class="detail-badge">DEEP DIVE</span>
+          <h2>영향력 지형도와 슈퍼 페이퍼 해부학</h2>
+          <p>가장 많이 인용된 핵심 문헌들이 어떻게 지식의 지형을 형성하고 융합되는지 분석합니다</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-body" style="grid-template-columns: 1fr; max-width: 1400px; padding-bottom: 5rem;">
+      
+      <!-- 상단: 산점도 영역 -->
+      <div class="detail-card" style="margin-bottom: 2rem;">
+        <div class="detail-card-header">
+          <h3 style="display:flex; align-items:center; gap:0.5rem;"><span style="font-size:1.2rem;">🌌</span> 핵심 문헌 지형도 (Top 50)</h3>
+          <p>발행 연도와 인용 횟수를 기반으로 핵심 문헌들의 위치를 시각화합니다. 버블의 크기는 논문이 참조한 참고문헌의 수를 나타냅니다.</p>
+        </div>
+        <div id="top-papers-scatter" style="width: 100%; height: 500px; background: #fafafa; border-radius: var(--radius-md);"></div>
+      </div>
+
+      <!-- 하단: 해부학 카드 (마스터-디테일) -->
+      <div>
+        <div style="margin-bottom: 1.5rem;">
+          <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--text-base); display:flex; align-items:center; gap:0.5rem;"><span style="font-size:1.2rem;">🧬</span> 슈퍼 페이퍼 해부학 (Top 20)</h3>
+          <p style="font-size: 0.9rem; color: var(--text-muted);">가장 파급력이 큰 논문들을 해부하여 인용 학문 분야(Methodological Lens)와 관점 혼합률을 뜯어봅니다.</p>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 380px 1fr; gap: 2rem; align-items: start;">
+          <!-- 좌측: 논문 리스트 (Master) -->
+          <div class="detail-card" style="padding: 1rem; height: 650px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem;" id="anatomy-list">
+            <!-- JS로 채움 -->
+          </div>
+          
+          <!-- 우측: 논문 상세 정보 (Detail) -->
+          <div class="detail-card" id="anatomy-detail" style="display: flex; flex-direction: column; gap: 1.5rem; min-height: 650px;">
+            <div id="anatomy-detail-content" style="flex: 1; display: flex; flex-direction: column; gap: 1.5rem;">
+              <!-- JS로 상세 정보 및 차트 채움 -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- 이론적 토대 상세 뷰 (전체화면 오버레이) -->
   <div id="theory-detail-view" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #f8fafc; z-index: 1000; overflow-y: auto; overflow-x: hidden;">
     <!-- 상단 헤더 -->
@@ -887,6 +942,7 @@
   <script src="theme_data.js"></script>
   <script src="keyword_authors.js"></script>
   <script src="theory_data.js"></script>
+  <script src="top_papers_data.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
